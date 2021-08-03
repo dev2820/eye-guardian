@@ -1,6 +1,6 @@
 <template>
-    <div id="warning-message" :style=regularTopStyle>
-        <span class="icon">icon</span>
+    <div id="warning-message" :style="regularTopStyle">
+        <font-awesome-icon icon="exclamation-triangle" class="icon"/>
         <span class="message">{{message}}</span>
     </div>
 </template>
@@ -31,7 +31,7 @@ export default {
 <style scoped>
 #warning-message {
     position:fixed;
-    background: rgba(127,127,127,0.8);
+    background: rgba(127,127,127,0.9);
     border-radius:8px;
     text-align:center;
     font-weight:bold;
@@ -43,5 +43,9 @@ export default {
 #warning-message .icon,
 #warning-message .message {
     margin:auto 0;
+}
+#warning-message .icon {
+    width:50px;
+    font-size:1.5em;
 }
 </style>

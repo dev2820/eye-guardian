@@ -41,6 +41,7 @@ function createWindow () {
   blueScreenWindow.setIgnoreMouseEvents(true);
 
   warningMessageWindow = new BrowserWindow({
+    fullscreen:true,
     frame:false,
     transparent:true,
     alwaysOnTop :true,
