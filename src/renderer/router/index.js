@@ -21,6 +21,11 @@ export default new Router({
       component: require('@/components/BlueScreen').default
     },
     {
+      path: '/warningMessage',
+      name: 'warning-message',
+      component: require('@/components/WarningMessage').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

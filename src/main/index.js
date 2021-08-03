@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let settingWindow,blueScreenWindow
+let settingWindow,blueScreenWindow,warningMessageWindow
 let tray = null
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
@@ -39,6 +39,19 @@ function createWindow () {
   })
   blueScreenWindow.loadURL(winURL+'/#/blueScreen')
   blueScreenWindow.setIgnoreMouseEvents(true);
+
+  warningMessageWindow = new BrowserWindow({
+    frame:false,
+    transparent:true,
+    alwaysOnTop :true,
+    focusable:false,
+    resizable:false,
+    webPreferences: {
+      devTools: false
+    },
+  })
+  warningMessageWindow.loadURL(winURL+'/#/warningMessage')
+  warningMessageWindow.setIgnoreMouseEvents(true);
 
   tray = new Tray(path.join(__dirname,'/assets/images/icon.ico'));
   const contextMenu = Menu.buildFromTemplate([
