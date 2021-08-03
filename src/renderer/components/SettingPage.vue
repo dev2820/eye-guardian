@@ -4,9 +4,9 @@
         <span>{{main}}</span>
         <button @click="increase">state increase</button>
         <button @click="decrease">state decrease</button>
-        {{isBlueScreenOn}}
-        <button @click="showBlueScreen(true)">bluescreen on</button>
-        <button @click="showBlueScreen(false)">bluescreen off</button>
+        {{isBlueLightFilterOn}}
+        <button @click="showBlueLightFilter(true)">BlueLightFilter on</button>
+        <button @click="showBlueLightFilter(false)">BlueLightFilter off</button>
     </div>
 </template>
 
@@ -21,31 +21,30 @@ export default {
     },
     mounted(){
         // console.log(this.$store.state)
-        ipc.on('BLUESCREEN_CONTROL',(e,payload)=>{
-            this.showBlueScreen(payload);
+        ipc.on('BLUELIGHT_FILTER_CONTROL',(e,payload)=>{
+            this.showBlueLightFilter(payload);
         })
     },
     computed: {
         ...mapState({
             main: state=>state.Counter.main,
-            isBlueScreenOn: state=>state.BlueScreen.show
+            isBlueLightFilterOn: state=>state.BlueLightFilter.show
         })
     },
     methods: {
-        ...mapActions(['showBlueScreen,hideBlueScreen']),
-        showBlueScreen(boolean){
+        ...mapActions(['showBlueLightFilter,hideBlueLightFilter']),
+        showBlueLightFilter(boolean){
             if(boolean){
-                this.$store.dispatch('showBlueScreen');
+                this.$store.dispatch('showBlueLightFilter');
             }
             else {
-                this.$store.dispatch('hideBlueScreen');
+                this.$store.dispatch('hideBlueLightFilter');
             }
         },
         increase(){
             this.$store.dispatch('someAsyncTask')
         },
         decrease(){
-            console.log(this.main)
             this.$store.dispatch('someAsyncTask')
         }
     }

@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let settingWindow,blueScreenWindow,warningMessageWindow
+let settingWindow,blueLightFilterWindow,warningMessageWindow
 let tray = null
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
@@ -26,7 +26,7 @@ function createWindow () {
   })
   settingWindow.loadURL(winURL)
 
-  blueScreenWindow = new BrowserWindow({
+  blueLightFilterWindow = new BrowserWindow({
     fullscreen:true,
     frame:false,
     transparent:true,
@@ -37,8 +37,8 @@ function createWindow () {
       devTools: false
     },
   })
-  blueScreenWindow.loadURL(winURL+'/#/blueScreen')
-  blueScreenWindow.setIgnoreMouseEvents(true);
+  blueLightFilterWindow.loadURL(winURL+'/#/blueLightFilter')
+  blueLightFilterWindow.setIgnoreMouseEvents(true);
 
   warningMessageWindow = new BrowserWindow({
     fullscreen:true,
@@ -67,7 +67,7 @@ function createWindow () {
       label: 'exit',
       type: 'normal',
       click(){
-        blueScreenWindow.destroy();
+        blueLightFilterWindow.destroy();
         settingWindow.destroy();
       }
     },
@@ -85,12 +85,12 @@ function createWindow () {
   settingWindow.on('closed',()=>{
     settingWindow = null
   })
-  blueScreenWindow.on('closed',()=>{
-    blueScreenWindow = null;
+  blueLightFilterWindow.on('closed',()=>{
+    blueLightFilterWindow = null;
   })
 }
 setTimeout(()=>{
-  settingWindow.send('BLUESCREEN_CONTROL',true);//블루스크린을 켜는 ipc 통신
+  settingWindow.send('BLUELIGHT_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
 },5000);
 app.on('ready', createWindow)
 
