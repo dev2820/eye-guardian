@@ -50,7 +50,7 @@ export default {
         })
     },
     methods: {
-        ...mapActions(['showBlueLightFilter,hideBlueLightFilter']),
+        ...mapActions(['showBlueLightFilter,hideBlueLightFilter','setWarningMode']),
         showBlueLightFilter(boolean){
             if(boolean){
                 this.$store.dispatch('showBlueLightFilter');
@@ -79,6 +79,9 @@ export default {
         },
         hideGuidText(){
             this.showGuide=false;
+        },
+        changeMessageMode(mode) {
+            this.$store.dispatch('setWarningMode',mode);
         }
     }
 }
