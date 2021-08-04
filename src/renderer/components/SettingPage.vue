@@ -21,6 +21,9 @@
         <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
         <hr/>
         <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuidText()"/>
+        blueLight 설정<input type="range" :value="blueLightFigure" @change="setBlueLightFigure($event)" min="0" max="0.5" step="0.01">
+        <hr/>
+        화면 명도 설정<input type="range" :value="darkness" @change="setDarkness($event)" min="0" max="0.5" step="0.01">
     </div>
 </template>
 
@@ -37,6 +40,8 @@ export default {
                 top:0,
                 left:0
             },
+            darknessModel:0,
+            blueLightFigureModel:0
         }
     },
     components: { 
@@ -46,17 +51,26 @@ export default {
         ipc.on('SCREEN_FILTER_CONTROL',(e,payload)=>{
             this.showScreenFilter(payload);
         })
+
     },
     computed: {
         ...mapState({
             main: state=>state.Counter.main,
             isScreenFilterOn: state=>state.ScreenFilter.show,
-            duration: state=>state.WarningMessage.duration
-
+            duration: state=>state.WarningMessage.duration,
+            darkness: state=>state.ScreenFilter.darkness,
+            blueLightFigure: state=>state.ScreenFilter.blueLightFigure,
         })
     },
     methods: {
-        ...mapActions(['showFilter,hideFilter','setWarningMode','insertWarningMessage','clearWarningMEssage']),
+        ...mapActions([
+            'showFilter,hideFilter',
+            'setWarningMode',
+            'insertWarningMessage',
+            'clearWarningMEssage',
+            'setDarkness',
+            'setBlueLightFigure'
+        ]),
         showScreenFilter(boolean){
             if(boolean){
                 this.$store.dispatch('showFilter');
@@ -93,6 +107,12 @@ export default {
         },
         clearMessage(){
             this.$store.dispatch('clearWarningMEssage');
+        },
+        setDarkness(e){
+            this.$store.dispatch('setDarkness',e.target.value);
+        },
+        setBlueLightFigure(e){
+            this.$store.dispatch('setBlueLightFigure',e.target.value);
         }
     }
 }
