@@ -1,6 +1,8 @@
 <template>
-    <div id="tooltip" :class="{show:show}">
-        {{message}}
+    <div id="tooltip" :class="{show:show}" :style="{left:tooltipLeft,top:tooltipTop}">
+        <slot></slot>
+        {{tooltipLeft}}
+        {{tooltipTop}}
         <span class="tail">▼</span>
     </div>
 </template>
@@ -17,19 +19,19 @@ export default {
             type:Object,
             default:()=>{
                 return {
-                    x:0,
-                    y:0
+                    left:0,
+                    top:0
                 }
             }
         },
-        message:{
-            type:String,
-            default:()=>''
-        }
     },
-    mounted(){
-        this.$el.style.left=(this.position.left)+'px';
-        this.$el.style.top=(this.position.top)+'px'
+    computed:{
+        tooltipLeft(){
+            return (this.position.left-100)+'px'
+        },
+        tooltipTop(){
+            return (this.position.top)+'px'
+        }
     }
 }
 </script>
@@ -42,6 +44,8 @@ export default {
     background-color:#ffdb00;
     padding:10px;
     border-radius:8px;
+    pointer-events: none;
+    width:200px;
 }
 #tooltip.show {
     opacity:1;
@@ -51,7 +55,7 @@ export default {
     position:absolute;
     color:#ffdb00;
     left:50%;
-    margin-left:-1em;
+    margin-left:-0.86rem;
     top:38px;
 }
 </style>

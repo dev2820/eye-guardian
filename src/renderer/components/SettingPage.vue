@@ -4,11 +4,19 @@
         <span>{{main}}</span>
         <button @click="increase">state increase</button>
         <button @click="decrease">state decrease</button>
+        <hr/>
         {{isBlueLightFilterOn}}
         <button @click="showBlueLightFilter(true)">BlueLightFilter on</button>
         <button @click="showBlueLightFilter(false)">BlueLightFilter off</button>
+        <hr/>
+        <button @click="changeMessageMode('regular-top')">regular-top</button>
+        <button @click="changeMessageMode('regular-bottom')">regular-bottom</button>
+        <button @click="changeMessageMode('mini')">mini</button>
+        <hr/>
         <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuidText()"/>
-        <tooltip :show="showGuide" :message="guideText" :position="guidePosition"></tooltip>
+        <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
+        <hr/>
+        <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuidText()"/>
     </div>
 </template>
 
@@ -58,8 +66,9 @@ export default {
             this.$store.dispatch('someAsyncTask')
         },
         showGuideText(e,guideType) {
-            this.guidePosition.top=e.screenY;
-            this.guidePosition.left=e.screenX;
+            console.log(e)
+            this.guidePosition.top=e.clientY;
+            this.guidePosition.left=e.clientX;
             switch(guideType) {
                 case 'guide1': {
                     this.guideText='guide1에 대한 가이드라인입니다.';
