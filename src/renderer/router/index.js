@@ -16,9 +16,9 @@ export default new Router({
       component: require('@/components/SettingPage').default
     },
     {
-      path: '/blueLightFilter',
-      name: 'blue-light-filter',
-      component: require('@/components/BlueLightFilter').default
+      path: '/screenFilter',
+      name: 'screen-filter',
+      component: require('@/components/ScreenFilter').default
     },
     {
       path: '/warningMessage',

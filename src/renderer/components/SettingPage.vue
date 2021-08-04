@@ -5,13 +5,17 @@
         <button @click="increase">state increase</button>
         <button @click="decrease">state decrease</button>
         <hr/>
-        {{isBlueLightFilterOn}}
-        <button @click="showBlueLightFilter(true)">BlueLightFilter on</button>
-        <button @click="showBlueLightFilter(false)">BlueLightFilter off</button>
+        {{isScreenFilterOn}}
+        <button @click="showScreenFilter(true)">screen filter on</button>
+        <button @click="showScreenFilter(false)">screen filter off</button>
         <hr/>
         <button @click="changeMessageMode('regular-top')">regular-top</button>
         <button @click="changeMessageMode('regular-bottom')">regular-bottom</button>
         <button @click="changeMessageMode('mini')">mini</button>
+        <hr/>
+        <button @click="insertMessage('eye-blink')">insert message</button>
+        <button @click="insertMessage('too-close')">insert message2</button>
+        <button @click="clearMessage('eye-blink')">clear message</button>
         <hr/>
         <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuidText()"/>
         <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
@@ -32,31 +36,33 @@ export default {
             guidePosition: {
                 top:0,
                 left:0
-            }
+            },
         }
     },
     components: { 
         Tooltip 
     },
     mounted(){
-        ipc.on('BLUELIGHT_FILTER_CONTROL',(e,payload)=>{
-            this.showBlueLightFilter(payload);
+        ipc.on('SCREEN_FILTER_CONTROL',(e,payload)=>{
+            this.showScreenFilter(payload);
         })
     },
     computed: {
         ...mapState({
             main: state=>state.Counter.main,
-            isBlueLightFilterOn: state=>state.BlueLightFilter.show
+            isScreenFilterOn: state=>state.ScreenFilter.show,
+            duration: state=>state.WarningMessage.duration
+
         })
     },
     methods: {
-        ...mapActions(['showBlueLightFilter,hideBlueLightFilter','setWarningMode']),
-        showBlueLightFilter(boolean){
+        ...mapActions(['showFilter,hideFilter','setWarningMode','insertWarningMessage','clearWarningMEssage']),
+        showScreenFilter(boolean){
             if(boolean){
-                this.$store.dispatch('showBlueLightFilter');
+                this.$store.dispatch('showFilter');
             }
             else {
-                this.$store.dispatch('hideBlueLightFilter');
+                this.$store.dispatch('hideFilter');
             }
         },
         increase(){
@@ -66,7 +72,6 @@ export default {
             this.$store.dispatch('someAsyncTask')
         },
         showGuideText(e,guideType) {
-            console.log(e)
             this.guidePosition.top=e.clientY;
             this.guidePosition.left=e.clientX;
             switch(guideType) {
@@ -82,6 +87,12 @@ export default {
         },
         changeMessageMode(mode) {
             this.$store.dispatch('setWarningMode',mode);
+        },
+        insertMessage(type) {
+            this.$store.dispatch('insertWarningMessage',{type,duration:this.duration});
+        },
+        clearMessage(){
+            this.$store.dispatch('clearWarningMEssage');
         }
     }
 }

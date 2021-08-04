@@ -1,45 +1,57 @@
 <template>
-    <div id="warning-message" 
-        :class="{'regular-top':mode==='regular-top',
+    <transition-group name="flip" tag="div" id="warning-message-queue"
+            :class="{'regular-top':mode==='regular-top',
                 'regular-bottom':mode==='regular-bottom',
-                'mini':mode==='mini'
-                }" 
+                'mini':mode==='mini',
+            }"
     >
-        <font-awesome-icon icon="exclamation-triangle" class="icon"/>
-        <div class="message">{{message}}</div>
-    </div>
+        <div class="message flip-item" v-for="(message,index) in messages" :key="index">
+            <font-awesome-icon icon="exclamation-triangle" class="icon"/>
+            <p class="text">{{message.type | messageFilter}}</p>
+        </div>
+    </transition-group>
 </template>
-
 <script>
 import { mapState } from 'vuex'
 export default {
     name:'warning-message',
     data(){
         return {
-            message:'경고메세지임',
+            show:false
         }
     },
     computed: {
         ...mapState({
-            mode: state=>state.WarningMessage.mode
+            mode: state=>state.WarningMessage.mode,
+            messages: (state)=>state.WarningMessage.messageQueue
         }),
+    },
+    filters: {
+        messageFilter(type){
+            switch(type){
+                case 'eye-blink':{
+                    return '눈 깜빡임 경고'
+                }
+                case 'too-close':{
+                    return '디스플레이 거리 경고'
+                }
+                default: {
+                    return ''
+                }
+            }
+        }
     }
 }
 </script>
 <style scoped>
-#warning-message {
+#warning-message-queue {
+    flex-direction:column;
     position:fixed;
-    background: rgba(127,127,127,0.9);
-    color:#ffdb00;
-    border-radius:8px;
-    text-align:center;
-    font-weight:bold;
-    font-size:1.3em;
+    opacity:1;
     display:flex;
-    padding:10px;
 }
-#warning-message.regular-top {
-    flex-direction:row;
+#warning-message-queue.regular-top {
+    justify-content: flex-start;
     height:80px;
     width:700px;
     left:50%;
@@ -47,8 +59,9 @@ export default {
     top:50px;
     justify-content: left;
 }
-#warning-message.regular-bottom {
-    flex-direction:row;
+#warning-message-queue.regular-bottom {
+    justify-content: flex-start;
+    flex-direction:column-reverse;
     height:80px;
     width:700px;
     left:50%;
@@ -56,30 +69,53 @@ export default {
     bottom:150px;
     justify-content: left;
 }
-#warning-message.mini {
-    height:150px;
+#warning-message-queue.mini {
+    justify-content: flex-end;
     width:300px;
+    height:500px;
     right:5px;
     bottom:45px;
-    flex-direction:column;
-    justify-content: center;
 }
-#warning-message .icon,
-#warning-message .message {
+#warning-message-queue .message {
+    position:relative;
+    background: rgba(127,127,127,0.9);
+    color:#ffdb00;
+    border-radius:8px;
+    text-align:center;
+    font-weight:bold;
+    font-size:1.3em;
+    padding:10px;
+    margin-top:10px;
+}
+/* #warning-message-queue .icon,
+#warning-message-queue .message {
     margin:auto 0;
 }
-#warning-message.mini .icon,
-#warning-message.mini .message {
+#warning-message-queue.mini .icon,
+#warning-message-queue.mini .message {
     margin:0 auto;
 }
-#warning-message .message {
+#warning-message-queue .message {
     padding:0 10px;
 }
-#warning-message .icon {
+#warning-message-queue .icon {
     width:50px;
     height:50px;
     font-size:1.5em;
 }
-#warning-message .message {
+#warning-message-queue.show {
+    opacity:1;
+    transition:0.3s;
+} */
+.flip-item {
+    transition:all 0.5s;
+    display:inline-block;
+}
+.flip-enter, .flip-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
+}
+.flip-leave-active {
+    position: absolute;
 }
 </style>

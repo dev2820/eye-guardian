@@ -1,12 +1,12 @@
 <template>
-    <div id="blue-light-filter" :class="{hidden:!isBlueLightFilterOn}">
+    <div id="screen-filter" :class="{hidden:!isScreenFilterOn}">
     </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 export default {
-    name:'blue-light-filter',
+    name:'ScreenFilter',
     data(){
         return {
 
@@ -14,20 +14,20 @@ export default {
     },
     computed: {
         ...mapState({
-            isBlueLightFilterOn: state=>state.BlueLightFilter.show
+            isScreenFilterOn: state=>state.ScreenFilter.show
         })
     }
 }
 </script>
 <style scoped>
-#blue-light-filter {
+#screen-filter {
     height:100vh;
     width:100vw;
     background:rgba(255,219,0,0.15);
     transition:opacity 1s ease-in-out;
     opacity:1;
 }
-#blue-light-filter.hidden {
+#screen-filter.hidden {
     opacity:0;
     transition:opacity 1s ease-in-out;
 }
