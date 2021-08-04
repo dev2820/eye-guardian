@@ -13,7 +13,7 @@ let settingWindow,ScreenFilterWindow,warningMessageWindow
 let tray = null
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
-  : `file://${__dirname}/index.html`
+  : `file://${__dirname}/index.html`;
 
 function createWindow () {
   /**
@@ -27,7 +27,7 @@ function createWindow () {
   settingWindow.loadURL(winURL)
 
   ScreenFilterWindow = new BrowserWindow({
-    fullscreen:true,
+    // fullscreen:true,
     frame:false,
     transparent:true,
     alwaysOnTop :true,
@@ -41,7 +41,7 @@ function createWindow () {
   ScreenFilterWindow.setIgnoreMouseEvents(true);
 
   warningMessageWindow = new BrowserWindow({
-    fullscreen:true,
+    // fullscreen:true,
     frame:false,
     transparent:true,
     alwaysOnTop :true,
@@ -54,7 +54,7 @@ function createWindow () {
   warningMessageWindow.loadURL(winURL+'/#/warningMessage')
   warningMessageWindow.setIgnoreMouseEvents(true);
 
-  tray = new Tray(path.join(__dirname,'/assets/images/icon.ico'));
+  tray = new Tray(path.join(__static,'/images/icon.ico'));
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'setting',
@@ -67,7 +67,8 @@ function createWindow () {
       label: 'exit',
       type: 'normal',
       click(){
-        ScreenFilterWindow.destroy();
+        ScreenFilterWindow.close();
+        warningMessageWindow.close();
         settingWindow.destroy();
       }
     },

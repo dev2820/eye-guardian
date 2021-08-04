@@ -36,7 +36,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #tooltip {
     position:fixed;
     opacity:0;

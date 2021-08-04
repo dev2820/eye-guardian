@@ -24,11 +24,14 @@
         blueLight 설정<input type="range" :value="blueLightFigure" @change="setBlueLightFigure($event)" min="0" max="0.5" step="0.01">
         <hr/>
         화면 명도 설정<input type="range" :value="darkness" @change="setDarkness($event)" min="0" max="0.5" step="0.01">
+        <video onplay="onPlay(this)" id="inputVideo" autoplay muted></video>
+        <canvas id="overlay" width="300" height="300" />
     </div>
 </template>
 
 <script>
-import { ipcRenderer as ipc} from 'electron'
+import * as faceapi from 'face-api.js';
+import { ipcRenderer as ipc } from 'electron'
 import { mapState,mapMutations,mapActions } from 'vuex'
 import Tooltip from './Tooltip.vue'
 export default {
@@ -51,7 +54,8 @@ export default {
         ipc.on('SCREEN_FILTER_CONTROL',(e,payload)=>{
             this.showScreenFilter(payload);
         })
-
+        // this.run();
+        this.showMyFace();
     },
     computed: {
         ...mapState({
@@ -113,6 +117,84 @@ export default {
         },
         setBlueLightFigure(e){
             this.$store.dispatch('setBlueLightFigure',e.target.value);
+        },
+        async run() {
+        // load the models
+            console.log('??')
+            await faceapi.loadMtcnnModel('/')
+            await faceapi.loadFaceRecognitionModel('/')
+            console.log('????')
+            // try to access users webcam and stream the images
+            // to the video element
+            const videoEl = document.getElementById('inputVideo')
+            navigator.getMedia = navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetuserMedia ||
+            navigator.msGetUserMedia;
+
+            navigator.getMedia(
+                { video: {} },
+                stream => videoEl.srcObject = stream,
+                err => console.error(err)
+            )
+            const mtcnnForwardParams = {
+                minFaceSize: 200
+            }
+
+            const mtcnnResults = await faceapi.mtcnn(document.getElementById('inputVideo'), mtcnnForwardParams)
+            console.log(mtcnnResults)
+            faceapi.drawDetection('overlay', mtcnnResults.map(res => res.faceDetection), { withScore: false })
+            faceapi.drawLandmarks('overlay', mtcnnResults.map(res => res.faceLandmarks), { lineWidth: 4, color: 'red' })
+
+        },
+        showMyFace() {
+            var canvas = document.getElementById('overlay'),
+            context = canvas.getContext('2d'),
+            video = document.getElementById('inputVideo'),
+            vendorUrl = window.URL || window.webkitURL;
+            
+            navigator.getMedia = navigator.getUserMedia ||
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetuserMedia ||
+            navigator.msGetUserMedia;
+            
+            navigator.getMedia({
+                video: true,
+                audio: false
+            }, function(stream) {
+                video.src = vendorUrl.createObjectURL(stream);
+                video.play();
+            }, function(error) {
+                // an error occurred
+            } );
+            
+            video.addEventListener('play', function() {
+                draw( this, context, 1024, 768 );
+            }, false );
+            
+            function draw( video, context, width, height ) {
+                var image, data, i, r, g, b, brightness;
+                
+                context.drawImage( video, 0, 0, width, height );
+                
+                image = context.getImageData( 0, 0, width, height );
+                data = image.data;
+                
+                for( i = 0 ; i < data.length ; i += 4 ) {
+                r = data[i];
+                g = data[i + 1];
+                b = data[i + 2];
+                brightness = ( r + g + b ) / 3;
+                
+                data[i] = data[i + 1] = data[i + 2] = brightness;
+                }
+                
+                image.data = data;
+                
+                context.putImageData( image, 0, 0 );
+                
+                setTimeout( draw, 10, video, context, width, height );
+            }
         }
     }
 }
