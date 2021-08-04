@@ -27,7 +27,6 @@ export default {
 #screen-filter {
     height:100vh;
     width:100vw;
-    background:rgba(255,219,0,0.15);
     transition:opacity 1s ease-in-out;
     opacity:1;
 }
