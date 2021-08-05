@@ -55,7 +55,7 @@ export default {
             this.showScreenFilter(payload);
         })
         // this.run();
-        this.showMyFace();
+        // this.showMyFace();
     },
     computed: {
         ...mapState({
@@ -133,7 +133,7 @@ export default {
             navigator.msGetUserMedia;
 
             navigator.getMedia(
-                { video: {} },
+                { video: true },
                 stream => videoEl.srcObject = stream,
                 err => console.error(err)
             )

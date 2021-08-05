@@ -14,7 +14,14 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
-    "postinstall": ""
+    "postinstall": "",
+    "electron-rebuild": "electron-rebuild -w opencv4nodejs"
+  },
+  "opencv4nodejs": {
+    "disableAutoBuild": 1,
+    "opencvIncludeDir": "C:\\opencv\\build\\include",
+    "opencvLibDir": "C:\\opencv\\build\\x64\\vc14\\lib",
+    "opencvBinDir": "C:\\opencv\\build\\x64\\vc14\\bin"
   },
   "build": {
     "productName": "eye-guardian",
@@ -58,6 +65,7 @@
     "axios": "^0.18.0",
     "face-api.js": "^0.22.2",
     "multispinner": "^0.2.1",
+    "opencv4nodejs": "^5.6.0",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",

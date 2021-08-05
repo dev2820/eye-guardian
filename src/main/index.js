@@ -27,7 +27,7 @@ function createWindow () {
   settingWindow.loadURL(winURL)
 
   ScreenFilterWindow = new BrowserWindow({
-    // fullscreen:true,
+    fullscreen:true,
     frame:false,
     transparent:true,
     alwaysOnTop :true,
@@ -41,7 +41,7 @@ function createWindow () {
   ScreenFilterWindow.setIgnoreMouseEvents(true);
 
   warningMessageWindow = new BrowserWindow({
-    // fullscreen:true,
+    fullscreen:true,
     frame:false,
     transparent:true,
     alwaysOnTop :true,
