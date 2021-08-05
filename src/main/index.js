@@ -37,9 +37,13 @@ function createWindow () {
       devTools: false
     },
   })
-  ScreenFilterWindow.loadURL(winURL+'/#/screenFilter')
+  if(process.env.NODE_ENV === 'development') {
+    ScreenFilterWindow.loadURL(winURL+'/#/screenFilter')
+  }
+  else {
+    ScreenFilterWindow.loadURL(winURL+'#screenFilter')
+  }
   ScreenFilterWindow.setIgnoreMouseEvents(true);
-
   warningMessageWindow = new BrowserWindow({
     fullscreen:true,
     frame:false,
@@ -51,7 +55,13 @@ function createWindow () {
       devTools: false
     },
   })
-  warningMessageWindow.loadURL(winURL+'/#/warningMessage')
+  
+  if(process.env.NODE_ENV === 'development') {
+    warningMessageWindow.loadURL(winURL+'/#/warningMessage')
+  }
+  else {
+    warningMessageWindow.loadURL(winURL+'#warningMessage')
+  }
   warningMessageWindow.setIgnoreMouseEvents(true);
 
   tray = new Tray(path.join(__static,'/images/icon.ico'));
@@ -93,6 +103,9 @@ function createWindow () {
 // setTimeout(()=>{
 //   settingWindow.send('SCREEN_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
 // },5000);
+setTimeout(()=>{
+  settingWindow.send('SCREEN_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
+},5000);
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
