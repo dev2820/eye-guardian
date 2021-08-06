@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, Tray,nativeImage } from 'electron'
+import { app, BrowserWindow, Menu, Tray,nativeImage, ipcRenderer,ipcMain } from 'electron'
 import '../renderer/store'
 import camera from 'camera'
 import * as faceapi from 'face-api.js';
@@ -24,6 +24,7 @@ function createWindow () {
    * Initial window options
    */
   settingWindow = new BrowserWindow({
+    webPreferences: { nodeIntegration: true },
     height: 563,
     useContentSize: true,
     width: 1000,
@@ -31,6 +32,7 @@ function createWindow () {
   settingWindow.loadURL(winURL)
 
   ScreenFilterWindow = new BrowserWindow({
+    webPreferences: { nodeIntegration: true },
     fullscreen:true,
     frame:false,
     transparent:true,
@@ -49,6 +51,7 @@ function createWindow () {
   }
   ScreenFilterWindow.setIgnoreMouseEvents(true);
   warningMessageWindow = new BrowserWindow({
+    webPreferences: { nodeIntegration: true },
     fullscreen:true,
     frame:false,
     transparent:true,
@@ -123,27 +126,30 @@ app.on('activate', () => {
     createWindow()
   }
 })
-// const ImageObj = new Image();
-// console.log(ImageObj)
+ipcMain.on('START',(evt,payload)=>{
+  console.log(evt,payload,'START')
+})
 let count=0;
+let ready=0;
 const webcam = camera.createStream()
 webcam.on('data', async (buffer) => {
-  
-  if(count>60){
-    webcam.destroy();
-  }
-  else {  
-    // await faceapi.loadTinyFaceDetectorModel('/models')
-    // const img = nativeImage.createFromBuffer(buffer);
-    // const image = await faceapi.bufferToImage(buffer)
-    // console.dir (count,image)
-    // const detections = await faceapi.detectAllFaces(img)
-    fs.writeFileSync(`snapshot/cam${count}.png`, buffer)
-    count++;
+  if(ready==1){
+    if(count>120){
+      webcam.destroy();
+    }
+    else {
+      settingWindow.send('FACE_BUFFER',buffer.toString('base64'));//블루스크린을 켜는 ipc 통신
+      count++;
+    }
   }
   // 
   // console.log(detections)
 })
+ipcMain.on('READY',(evt,payload)=>{
+  // console.log(evt,payload,'READY');
+  ready=1;
+})
+
 // const cv = require('opencv4nodejs');
 // try {
 //   const image = cv.imread(path.resolve('static','images/test.jpg'));

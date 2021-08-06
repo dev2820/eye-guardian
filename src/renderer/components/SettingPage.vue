@@ -26,11 +26,28 @@
         화면 명도 설정<input type="range" :value="darkness" @change="setDarkness($event)" min="0" max="0.5" step="0.01">
         <canvas id="inputCanvas" width="320" height="240" style="display:none"></canvas>
         <video id="inputVideo" autoplay loop></video>
+        <video id="cam" autoplay muted playsinline></video>
+        <img id="snapshot"/>
     </div>
 </template>
 
 <script>
 import * as faceapi from 'face-api.js';
+faceapi.env.monkeyPatch({
+    Canvas: HTMLCanvasElement,
+    Image: HTMLImageElement,
+    ImageData: ImageData,
+    Video: HTMLVideoElement,
+    createCanvasElement: () => document.createElement('canvas'),
+    createImageElement: () => document.createElement('img')
+});
+        Promise.all([
+            faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+            faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+        ]).then(()=>{
+            ipc.send('READY',1);
+        })
 import { ipcRenderer as ipc } from 'electron'
 import { mapState,mapMutations,mapActions } from 'vuex'
 import Tooltip from './Tooltip.vue'
@@ -54,12 +71,17 @@ export default {
         ipc.on('SCREEN_FILTER_CONTROL',(e,payload)=>{
             this.showScreenFilter(payload);
         })
-        var videoInput = document.getElementById('inputVideo');
-        var canvasInput = document.getElementById('inputCanvas');
-        
-        var htracker = new headtrackr.Tracker();
-        htracker.init(videoInput, canvasInput);
-        htracker.start();
+        ipc.on('FACE_BUFFER',async (e,payload)=>{
+            const image = new Image();
+            image.src = 'data:image/jpeg;base64, '+payload;
+            const detections = await faceapi.detectSingleFace(image)
+            // .withFaceLandmarks().withFaceDescriptors()
+            // this.$el.appendChild(image)
+            // console.log(detections)
+            const info = document.createElement('span');
+            info.innerText = detections ? detections.classScore : 'no face';
+            this.$el.appendChild(info)
+        })
     },
     computed: {
         ...mapState({
