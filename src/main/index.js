@@ -1,5 +1,9 @@
-import { app, BrowserWindow, Menu, Tray } from 'electron'
+import { app, BrowserWindow, Menu, Tray,nativeImage } from 'electron'
 import '../renderer/store'
+import camera from 'camera'
+import * as faceapi from 'face-api.js';
+import '@tensorflow/tfjs'
+import fs from 'fs';
 import path from 'path'
 /**
  * Set `__static` path to static files in production
@@ -103,9 +107,9 @@ function createWindow () {
 // setTimeout(()=>{
 //   settingWindow.send('SCREEN_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
 // },5000);
-setTimeout(()=>{
-  settingWindow.send('SCREEN_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
-},5000);
+// setTimeout(()=>{
+//   settingWindow.send('SCREEN_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
+// },5000);
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
@@ -119,6 +123,35 @@ app.on('activate', () => {
     createWindow()
   }
 })
+// const ImageObj = new Image();
+// console.log(ImageObj)
+let count=0;
+const webcam = camera.createStream()
+webcam.on('data', async (buffer) => {
+  
+  if(count>60){
+    webcam.destroy();
+  }
+  else {  
+    // await faceapi.loadTinyFaceDetectorModel('/models')
+    // const img = nativeImage.createFromBuffer(buffer);
+    // const image = await faceapi.bufferToImage(buffer)
+    // console.dir (count,image)
+    // const detections = await faceapi.detectAllFaces(img)
+    fs.writeFileSync(`snapshot/cam${count}.png`, buffer)
+    count++;
+  }
+  // 
+  // console.log(detections)
+})
+// const cv = require('opencv4nodejs');
+// try {
+//   const image = cv.imread(path.resolve('static','images/test.jpg'));
+//   cv.imshowWait('Image', image);
+// }
+// catch(err){
+//   console.log('err',err);
+// }
 
 /**
  * Auto Updater
