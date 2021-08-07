@@ -10,6 +10,8 @@
 import * as faceapi from 'face-api.js';
 import { ipcRenderer as ipc } from 'electron'
 import { exec } from 'child_process'
+import fs from 'fs'
+import { mapState,mapActions } from 'vuex'
 
 faceapi.env.monkeyPatch({
     Canvas: HTMLCanvasElement,
@@ -19,8 +21,7 @@ faceapi.env.monkeyPatch({
     createCanvasElement: () => document.createElement('canvas'),
     createImageElement: () => document.createElement('img')
 });
-import fs from 'fs'
-import { mapState,mapActions } from 'vuex'
+
 export default {
     name:'face-process',
     data(){
@@ -69,7 +70,7 @@ export default {
             );
             videoEl.addEventListener('play',()=>{
                 draw();
-                // bright();
+                bright();
             },false)
 
             
@@ -85,17 +86,19 @@ export default {
                 const detections = await faceapi.detectSingleFace(img)
                 this.detectFace = detections?detections.classScore : 'no face'
                 
-                setTimeout( draw, 60 );//10~30프레임
+                setTimeout( draw, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
             let bright = async () =>{
                 const context = canvas.getContext('2d');
                 context.drawImage(videoEl, 0, 0, 200, 200);
-                const base64String = canvas.toDataURL('image/png');
+                const base64String = canvas.toDataURL('image/png');//png형식의 base64 string을 생성한다.
                 const buffer = new Buffer(base64String.toString(),"base64")
                 fs.writeFileSync('bright_file.png',buffer);
-                //exec -> 밝기 테스트해서 값 가져오고
-                //message 도 찍어 
-                //this.$store.dispatch('insertWarningMessage',{type:'bright-warning',3});
+                //1. 이미지가 제대로 생성되지 않는다. => 버그 수정해서 bright_file.png로 저장할 것
+                //2. 이미지가 제대로 생성된다면 exec로 main.py를 실행해서 이미지의 밝기값을 가져오게 만든다.
+                //3. 밝기값에 대한 임계치를 설정해서(ex. 주변이 아주 어두울때 main.py가 1 값을 반환한다면) 아래 코드를 실행해 message를 생성한다. 
+                //this.$store.dispatch('insertWarningMessage',{type:'bright-warning',3});//이 코드는 bright-warning타입의 경고문을 3초간 띄운다.
+                //4. 현재 setTimeout을 통해 밝기 테스트를 5초마다 진행하게 되어있다. 필요에 따라 이 값도 바꿔줄 수 있다.
                 setTimeout( bright, 5000 );//5초마다 밝기 테스트하도록 되어있음
             }
         }
