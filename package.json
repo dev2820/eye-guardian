@@ -19,9 +19,9 @@
   },
   "opencv4nodejs": {
     "disableAutoBuild": 1,
-    "opencvIncludeDir": "C:\\opencv\\build\\include",
-    "opencvLibDir": "C:\\opencv\\build\\x64\\vc14\\lib",
-    "opencvBinDir": "C:\\opencv\\build\\x64\\vc14\\bin"
+    "opencvIncludeDir": "C:\\tools\\opencv\\build\\include",
+    "opencvLibDir": "C:\\tools\\opencv\\build\\x64\\vc15\\lib",
+    "opencvBinDir": "C:\\tools\\opencv\\build\\x64\\vc15\\bin"
   },
   "build": {
     "productName": "eye-guardian",
@@ -102,7 +102,6 @@
     "listr": "^0.14.3",
     "mini-css-extract-plugin": "0.4.0",
     "node-loader": "^0.6.0",
-    "node-sass": "^4.9.2",
     "sass-loader": "^7.0.3",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",

@@ -1,0 +1,1 @@
+require('opencv4nodejs')
