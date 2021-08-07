@@ -35,7 +35,7 @@ export default {
             faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
             faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
         ]).then(()=>{
-            // this.showVideo();
+            this.showVideo();//웹캠을 실행하며, 웹캠으로부터 받아온 리소스를 처리하는 메소드
             ipc.send('MESSAGE',1);
         })
         ipc.on('MESSAGE2',(evt,payload)=>{
