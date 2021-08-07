@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let settingWindow,ScreenFilterWindow,warningMessageWindow
+let settingWindow,ScreenFilterWindow,warningMessageWindow,faceProcessWindow
 let tray = null
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
@@ -71,6 +71,19 @@ function createWindow () {
   }
   warningMessageWindow.setIgnoreMouseEvents(true);
 
+  faceProcessWindow = new BrowserWindow({
+    webPreferences: { nodeIntegration: true },
+    useContentSize: true,
+    show:true
+  })
+  
+  if(process.env.NODE_ENV === 'development') {
+    faceProcessWindow.loadURL(winURL+'/#/faceProcess')
+  }
+  else {
+    faceProcessWindow.loadURL(winURL+'#faceProcess')
+  }
+  
   tray = new Tray(path.join(__static,'/images/icon.ico'));
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -86,6 +99,7 @@ function createWindow () {
       click(){
         ScreenFilterWindow.close();
         warningMessageWindow.close();
+        faceProcessWindow.close();
         settingWindow.destroy();
       }
     },
@@ -101,10 +115,16 @@ function createWindow () {
     settingWindow.hide();
   })
   settingWindow.on('closed',()=>{
-    settingWindow = null
+    settingWindow = null;
   })
   ScreenFilterWindow.on('closed',()=>{
     ScreenFilterWindow = null;
+  })
+  warningMessageWindow.on('closed',()=>{
+    warningMessageWindow = null;
+  })
+  faceProcessWindow.on('closed',()=>{
+    faceProcessWindow = null;
   })
 }
 // setTimeout(()=>{
@@ -126,28 +146,28 @@ app.on('activate', () => {
     createWindow()
   }
 })
-ipcMain.on('START',(evt,payload)=>{
-  console.log(evt,payload,'START')
-})
-let count=0;
-let ready=0;
-const webcam = camera.createStream()
-webcam.on('data', async (buffer) => {
-  if(ready==1){
-    if(count>120){
-      webcam.destroy();
-    }
-    else {
-      settingWindow.send('FACE_BUFFER',buffer.toString('base64'));//블루스크린을 켜는 ipc 통신
-      count++;
-    }
-  }
-  // 
-  // console.log(detections)
-})
+// ipcMain.on('START',(evt,payload)=>{
+//   console.log(evt,payload,'START')
+// })
+// let count=0;
+// let ready=0;
+// const webcam = camera.createStream()
+// webcam.on('data', async (buffer) => {
+//   if(ready==1){
+//     if(count>120){
+//       webcam.destroy();
+//     }
+//     else {
+//       settingWindow.send('FACE_BUFFER',buffer.toString('base64'));//블루스크린을 켜는 ipc 통신
+//       count++;
+//     }
+//   }
+//   // 
+//   // console.log(detections)
+// })
 ipcMain.on('READY',(evt,payload)=>{
   // console.log(evt,payload,'READY');
-  ready=1;
+  faceProcessWindow.send('FACE_DETECT_START',true)
 })
 
 // const cv = require('opencv4nodejs');

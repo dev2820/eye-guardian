@@ -26,6 +26,11 @@ export default new Router({
       component: require('@/components/WarningMessage').default
     },
     {
+      path: '/faceProcess',
+      name: 'face-process',
+      component: require('@/components/FaceProcess').default
+    },
+    {
       path: '*',
       redirect: '/'
     }
