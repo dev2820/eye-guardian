@@ -5,6 +5,7 @@ import * as faceapi from 'face-api.js';
 import '@tensorflow/tfjs'
 import fs from 'fs';
 import path from 'path'
+import { exec, fork } from 'child_process'
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -146,22 +147,39 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+ipcMain.on('BRIGHT',(evt,payload)=>{
+  const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
+    if(stderr) {
+      console.error(stderr)
+    }
+    console.log(stdout)
+  })
+})
+
 // ipcMain.on('START',(evt,payload)=>{
 //   console.log(evt,payload,'START')
 // })
-// let count=0;
-// let ready=0;
+let count=0;
+// // let ready=0;
 // const webcam = camera.createStream()
 // webcam.on('data', async (buffer) => {
-//   if(ready==1){
 //     if(count>120){
 //       webcam.destroy();
 //     }
 //     else {
-//       settingWindow.send('FACE_BUFFER',buffer.toString('base64'));//블루스크린을 켜는 ipc 통신
+//       // settingWindow.send('FACE_BUFFER',buffer.toString('base64'));//블루스크린을 켜는 ipc 통신
+//       fs.writeFileSync(`snapshot/${count}image.jpeg`,buffer);
 //       count++;
+//       const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
+//         if(stderr) {
+//           console.error(stderr)
+//         }
+//         console.log(stdout)
+//         // settingWindow.send('FACE_BUFFER',buffer.toString('base64'));//블루스크린을 켜는 ipc 통신
+//       })
 //     }
-//   }
+// });
 //   // 
 //   // console.log(detections)
 // })
@@ -169,7 +187,10 @@ ipcMain.on('READY',(evt,payload)=>{
   // console.log(evt,payload,'READY');
   faceProcessWindow.send('FACE_DETECT_START',true)
 })
-
+ipcMain.on('MESSAGE',(evt,payload)=>{
+  console.log(evt,payload)
+  faceProcessWindow.send('MESSAGE2',2)
+})
 // const cv = require('opencv4nodejs');
 // try {
 //   const image = cv.imread(path.resolve('static','images/test.jpg'));

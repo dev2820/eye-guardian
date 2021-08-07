@@ -24,12 +24,10 @@
         blueLight 설정<input type="range" :value="blueLightFigure" @change="setBlueLightFigure($event)" min="0" max="0.5" step="0.01">
         <hr/>
         화면 명도 설정<input type="range" :value="darkness" @change="setDarkness($event)" min="0" max="0.5" step="0.01">
-        
     </div>
 </template>
 
 <script>
-
 import { ipcRenderer as ipc } from 'electron'
 import { mapState,mapMutations,mapActions } from 'vuex'
 import Tooltip from './Tooltip.vue'
@@ -67,7 +65,8 @@ export default {
     },
     methods: {
         ...mapActions([
-            'showFilter,hideFilter',
+            'showFilter',
+            'hideFilter',
             'setWarningMode',
             'insertWarningMessage',
             'clearWarningMEssage',
