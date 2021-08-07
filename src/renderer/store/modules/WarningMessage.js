@@ -2,7 +2,7 @@ const state = {
     mode: 'regular-bottom',
     // type: 'eye-blink',
     messageQueue: [],
-    duration:15
+    duration:3
 }
 
 const mutations = {
