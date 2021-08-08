@@ -9,7 +9,7 @@
 
 <script>
 export default {
-    name: 'Toggle',
+    name: 'toggle',
     props:{
         'checked':{
             type: Boolean,

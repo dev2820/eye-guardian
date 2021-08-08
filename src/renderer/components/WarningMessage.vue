@@ -90,26 +90,6 @@ export default {
     padding:10px;
     margin-top:10px;
 }
-/* #warning-message-queue .icon,
-#warning-message-queue .message {
-    margin:auto 0;
-}
-#warning-message-queue.mini .icon,
-#warning-message-queue.mini .message {
-    margin:0 auto;
-}
-#warning-message-queue .message {
-    padding:0 10px;
-}
-#warning-message-queue .icon {
-    width:50px;
-    height:50px;
-    font-size:1.5em;
-}
-#warning-message-queue.show {
-    opacity:1;
-    transition:0.3s;
-} */
 .flip-item {
     transition:all 0.5s;
     display:inline-block;
