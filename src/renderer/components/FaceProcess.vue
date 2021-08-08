@@ -101,13 +101,13 @@ export default {
                 //3. 밝기값에 대한 임계치를 설정해서(ex. 주변이 아주 어두울때 main.py가 1 값을 반환한다면) 아래 코드를 실행해 message를 생성한다. 
                 //4. 현재 setTimeout을 통해 밝기 테스트를 5초마다 진행하게 되어있다. 필요에 따라 이 값도 바꿔줄 수 있다.
                 const data= context.getImageData(0,0,canvas.width,canvas.height).data;
-                let r,g,b,colorSum=0;
+                let colorSum=0;
                 for(let x= 0, len= data.length; x < len; x+=4) {
                     colorSum += Math.sqrt(0.299 * (data[x] ** 2)
                     + 0.587 * (data[x+1] ** 2)
                     + 0.114 * (data[x+2] ** 2))
                 }
-                var brightness= Math.floor(colorSum /(canvas.width*canvas.height));
+                let brightness= Math.floor(colorSum /(canvas.width*canvas.height));
                 console.log('brightness',brightness)
                 setTimeout( bright, 5000 );//5초마다 밝기 테스트하도록 되어있음
                 if(brightness < 50)
