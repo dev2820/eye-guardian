@@ -2,13 +2,16 @@ const state = {
     mode: 'regular-bottom',
     // type: 'eye-blink',
     messageQueue: [],
-    duration:3
+    duration:3,
 }
 
 const mutations = {
     SET_WARNING_MODE (state,payload) {
         //추후 payload의 vailidata검사 진행
         state.mode=payload
+    },
+    SET_WARNING_DURATION (state,payload) {
+        state.duration=payload
     },
     UNSHIFT_WARNING_MESSAGE (state,payload) {
         // state.messageQueue.push(payload);
@@ -26,6 +29,9 @@ const mutations = {
 const actions = {
     setWarningMode ({ commit },payload) {
         commit('SET_WARNING_MODE',payload);
+    },
+    setWarningDuration ({ commit },payload) {
+        commit('SET_WARNING_DURATION',payload);
     },
     insertWarningMessage({commit},payload) {
         commit('UNSHIFT_WARNING_MESSAGE',payload);
