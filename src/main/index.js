@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, Tray,nativeImage, ipcRenderer,ipcMain } from 'electron'
 import '../renderer/store'
-import camera from 'camera'
+// import camera from 'camera'
 import * as faceapi from 'face-api.js';
 import '@tensorflow/tfjs'
 import fs from 'fs';
