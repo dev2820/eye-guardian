@@ -17,6 +17,12 @@
     "postinstall": "",
     "electron-rebuild": "electron-rebuild -w opencv4nodejs"
   },
+  "opencv4nodejs": {
+    "disableAutoBuild": 1,
+    "opencvIncludeDir": "C:\\tools\\opencv\\build\\include",
+    "opencvLibDir": "C:\\tools\\opencv\\build\\x64\\vc15\\lib",
+    "opencvBinDir": "C:\\tools\\opencv\\build\\x64\\vc15\\bin"
+  },
   "build": {
     "productName": "eye-guardian",
     "appId": "com.example.yourapp",
@@ -55,12 +61,6 @@
       "createDesktopShortcut": true
     }
   },
-  "opencv4nodejs": {
-    "disableAutoBuild": 1,
-    "opencvIncludeDir": "C:\\tools\\opencv\\build\\include",
-    "opencvLibDir": "C:\\tools\\opencv\\build\\x64\\vc15\\lib",
-    "opencvBinDir": "C:\\tools\\opencv\\build\\x64\\vc15\\bin"
-  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
@@ -68,9 +68,11 @@
     "@fortawesome/vue-fontawesome": "^2.0.2",
     "@tensorflow/tfjs": "^3.8.0",
     "axios": "^0.18.0",
+    "camera": "^1.0.0",
     "face-api.js": "^0.22.2",
     "headtrackr": "^0.0.1",
     "multispinner": "^0.2.1",
+    "osenv": "^0.1.5",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
@@ -103,7 +105,6 @@
     "listr": "^0.14.3",
     "mini-css-extract-plugin": "0.4.0",
     "node-loader": "^0.6.0",
-    "node-sass": "^4.9.2",
     "sass-loader": "^7.0.3",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
