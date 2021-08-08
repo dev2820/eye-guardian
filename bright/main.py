@@ -60,7 +60,7 @@ class ImageBrightnessDetect(object):
 
         # Get average pixel level for each layer
         image_stats = ImageStat.Stat(image)
-        red_channel_mean, green_channel_mean, blue_channel_mean = image_stats.mean
+        red_channel_mean, green_channel_mean, blue_channel_mean, transparency = image_stats.mean
 
         # The three constants (.299, .587, and .114) represent the different degrees to which each of the primary (RGB)
         # colors affects human perception of the overall brightness of a color.  Notice that they sum to 1.

@@ -1,1 +1,2 @@
-require('opencv4nodejs')
+
+console.log(2**2)
