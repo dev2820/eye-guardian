@@ -100,6 +100,14 @@ export default {
                 //this.$store.dispatch('insertWarningMessage',{type:'bright-warning',3});//이 코드는 bright-warning타입의 경고문을 3초간 띄운다.
                 //4. 현재 setTimeout을 통해 밝기 테스트를 5초마다 진행하게 되어있다. 필요에 따라 이 값도 바꿔줄 수 있다.
                 setTimeout( bright, 5000 );//5초마다 밝기 테스트하도록 되어있음
+                /*
+                   const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
+                        if(stderr) {
+                        console.error(stderr)
+                        }
+                        console.log(stdout)
+                    })
+                 */
             }
         }
     }

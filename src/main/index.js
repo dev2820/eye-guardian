@@ -148,14 +148,14 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('BRIGHT',(evt,payload)=>{
-  const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
-    if(stderr) {
-      console.error(stderr)
-    }
-    console.log(stdout)
-  })
-})
+// ipcMain.on('BRIGHT',(evt,payload)=>{
+//   const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
+//     if(stderr) {
+//       console.error(stderr)
+//     }
+//     console.log(stdout)
+//   })
+// })
 
 // ipcMain.on('START',(evt,payload)=>{
 //   console.log(evt,payload,'START')
