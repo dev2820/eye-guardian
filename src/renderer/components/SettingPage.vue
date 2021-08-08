@@ -39,9 +39,8 @@
             <button @click="insertMessage('eye-blink')">insert eye-blink warning</button>
             <button @click="insertMessage('too-close')">insert too-close warning</button>
             <button @click="insertMessage('bright-warning')">insert bright warning</button>
-            <!-- <button @click="clearMessage()">clear message</button> -->
+            <button @click="clearMessage()">clear message</button>
         </section>
-
         <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>
         <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
         <hr/>
@@ -73,7 +72,9 @@ export default {
         Toggle 
     },
     mounted(){
-        
+        ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
+            this.insertMessage(payload.type);
+        })
     },
     computed: {
         ...mapState({

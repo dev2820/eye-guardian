@@ -204,7 +204,7 @@ ipcMain.on('READY',(evt,payload)=>{
   faceProcessWindow.send('FACE_DETECT_START',true)
 })
 ipcMain.on('MESSAGE',(evt,payload)=>{
-  console.log(evt,payload)
+  // console.log(evt,payload)
   faceProcessWindow.send('MESSAGE2',2)
 })
 ipcMain.on('SHOW_STRETCH_GUIDE',(evt,payload)=>{
@@ -213,6 +213,9 @@ ipcMain.on('SHOW_STRETCH_GUIDE',(evt,payload)=>{
 })
 ipcMain.on('HIDE_STRETCH_GUIDE',(evt,payload)=>{
   stretchGuideWindow.hide();
+})
+ipcMain.on('BRIGHT_WARNING',(evt,payload)=>{
+  settingWindow.send('INSERT_BRIGHT_WARNING',payload);
 })
 // const cv = require('opencv4nodejs');
 // try {

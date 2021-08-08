@@ -1,7 +1,7 @@
 <template>
     <div id="face-process">
         <canvas id="inputCanvas" style="display:none"></canvas>
-        <video id="inputVideo" autoplay loop></video>
+        <video id="inputVideo"></video>
         <div>{{detectFace}}</div>
     </div>
 </template>
@@ -41,15 +41,18 @@ export default {
         ipc.on('MESSAGE2',(evt,payload)=>{
             console.log(evt,payload)
         })
-        console.log(exec)
     },
     computed: {
         ...mapState({
             isScreenFilterOn: state=>state.ScreenFilter.show,
+            duration: state=>state.WarningMessage.duration,
         })
     },
     methods:{
         ...mapActions(['insertMessage']),
+        generateBrightWarning(){
+            ipc.send('BRIGHT_WARNING',{type:'bright-warning'})
+        },
         showVideo(){
             const videoEl = document.getElementById('inputVideo')
             const canvas = document.getElementById('inputCanvas')
@@ -109,10 +112,14 @@ export default {
                     + 0.587 * (g ** 2)
                     + 0.114 * (b ** 2));
                 const brightness= Math.floor(colorSum /(canvas.width*canvas.height));
-                console.log('brightness',brightness)
-                setTimeout( bright, 5000 );//5초마다 밝기 테스트하도록 되어있음
-                if(brightness < 50)
-                    this.$store.dispatch('insertWarningMessage',{type:'bright-warning',payload:3});//이 코드는 bright-warning타입의 경고문을 3초간 띄운다.
+                // console.log('brightness',brightness)
+                if(brightness<=0) {
+                    //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
+                }
+                else if(brightness < 60){
+                    this.generateBrightWarning();
+                }
+                setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
             }
         }
     }

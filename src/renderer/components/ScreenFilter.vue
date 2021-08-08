@@ -38,10 +38,12 @@ export default {
     position:absolute;
     height:100%;
     width:100%;
+    transition:all 0.5s ease-in-out;
 }
 #darkness {
     position:absolute;
     height:100%;
     width:100%;
+    transition:all 0.5s ease-in-out;
 }
 </style>

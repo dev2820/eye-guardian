@@ -1,5 +1,6 @@
 const state = {
     show: false,
+    autoSetting:false,//true일 경우 어두워지면 자동으로 밝기 조절
     blueLightFigure:0.1,//0~0.5
     darkness:0 // 0~0.5
 }
