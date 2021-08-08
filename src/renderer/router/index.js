@@ -31,6 +31,11 @@ export default new Router({
       component: require('@/components/FaceProcess').default
     },
     {
+      path: '/stretchGuideScreen',
+      name: 'stretch-guide-screen',
+      component: require('@/components/StretchGuideScreen').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

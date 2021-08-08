@@ -1,11 +1,7 @@
 import { app, BrowserWindow, Menu, Tray,nativeImage, ipcRenderer,ipcMain } from 'electron'
 import '../renderer/store'
-// import camera from 'camera'
-import * as faceapi from 'face-api.js';
 import '@tensorflow/tfjs'
-import fs from 'fs';
 import path from 'path'
-import { exec, fork } from 'child_process'
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -14,17 +10,14 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let settingWindow,ScreenFilterWindow,warningMessageWindow,faceProcessWindow
+let settingWindow,ScreenFilterWindow,warningMessageWindow,faceProcessWindow,stretchGuideWindow
 let tray = null
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`;
 
 function createWindow () {
-  /**
-   * Initial window options
-   */
-  settingWindow = new BrowserWindow({
+  settingWindow = new BrowserWindow({//설정 화면
     webPreferences: { nodeIntegration: true },
     height: 563,
     useContentSize: true,
@@ -32,7 +25,7 @@ function createWindow () {
   })
   settingWindow.loadURL(winURL)
 
-  ScreenFilterWindow = new BrowserWindow({
+  ScreenFilterWindow = new BrowserWindow({//필터(블루라이트,명암 등)
     webPreferences: { nodeIntegration: true },
     fullscreen:true,
     frame:false,
@@ -51,7 +44,8 @@ function createWindow () {
     ScreenFilterWindow.loadURL(winURL+'#screenFilter')
   }
   ScreenFilterWindow.setIgnoreMouseEvents(true);
-  warningMessageWindow = new BrowserWindow({
+
+  warningMessageWindow = new BrowserWindow({//경고 화면
     webPreferences: { nodeIntegration: true },
     fullscreen:true,
     frame:false,
@@ -72,10 +66,10 @@ function createWindow () {
   }
   warningMessageWindow.setIgnoreMouseEvents(true);
 
-  faceProcessWindow = new BrowserWindow({
+  faceProcessWindow = new BrowserWindow({//웹캠 관련 처리가 동작하는 화면
     webPreferences: { nodeIntegration: true },
     useContentSize: true,
-    show:true
+    show:true//추후 안보이게 변경할 예정
   })
   
   if(process.env.NODE_ENV === 'development') {
@@ -85,7 +79,25 @@ function createWindow () {
     faceProcessWindow.loadURL(winURL+'#faceProcess')
   }
   
-  tray = new Tray(path.join(__static,'/images/icon.ico'));
+  stretchGuideWindow = new BrowserWindow({//스트레칭화면
+    webPreferences: { nodeIntegration: true },
+    useContentSize: true,
+    frame:false,
+    // alwaysOnTop :true,
+    transparent:true,
+    webPreferences: {
+      devTools: false
+    },
+    show:false
+  })
+  
+  if(process.env.NODE_ENV === 'development') {
+    stretchGuideWindow.loadURL(winURL+'/#/stretchGuideScreen')
+  }
+  else {
+    stretchGuideWindow.loadURL(winURL+'#stretchGuideScreen')
+  }
+  tray = new Tray(path.join(__static,'/images/icon.ico'));//작업 관리자 요소
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'setting',
@@ -101,6 +113,7 @@ function createWindow () {
         ScreenFilterWindow.close();
         warningMessageWindow.close();
         faceProcessWindow.close();
+        stretchGuideWindow.close();
         settingWindow.destroy();
       }
     },
@@ -111,7 +124,7 @@ function createWindow () {
     settingWindow.show();
   })
   
-  settingWindow.on('close', (e) => {
+  settingWindow.on('close', (e) => {//설정 화면을 꺼도 꺼지지 않게 함
     e.preventDefault();
     settingWindow.hide();
   })
@@ -126,6 +139,9 @@ function createWindow () {
   })
   faceProcessWindow.on('closed',()=>{
     faceProcessWindow = null;
+  })
+  stretchGuideWindow.on('closed',()=>{
+    stretchGuideWindow = null;
   })
 }
 // setTimeout(()=>{
@@ -190,6 +206,13 @@ ipcMain.on('READY',(evt,payload)=>{
 ipcMain.on('MESSAGE',(evt,payload)=>{
   console.log(evt,payload)
   faceProcessWindow.send('MESSAGE2',2)
+})
+ipcMain.on('SHOW_STRETCH_GUIDE',(evt,payload)=>{
+  stretchGuideWindow.show();
+  stretchGuideWindow.send('PLAY_STRETCH_GUIDE');
+})
+ipcMain.on('HIDE_STRETCH_GUIDE',(evt,payload)=>{
+  stretchGuideWindow.hide();
 })
 // const cv = require('opencv4nodejs');
 // try {
