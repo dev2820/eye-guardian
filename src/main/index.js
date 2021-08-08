@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, Tray,nativeImage, ipcRenderer,ipcMain } from 'electron'
 import '../renderer/store'
-import camera from 'camera'
+// import camera from 'camera'
 import * as faceapi from 'face-api.js';
 import '@tensorflow/tfjs'
 import fs from 'fs';
@@ -148,14 +148,14 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('BRIGHT',(evt,payload)=>{
-  const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
-    if(stderr) {
-      console.error(stderr)
-    }
-    console.log(stdout)
-  })
-})
+// ipcMain.on('BRIGHT',(evt,payload)=>{
+//   const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
+//     if(stderr) {
+//       console.error(stderr)
+//     }
+//     console.log(stdout)
+//   })
+// })
 
 // ipcMain.on('START',(evt,payload)=>{
 //   console.log(evt,payload,'START')

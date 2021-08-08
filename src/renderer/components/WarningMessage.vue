@@ -35,6 +35,9 @@ export default {
                 case 'too-close':{
                     return '디스플레이 거리 경고'
                 }
+                case 'bright-warning':{
+                    return '주변이 너무 어둡습니다. 지금은 아니지만 추후 자동으로 화면 밝기를 조정할 예정입니다.'
+                }
                 default: {
                     return ''
                 }
