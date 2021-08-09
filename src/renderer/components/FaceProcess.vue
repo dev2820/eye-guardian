@@ -1,7 +1,7 @@
 <template>
     <div id="face-process">
         <canvas id="inputCanvas" style="display:none"></canvas>
-        <video id="inputVideo"></video>
+        <video id="inputVideo" autoplay></video>
         <div>{{detectFace}}</div>
     </div>
 </template>
@@ -74,8 +74,8 @@ export default {
             videoEl.addEventListener('play',()=>{
                 draw();
                 bright();
-            },false)
 
+            },false)
             
             let draw = async () => {
                 function makeImage(){
@@ -87,10 +87,14 @@ export default {
                 }
                 const img = makeImage();
                 const detections = await faceapi.detectSingleFace(img)
-                this.detectFace = detections?detections.classScore : 'no face'
+                if(detections){
+                    console.log(detections)
+                    this.detectFace = detections?detections.classScore : 'no face'
+                }
                 
                 setTimeout( draw, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
+            
             let bright = async () =>{
                 const context = canvas.getContext('2d');
                 // context.drawImage(videoEl, 0, 0, 200, 200);
@@ -116,10 +120,22 @@ export default {
                 if(brightness<=0) {
                     //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
                 }
-                else if(brightness < 60){
+                else if(brightness < 50){
                     this.generateBrightWarning();
                 }
                 setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
+            }
+            let eyeblink = async () => {
+                //눈 깜빡임 감지 로직 
+                //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+            }
+            let sitted = async () => {
+                //앉아있는지 감지하는 로직
+                //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+            }
+            let screenDistance = async () => {
+                //화면과의 거리 감지하는 로직
+                //setTimeout( screenDistance, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
         }
     }
