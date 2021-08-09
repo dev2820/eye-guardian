@@ -17,13 +17,7 @@ export default {
         }
     },
     mounted() {
-        // setTimeout(()=>{//추후, 비디오가 끝나면 closeStretchGuide를 실행하도록 수정
-        //     // this.closeStretchGuide();
-        // },5000)
         const videoEl = this.$refs['stretchVideo'];
-        // videoEl.addEventListener('play',()=>{
-        //     console.log('play')
-        // });
         videoEl.addEventListener('ended',()=>{//플레이가 끝나면
             // console.log('ended')
             this.closeStretchGuide();

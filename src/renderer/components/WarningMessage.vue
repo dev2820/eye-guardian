@@ -7,24 +7,37 @@
     >
         <div class="message flip-item" v-for="(message,index) in messages" :key="index">
             <font-awesome-icon icon="exclamation-triangle" class="icon"/>
-            <p class="text">{{message.type | messageFilter}}</p>
+            <p class="text">{{message | messageFilter}}</p>
         </div>
     </transition-group>
 </template>
 <script>
-import { mapState } from 'vuex'
+import setting from '/setting.json'
+import { ipcRenderer as ipc } from 'electron'
 export default {
     name:'warning-message',
     data(){
         return {
-            show:false
+            mode:'regular-top',
+            messages: [],
+            duration:3
         }
     },
-    computed: {
-        ...mapState({
-            mode: state=>state.WarningMessage.mode,
-            messages: (state)=>state.WarningMessage.messageQueue
-        }),
+    mounted(){
+        this.mode = setting.warningMessage.mode;
+        this.duration = setting.warningMessage.duration;
+        ipc.on('SET_WARNING_MODE',(evt,payload)=>{
+            this.mode = payload;
+        })
+        ipc.on('INSERT_MESSAGE',(evt,payload)=>{
+            this.messages.unshift(payload);
+            setTimeout(()=>{
+                this.messages.pop()
+            },this.duration*1000)
+        })
+        ipc.on('SET_WARNING_DURATION',(evt,payload)=>{
+            this.duration = parseInt(payload);
+        })
     },
     filters: {
         messageFilter(type){

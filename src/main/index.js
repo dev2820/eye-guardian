@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Menu, Tray,nativeImage, ipcRenderer,ipcMain } from 'electron'
-import '../renderer/store'
 import '@tensorflow/tfjs'
 import path from 'path'
+import fs from 'fs'
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -9,7 +9,7 @@ import path from 'path'
 if (process.env.NODE_ENV !== 'development') {
   global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
-
+const setting = JSON.parse(fs.readFileSync('setting.json','utf-8'));
 let settingWindow,ScreenFilterWindow,warningMessageWindow,faceProcessWindow,stretchGuideWindow
 let tray = null
 const winURL = process.env.NODE_ENV === 'development'
@@ -24,26 +24,6 @@ function createWindow () {
     width: 1000,
   })
   settingWindow.loadURL(winURL)
-
-  ScreenFilterWindow = new BrowserWindow({//필터(블루라이트,명암 등)
-    webPreferences: { nodeIntegration: true },
-    fullscreen:true,
-    frame:false,
-    transparent:true,
-    alwaysOnTop :true,
-    focusable:false,
-    resizable:false,
-    webPreferences: {
-      devTools: false
-    },
-  })
-  if(process.env.NODE_ENV === 'development') {
-    ScreenFilterWindow.loadURL(winURL+'/#/screenFilter')
-  }
-  else {
-    ScreenFilterWindow.loadURL(winURL+'#screenFilter')
-  }
-  ScreenFilterWindow.setIgnoreMouseEvents(true);
 
   warningMessageWindow = new BrowserWindow({//경고 화면
     webPreferences: { nodeIntegration: true },
@@ -65,6 +45,26 @@ function createWindow () {
     warningMessageWindow.loadURL(winURL+'#warningMessage')
   }
   warningMessageWindow.setIgnoreMouseEvents(true);
+
+  ScreenFilterWindow = new BrowserWindow({//필터(블루라이트,명암 등)
+    webPreferences: { nodeIntegration: true },
+    fullscreen:true,
+    frame:false,
+    transparent:true,
+    alwaysOnTop :true,
+    focusable:false,
+    resizable:false,
+    webPreferences: {
+      devTools: false
+    },
+  })
+  if(process.env.NODE_ENV === 'development') {
+    ScreenFilterWindow.loadURL(winURL+'/#/screenFilter')
+  }
+  else {
+    ScreenFilterWindow.loadURL(winURL+'#screenFilter')
+  }
+  ScreenFilterWindow.setIgnoreMouseEvents(true);
 
   faceProcessWindow = new BrowserWindow({//웹캠 관련 처리가 동작하는 화면
     webPreferences: { nodeIntegration: true },
@@ -110,6 +110,7 @@ function createWindow () {
       label: 'exit',
       type: 'normal',
       click(){
+        fs.writeFileSync('setting.json',JSON.stringify(setting));
         ScreenFilterWindow.close();
         warningMessageWindow.close();
         faceProcessWindow.close();
@@ -144,12 +145,7 @@ function createWindow () {
     stretchGuideWindow = null;
   })
 }
-// setTimeout(()=>{
-//   settingWindow.send('SCREEN_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
-// },5000);
-// setTimeout(()=>{
-//   settingWindow.send('SCREEN_FILTER_CONTROL',true);//블루스크린을 켜는 ipc 통신
-// },5000);
+
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
@@ -164,19 +160,53 @@ app.on('activate', () => {
   }
 })
 
-// ipcMain.on('BRIGHT',(evt,payload)=>{
-//   const py = exec('py bright/main.py --input_path snapshot/0image.jpeg',(err,stdout,stderr)=>{
-//     if(stderr) {
-//       console.error(stderr)
-//     }
-//     console.log(stdout)
-//   })
-// })
+//set show stretch_guide
+ipcMain.on('SHOW_STRETCH_GUIDE',(evt,payload)=>{
+  stretchGuideWindow.show();
+  stretchGuideWindow.send('PLAY_STRETCH_GUIDE');
+})
+ipcMain.on('HIDE_STRETCH_GUIDE',(evt,payload)=>{
+  stretchGuideWindow.hide();
+})
 
-// ipcMain.on('START',(evt,payload)=>{
-//   console.log(evt,payload,'START')
-// })
-let count=0;
+//set screenFilter
+ipcMain.on('SET_FILTER_SHOW',(evt,payload)=>{
+  setting.screenFilter.show=payload;
+  ScreenFilterWindow.send('SET_FILTER_SHOW',payload)
+})
+ipcMain.on('SET_DARKNESS',(evt,payload)=>{
+  setting.screenFilter.darkness=payload;
+  ScreenFilterWindow.send('SET_DARKNESS',payload)
+})
+ipcMain.on('SET_BLUELIGHTFIGURE',(evt,payload)=>{
+  setting.screenFilter.blueLightFigure=payload;
+  ScreenFilterWindow.send('SET_BLUELIGHTFIGURE',payload)
+})
+
+//set warningMessage
+ipcMain.on('SET_WARNING_MODE',(evt,payload)=>{
+  setting.warningMessage.mode=payload;
+  warningMessageWindow.send('SET_WARNING_MODE',payload)
+})
+ipcMain.on('INSERT_MESSAGE',(evt,payload)=>{
+  warningMessageWindow.send('INSERT_MESSAGE',payload)
+})
+ipcMain.on('SET_WARNING_DURATION',(evt,payload)=>{
+  setting.warningMessage.show=payload;
+  warningMessageWindow.send('SET_WARNING_DURATION',payload)
+})
+
+//opencv4nodejs로 사진 띄우는 예제
+// const cv = require('opencv4nodejs');
+// try {
+//   const image = cv.imread(path.resolve('static','images/test.jpg'));
+//   cv.imshowWait('Image', image);
+// }
+// catch(err){
+//   console.log('err',err);
+// }
+
+// camera 모듈 사용 예제
 // // let ready=0;
 // const webcam = camera.createStream()
 // webcam.on('data', async (buffer) => {
@@ -199,49 +229,3 @@ let count=0;
 //   // 
 //   // console.log(detections)
 // })
-ipcMain.on('READY',(evt,payload)=>{
-  // console.log(evt,payload,'READY');
-  faceProcessWindow.send('FACE_DETECT_START',true)
-})
-ipcMain.on('MESSAGE',(evt,payload)=>{
-  // console.log(evt,payload)
-  faceProcessWindow.send('MESSAGE2',2)
-})
-ipcMain.on('SHOW_STRETCH_GUIDE',(evt,payload)=>{
-  stretchGuideWindow.show();
-  stretchGuideWindow.send('PLAY_STRETCH_GUIDE');
-})
-ipcMain.on('HIDE_STRETCH_GUIDE',(evt,payload)=>{
-  stretchGuideWindow.hide();
-})
-ipcMain.on('BRIGHT_WARNING',(evt,payload)=>{
-  settingWindow.send('INSERT_BRIGHT_WARNING',payload);
-})
-// const cv = require('opencv4nodejs');
-// try {
-//   const image = cv.imread(path.resolve('static','images/test.jpg'));
-//   cv.imshowWait('Image', image);
-// }
-// catch(err){
-//   console.log('err',err);
-// }
-
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-/*
-import { autoUpdater } from 'electron-updater'
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- */

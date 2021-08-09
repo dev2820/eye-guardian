@@ -45,14 +45,12 @@
         <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
         <hr/>
         <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>
-        
         <hr/>
         
     </div>
 </template>
-
 <script>
-import { mapState,mapMutations,mapActions } from 'vuex'
+import setting from '/setting.json'
 import { ipcRenderer as ipc } from 'electron'
 import Tooltip from './Tooltip.vue'
 import Toggle from './Toggle.vue'
@@ -65,50 +63,34 @@ export default {
                 top:0,
                 left:0
             },
+            isScreenFilterOn: false,
+            duration: 3,
+            darkness: 0,
+            blueLightFigure: 0
         }
     },
     components: { 
         Tooltip,
         Toggle 
     },
+    // created(){
+    //     ipc.on('INIT_DATA',(evt,payload)=>{
+    //         console.log(payload)
+    //     })
+    // },
     mounted(){
+        this.isScreenFilterOn = setting.screenFilter.show;
+        this.duration = setting.warningMessage.duration;
+        this.darkness = setting.screenFilter.darkness;
+        this.blueLightFigure = setting.screenFilter.blueLightFigure;
+        // ipc.on('INIT_DATA',(evt,payload)=>{
+        //     console.log(payload)
+        // })
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
             this.insertMessage(payload.type);
         })
     },
-    computed: {
-        ...mapState({
-            isScreenFilterOn: state=>state.ScreenFilter.show,
-            duration: state=>state.WarningMessage.duration,
-            darkness: state=>state.ScreenFilter.darkness,
-            blueLightFigure: state=>state.ScreenFilter.blueLightFigure,
-        })
-    },
     methods: {
-        ...mapActions([
-            'showFilter',
-            'hideFilter',
-            'setWarningMode',
-            'insertWarningMessage',
-            'clearWarningMEssage',
-            'setDarkness',
-            'setBlueLightFigure',
-            'setWarningDuration'
-        ]),
-        showScreenFilter(boolean){
-            if(boolean){
-                this.$store.dispatch('showFilter');
-            }
-            else {
-                this.$store.dispatch('hideFilter');
-            }
-        },
-        increase(){
-            this.$store.dispatch('someAsyncTask')
-        },
-        decrease(){
-            this.$store.dispatch('someAsyncTask')
-        },
         showGuideText(e,guideType) {
             this.guidePosition.top=e.clientY;
             this.guidePosition.left=e.clientX;
@@ -120,26 +102,39 @@ export default {
             }
             this.showGuide=true;
         },
+        showScreenFilter(boolean){
+            this.isScreenFilterOn = boolean;
+            ipc.send('SET_FILTER_SHOW',boolean)
+            // this.$store.dispatch('showFilter');
+        },
+        setDarkness(e){
+            this.darkness = e.target.value;
+            ipc.send('SET_DARKNESS',e.target.value);
+            // this.$store.dispatch('setDarkness',e.target.value);
+        },
+        setBlueLightFigure(e){
+            this.blueLightFigure = e.target.value;
+            ipc.send('SET_BLUELIGHTFIGURE',e.target.value);
+            // this.$store.dispatch('setBlueLightFigure',e.target.value);
+        },
         hideGuideText(){
             this.showGuide=false;
         },
         changeMessageMode(mode) {
-            this.$store.dispatch('setWarningMode',mode);
+            ipc.send('SET_WARNING_MODE',mode);
+            // this.$store.dispatch('setWarningMode',mode);
         },
         insertMessage(type) {
-            this.$store.dispatch('insertWarningMessage',{type,duration:this.duration});
+            ipc.send('INSERT_MESSAGE',type);
+            // this.$store.dispatch('insertWarningMessage',{type,duration:this.duration});
         },
         clearMessage(){
-            this.$store.dispatch('clearWarningMEssage');
-        },
-        setDarkness(e){
-            this.$store.dispatch('setDarkness',e.target.value);
-        },
-        setBlueLightFigure(e){
-            this.$store.dispatch('setBlueLightFigure',e.target.value);
+            // ipc.send('SET_WARNING_MODE',mode);
+            // this.$store.dispatch('clearWarningMEssage');
         },
         setWarningDuration(e){
-            this.$store.dispatch('setWarningDuration',e.target.value);
+            ipc.send('SET_WARNING_DURATION',e.target.value);
+            // this.$store.dispatch('setWarningDuration',e.target.value);
         },
         playStretchGuide(){
             ipc.send('SHOW_STRETCH_GUIDE');

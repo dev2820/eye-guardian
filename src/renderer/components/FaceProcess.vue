@@ -3,6 +3,7 @@
         <canvas id="inputCanvas" style="display:none"></canvas>
         <video id="inputVideo" autoplay></video>
         <div>{{detectFace}}</div>
+        <div id="detect-box"></div>
     </div>
 </template>
 
@@ -11,7 +12,6 @@ import * as faceapi from 'face-api.js';
 import { ipcRenderer as ipc } from 'electron'
 import { exec } from 'child_process'
 import fs from 'fs'
-import { mapState,mapActions } from 'vuex'
 
 faceapi.env.monkeyPatch({
     Canvas: HTMLCanvasElement,
@@ -26,7 +26,7 @@ export default {
     name:'face-process',
     data(){
         return {
-            detectFace:'no face'
+            detectFace:'no face',
         }
     },
     mounted(){
@@ -36,26 +36,16 @@ export default {
             faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
         ]).then(()=>{
             this.showVideo();//웹캠을 실행하며, 웹캠으로부터 받아온 리소스를 처리하는 메소드
-            ipc.send('MESSAGE',1);
-        })
-        ipc.on('MESSAGE2',(evt,payload)=>{
-            console.log(evt,payload)
-        })
-    },
-    computed: {
-        ...mapState({
-            isScreenFilterOn: state=>state.ScreenFilter.show,
-            duration: state=>state.WarningMessage.duration,
         })
     },
     methods:{
-        ...mapActions(['insertMessage']),
         generateBrightWarning(){
-            ipc.send('BRIGHT_WARNING',{type:'bright-warning'})
+            ipc.send('INSERT_MESSAGE','bright-warning')
         },
         showVideo(){
             const videoEl = document.getElementById('inputVideo')
             const canvas = document.getElementById('inputCanvas')
+            const box = document.getElementById('detect-box')
             navigator.getMedia = navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
             navigator.mozGetuserMedia ||
@@ -74,15 +64,15 @@ export default {
             videoEl.addEventListener('play',()=>{
                 draw();
                 bright();
-                eyeblink();
-                sitted();
-                screenDistance();
+                // eyeblink();
+                // sitted();
+                // screenDistance();
             },false)
             
             let draw = async () => {
                 function makeImage(){
                     const context = canvas.getContext('2d');
-                    context.drawImage(videoEl, 0, 0, 200, 200);
+                    context.drawImage(videoEl, 0, 0, 300, 150);
                     const img = new Image();
                     img.src = canvas.toDataURL('image/jpeg');
                     return img;
@@ -91,10 +81,13 @@ export default {
                 const detections = await faceapi.detectSingleFace(img)
                 if(detections){
                     console.log(detections)
+                    box.style.width = detections.box.width+'px';
+                    box.style.height = detections.box.height+'px';
+                    box.style.top = detections.box.y+'px';
+                    box.style.left = detections.box.x+'px';
                     this.detectFace = detections?detections.classScore : 'no face'
                 }
-                
-                setTimeout( draw, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+                setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
             
             let bright = async () =>{
@@ -136,6 +129,19 @@ export default {
                 //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
             let screenDistance = async () => {
+                function makeImage(){
+                    const context = canvas.getContext('2d');
+                    context.drawImage(videoEl, 0, 0, 200, 200);
+                    const img = new Image();
+                    img.src = canvas.toDataURL('image/jpeg');
+                    return img;
+                }
+                const img = makeImage();
+                // const detections = await faceapi.detectSingleFace(img)
+                // if(detections){
+                    // console.log(detections)
+                    // this.detectFace = detections?detections.classScore : 'no face'
+                // }
                 //화면과의 거리 감지하는 로직
                 //setTimeout( screenDistance, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
@@ -145,6 +151,12 @@ export default {
 </script>
 <style scoped>
 video {
-    border:2px solid black;
+    /* border:2px solid black; */
+    width:300px;
+    height:150px;
+}
+div#detect-box {
+    position:absolute;
+    background:red;
 }
 </style>

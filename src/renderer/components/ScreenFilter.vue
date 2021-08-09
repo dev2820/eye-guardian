@@ -6,19 +6,29 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import setting from '/setting.json'
+import { ipcRenderer as ipc } from 'electron'
 export default {
     name:'ScreenFilter',
     data(){
         return {
-
+            isScreenFilterOn: false,
+            blueLightFigure: 0,
+            darkness: 0
         }
     },
-    computed: {
-        ...mapState({
-            isScreenFilterOn: state=>state.ScreenFilter.show,
-            blueLightFigure: state=>state.ScreenFilter.blueLightFigure,
-            darkness: state=>state.ScreenFilter.darkness,
+    mounted(){
+        this.isScreenFilterOn = setting.screenFilter.show;
+        this.blueLightFigure = setting.screenFilter.blueLightFigure;
+        this.darkness = setting.screenFilter.darkness;
+        ipc.on('SET_FILTER_SHOW',(evt,payload)=>{
+            this.isScreenFilterOn = payload;
+        })
+        ipc.on('SET_BLUELIGHTFIGURE',(evt,payload)=>{
+            this.blueLightFigure = payload;
+        })
+        ipc.on('SET_DARKNESS',(evt,payload)=>{
+            this.darkness = payload;
         })
     },
 }
