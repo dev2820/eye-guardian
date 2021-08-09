@@ -41,6 +41,10 @@
             <button @click="insertMessage('bright-warning')">insert bright warning</button>
             <button @click="clearMessage()">clear message</button>
         </section>
+        <section>
+            얼굴 거리 설정
+            <button @click="saveDistanceStd()">저장</button>
+        </section>
         <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>
         <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
         <hr/>
@@ -106,6 +110,9 @@ export default {
             this.isScreenFilterOn = boolean;
             ipc.send('SET_FILTER_SHOW',boolean)
             // this.$store.dispatch('showFilter');
+        },
+        saveDistanceStd(){
+            ipc.send('SAVE_DISTANCE', null)
         },
         setDarkness(e){
             this.darkness = e.target.value;

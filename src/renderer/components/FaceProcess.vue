@@ -42,10 +42,14 @@ export default {
         generateBrightWarning(){
             ipc.send('INSERT_MESSAGE','bright-warning')
         },
+        generateDistanceWarning(){
+            ipc.send('INSERT_MESSAGE','distance-warning')
+        },
         showVideo(){
             const videoEl = document.getElementById('inputVideo')
             const canvas = document.getElementById('inputCanvas')
             const box = document.getElementById('detect-box')
+            let distance;
             navigator.getMedia = navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
             navigator.mozGetuserMedia ||
@@ -61,12 +65,20 @@ export default {
                     console.error(err)
                 }
             );
+
+            fs.readFile('distance.ini', (err, data)=>{
+                if(err)
+                    return console.log('기본 정보 없음');
+                distance = parseFloat(data.toString());
+            })
+            
             videoEl.addEventListener('play',()=>{
+                ipc.on('SAVE_DISTANCE', saveDistance)
                 draw();
                 bright();
                 // eyeblink();
                 // sitted();
-                // screenDistance();
+                screenDistance();
             },false)
             
             let draw = async () => {
@@ -80,13 +92,12 @@ export default {
                 const img = makeImage();
                 const detections = await faceapi.detectSingleFace(img)
                 if(detections){
-                    console.log(detections)
                     box.style.width = detections.box.width+'px';
                     box.style.height = detections.box.height+'px';
                     box.style.top = detections.box.y+'px';
                     box.style.left = detections.box.x+'px';
-                    this.detectFace = detections?detections.classScore : 'no face'
                 }
+                this.detectFace = detections?detections.classScore : 'no face'
                 setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
             
@@ -136,14 +147,39 @@ export default {
                     img.src = canvas.toDataURL('image/jpeg');
                     return img;
                 }
-                const img = makeImage();
-                // const detections = await faceapi.detectSingleFace(img)
-                // if(detections){
-                    // console.log(detections)
-                    // this.detectFace = detections?detections.classScore : 'no face'
-                // }
+                if(distance){
+                    const img = makeImage();
+                    const detections = await faceapi.detectSingleFace(img)
+                    if(detections && distance*8/6 < detections.box.width){
+                        this.generateDistanceWarning();
+                        console.log('waring!')
+                    }
+                    else{
+                        console.log('it\'s ok')
+                    }
+                }
                 //화면과의 거리 감지하는 로직
-                //setTimeout( screenDistance, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+                setTimeout( screenDistance, 3*1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+            }
+            const saveDistance = async ()=>{
+                console.log('hhi')
+                function makeImage(){
+                    const context = canvas.getContext('2d');
+                    context.drawImage(videoEl, 0, 0, 200, 200);
+                    const img = new Image();
+                    img.src = canvas.toDataURL('image/jpeg');
+                    return img;
+                }
+                const detections = await faceapi.detectSingleFace(makeImage());
+                if(detections){
+                    distance = detections.box.width;
+                    fs.writeFile('distance.ini', distance, (err)=>{
+                        if(err)
+                            console.err(err);
+                    })
+                }
+                else
+                    console.log('잠시후 다시시도 바람')
             }
         }
     }

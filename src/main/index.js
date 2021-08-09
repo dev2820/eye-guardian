@@ -196,6 +196,10 @@ ipcMain.on('SET_WARNING_DURATION',(evt,payload)=>{
   warningMessageWindow.send('SET_WARNING_DURATION',payload)
 })
 
+//set distance
+ipcMain.on('SAVE_DISTANCE',(evt,payload)=>{
+  faceProcessWindow.send('SAVE_DISTANCE')
+})
 //opencv4nodejs로 사진 띄우는 예제
 // const cv = require('opencv4nodejs');
 // try {
