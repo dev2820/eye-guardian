@@ -13,7 +13,7 @@
 import * as faceapi from 'face-api.js';
 import { ipcRenderer as ipc } from 'electron'
 // import { exec } from 'child_process'
-// import fs from 'fs'
+import fs from 'fs'
 import path from 'path'
 faceapi.env.monkeyPatch({
     Canvas: HTMLCanvasElement,
@@ -51,7 +51,7 @@ export default {
     mounted(){
         const dataPath =
             process.env.NODE_ENV === 'development'
-                ? path.join(__dirname,'../data')
+                ? "./data"
                 : path.join(process.resourcesPath, 'data');
         Promise.all([
             faceapi.nets.faceRecognitionNet.loadFromDisk(dataPath+'/models'),
@@ -153,14 +153,14 @@ export default {
                 }
                 setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
             }
-            let eyeblink = async () => {
-                //눈 깜빡임 감지 로직 
-                //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-            }
-            let sitted = async () => {
-                //앉아있는지 감지하는 로직
-                //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-            }
+            // let eyeblink = async () => {
+            //     //눈 깜빡임 감지 로직 
+            //     //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+            // }
+            // let sitted = async () => {
+            //     //앉아있는지 감지하는 로직
+            //     //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+            // }
             let screenDistance = async () => {
                 function makeImage(){
                     const context = canvas.getContext('2d');
