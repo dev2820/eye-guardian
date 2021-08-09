@@ -54,6 +54,9 @@ export default {
                 case 'bright-warning':{
                     return '주변이 너무 어둡습니다. 지금은 아니지만 추후 자동으로 화면 밝기를 조정할 예정입니다.'
                 }
+                case 'distance-warning':{
+                    return '얼굴이 너무 가깝네요. 떨어지세요.'
+                }
                 default: {
                     return ''
                 }

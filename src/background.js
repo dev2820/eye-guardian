@@ -247,6 +247,10 @@ ipcMain.on('SET_WARNING_DURATION',(evt,payload)=>{
   setting.warningMessage.duration=payload;
   warningMessageWindow.send('SET_WARNING_DURATION',payload)
 })
+
+ipcMain.on('SAVE_DISTANCE',(evt,payload)=>{
+  faceProcessWindow.send('SAVE_DISTANCE')
+})
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === 'win32') {
