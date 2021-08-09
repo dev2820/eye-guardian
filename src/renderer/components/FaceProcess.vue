@@ -74,7 +74,9 @@ export default {
             videoEl.addEventListener('play',()=>{
                 draw();
                 bright();
-
+                eyeblink();
+                sitted();
+                screenDistance();
             },false)
             
             let draw = async () => {
