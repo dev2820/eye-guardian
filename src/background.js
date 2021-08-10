@@ -218,9 +218,7 @@ ipcMain.on('SHOW_STRETCH_GUIDE',(evt,payload)=>{
 ipcMain.on('HIDE_STRETCH_GUIDE',(evt,payload)=>{
   stretchGuideWindow.hide();
 })
-ipcMain.on('FACEAPI_READY',()=>{
-  faceProcessWindow.send('FACEAPI_CONFIRM',1)
-})
+
 //set screenFilter
 ipcMain.on('SET_FILTER_SHOW',(evt,payload)=>{
   setting.screenFilter.show=payload;
