@@ -113,7 +113,8 @@ export default {
             // this.$store.dispatch('showFilter');
         },
         saveDistanceStd(){
-            ipc.send('SAVE_DISTANCE', null)
+            // ipc.send('SAVE_DISTANCE', null)
+            ipc.send('ESTIMATE_DISTANCE',1);
         },
         setDarkness(e){
             this.darkness = e.target.value;

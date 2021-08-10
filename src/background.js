@@ -20,6 +20,7 @@ warningMessageWindow=null,
 faceProcessWindow=null,
 stretchGuideWindow=null;
 let tray = null;
+
 const setting = JSON.parse(fs.readFileSync(path.join(dataPath,'setting.json')));
 
 function registerLocalVideoProtocol () {
@@ -246,8 +247,11 @@ ipcMain.on('SET_WARNING_DURATION',(evt,payload)=>{
   warningMessageWindow.send('SET_WARNING_DURATION',payload)
 })
 
-ipcMain.on('SAVE_DISTANCE',(evt,payload)=>{
-  faceProcessWindow.send('SAVE_DISTANCE')
+ipcMain.on('ESTIMATE_DISTANCE',(evt,payload)=>{
+  faceProcessWindow.send('ESTIMATE_DISTANCE')
+})
+ipcMain.on('SET_FACE_DISTANCE',(evt,payload)=>{
+  setting.faceProcess.faceLength = payload;
 })
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

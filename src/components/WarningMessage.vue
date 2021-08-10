@@ -48,14 +48,17 @@ export default {
                 case 'eye-blink':{
                     return '눈 깜빡임 경고'
                 }
-                case 'too-close':{
-                    return '디스플레이 거리 경고'
-                }
                 case 'bright-warning':{
                     return '주변이 너무 어둡습니다. 지금은 아니지만 추후 자동으로 화면 밝기를 조정할 예정입니다.'
                 }
                 case 'distance-warning':{
                     return '얼굴이 너무 가깝네요. 떨어지세요.'
+                }
+                case 'detect-face': {
+                    return '얼굴이 감지되었습니다.'
+                }
+                case 'no-face': {
+                    return '얼굴이 감지되지 않습니다.'
                 }
                 default: {
                     return ''

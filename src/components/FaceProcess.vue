@@ -4,7 +4,6 @@
         <video id="inputVideo" autoplay></video>
         <div>{{detectFace}}</div>
         <div>{{loadCamera}}</div>
-        <div>{{what}}</div>
         <div id="detect-box"></div>
     </div>
 </template>
@@ -13,7 +12,7 @@
 import * as faceapi from 'face-api.js';
 import { ipcRenderer as ipc } from 'electron'
 // import { exec } from 'child_process'
-import fs from 'fs'
+// import fs from 'fs'
 import path from 'path'
 faceapi.env.monkeyPatch({
     Canvas: HTMLCanvasElement,
@@ -46,9 +45,17 @@ export default {
         return {
             loadCamera: false,
             detectFace:'no face',
+            faceLength:0
         }
     },
     mounted(){
+        ipc.send('REQUEST_INIT_SCREEN_VALUE','faceProcess')
+        ipc.on('INIT',(evt,payload)=>{
+            this.faceLength = parseFloat(payload.faceProcess.faceLength);
+        })
+        ipc.on('ESTIMATE_DISTANCE',()=>{
+            this.saveDistance();
+        })
         const dataPath =
             process.env.NODE_ENV === 'development'
                 ? "./data"
@@ -67,15 +74,33 @@ export default {
     methods:{
         generateBrightWarning(){
             ipc.send('INSERT_MESSAGE','bright-warning')
+            // ipc.send('SET_DARKNESS',0.5);//0~0.5
         },
         generateDistanceWarning(){
             ipc.send('INSERT_MESSAGE','distance-warning')
+        },
+        async saveDistance() {
+            const videoEl = document.getElementById('inputVideo')
+            const canvas = document.getElementById('inputCanvas')
+            const context = canvas.getContext('2d');
+            context.drawImage(videoEl, 0, 0, 300, 150);
+            const img = new Image();
+            img.src = canvas.toDataURL('image/jpeg');
+
+            const detections = await faceapi.detectSingleFace(img);
+            if(detections){
+                this.faceLength = detections.box.width;
+                ipc.send('INSERT_MESSAGE','detect-face');
+                ipc.send('SET_FACE_DISTANCE',detections.box.width);
+            }
+            else {
+                ipc.send('INSERT_MESSAGE','no-face')
+            }
         },
         showVideo(){
             const videoEl = document.getElementById('inputVideo')
             const canvas = document.getElementById('inputCanvas')
             const box = document.getElementById('detect-box')
-            let distance;
             navigator.getMedia = navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
             navigator.mozGetuserMedia ||
@@ -91,15 +116,8 @@ export default {
                     console.error(err)
                 }
             );
-
-            fs.readFile('distance.ini', (err, data)=>{
-                if(err)
-                    return console.log('기본 정보 없음');
-                distance = parseFloat(data.toString());
-            })
             
             videoEl.addEventListener('play',()=>{
-                ipc.on('SAVE_DISTANCE', saveDistance)
                 draw();
                 bright();
                 // eyeblink();
@@ -164,44 +182,20 @@ export default {
             let screenDistance = async () => {
                 function makeImage(){
                     const context = canvas.getContext('2d');
-                    context.drawImage(videoEl, 0, 0, 200, 200);
+                    context.drawImage(videoEl, 0, 0, 300, 150);
                     const img = new Image();
                     img.src = canvas.toDataURL('image/jpeg');
                     return img;
                 }
-                if(distance){
+                if(this.faceLength !== 0){
                     const img = makeImage();
                     const detections = await faceapi.detectSingleFace(img)
-                    if(detections && distance*8/6 < detections.box.width){
+                    if(detections && (this.faceLength*8)/6 < detections.box.width){
                         this.generateDistanceWarning();
-                        console.log('waring!')
-                    }
-                    else{
-                        console.log('it\'s ok')
                     }
                 }
                 //화면과의 거리 감지하는 로직
-                setTimeout( screenDistance, 3*1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-            }
-            const saveDistance = async ()=>{
-                console.log('hhi')
-                function makeImage(){
-                    const context = canvas.getContext('2d');
-                    context.drawImage(videoEl, 0, 0, 200, 200);
-                    const img = new Image();
-                    img.src = canvas.toDataURL('image/jpeg');
-                    return img;
-                }
-                const detections = await faceapi.detectSingleFace(makeImage());
-                if(detections){
-                    distance = detections.box.width;
-                    fs.writeFile('distance.ini', distance, (err)=>{
-                        if(err)
-                            console.err(err);
-                    })
-                }
-                else
-                    console.log('잠시후 다시시도 바람')
+                setTimeout( screenDistance, 10*1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             }
         }
     }
