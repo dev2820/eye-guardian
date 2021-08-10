@@ -146,7 +146,6 @@ app.on('ready', async () => {
   },false)
   warningMessageWindow.setIgnoreMouseEvents(true);
   warningMessageWindow.setAlwaysOnTop(true,"normal")
-
   screenFilterWindow = createWindow('/#/screenFilter','index.html#screenFilter',{
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
