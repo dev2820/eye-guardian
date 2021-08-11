@@ -16,8 +16,13 @@ export default {
   padding: 0;
   font-family: 'Nanum_Gothic', 'Times New Roman', Times, serif;
 }
+:root {
+  --success-color:#67C23A;
+  --warning-color:#E6A23C;
+  --danger-color:#F56C6C;
+}
 @font-face { 
   font-family: 'Nanum_Gothic';
-  src: url('./assets/fonts/Nanum_Gothic/NanumGothic-Regular.ttf');
+  src: local('Nanum-Gothic'), url('./assets/fonts/Nanum_Gothic/NanumGothic-Regular.ttf');
 }
 </style>
