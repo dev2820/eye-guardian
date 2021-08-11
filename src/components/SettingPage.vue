@@ -153,17 +153,6 @@ export default {
         })
     },
     methods: {
-        showGuideText(e,guideType) {
-            this.guidePosition.top=e.clientY;
-            this.guidePosition.left=e.clientX;
-            switch(guideType) {
-                case 'guide1': {
-                    this.guideText='guide1에 대한 가이드라인입니다.';
-                    break;
-                }
-            }
-            this.showGuide=true;
-        },
         showScreenFilter(boolean){
             this.isScreenFilterOn = boolean;
             ipc.send('SET_FILTER_SHOW',boolean)
@@ -203,9 +192,6 @@ export default {
         setBlueLightFigure(e){
             this.blueLightFigure = parseFloat(e.target.value);
             ipc.send('SET_BLUELIGHTFIGURE',e.target.value);
-        },
-        hideGuideText(){
-            this.showGuide=false;
         },
         changeMessageMode(e) {
             if(e.target.value!==this.messageMode) {
