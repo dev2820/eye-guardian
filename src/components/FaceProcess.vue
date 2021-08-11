@@ -37,7 +37,11 @@ export default {
             this.faceLength = parseFloat(payload.faceProcess.faceLength);
         })
         ipc.on('ESTIMATE_DISTANCE',()=>{
-            this.saveDistance();
+            ipc.send('INSERT_MESSAGE',{content:'ready-to-capture',type:'normal'})
+            setTimeout(
+                ()=>this.saveDistance(),
+                5*1000
+            )
         })
         const dataPath =
             process.env.NODE_ENV === 'development'
@@ -48,7 +52,6 @@ export default {
             faceapi.nets.faceLandmark68Net.loadFromDisk(dataPath+'/models'),
             faceapi.nets.ssdMobilenetv1.loadFromDisk(dataPath+'/models')
         ]).then(()=>{
-            this.loadCamera = true;
             this.showVideo();//웹캠을 실행하며, 웹캠으로부터 받아온 리소스를 처리하는 메소드
         }).catch((err)=>{
             console.error(err)
@@ -56,11 +59,11 @@ export default {
     },
     methods:{
         generateBrightWarning(){
-            ipc.send('INSERT_MESSAGE','bright-warning')
+            ipc.send('INSERT_MESSAGE',{content:'bright-warning',type:'normal'})
             // ipc.send('SET_DARKNESS',0.5);//0~0.5
         },
         generateDistanceWarning(){
-            ipc.send('INSERT_MESSAGE','distance-warning')
+            ipc.send('INSERT_MESSAGE',{content:'distance-warning',type:'warning'})
         },
         async saveDistance() {
             const videoEl = document.getElementById('inputVideo')
@@ -70,11 +73,11 @@ export default {
             const detections = await faceapi.detectSingleFace(img);
             if(detections){
                 this.faceLength = detections.box.width;
-                ipc.send('INSERT_MESSAGE','detect-face');
+                ipc.send('INSERT_MESSAGE',{content:'capture-face',type:'normal'});
                 ipc.send('SET_FACE_DISTANCE',detections.box.width);
             }
             else {
-                ipc.send('INSERT_MESSAGE','no-face')
+                ipc.send('INSERT_MESSAGE',{content:'no-face',type:'warning'})
             }
         },
         getImgfromWebcam(videoEl,canvas){
@@ -100,11 +103,16 @@ export default {
                     videoEl.play();
                 },
                 (err) => {
+                    ipc.send('LOAD_CAMERA_FAILED',true)
                     console.error(err)
                 }
             );
             
-            videoEl.addEventListener('play',()=>{
+            videoEl.addEventListener('play',async ()=>{
+                const img = this.getImgfromWebcam(videoEl,canvas);
+                await faceapi.detectSingleFace(img)
+                this.loadCamera = true;
+                ipc.send('LOAD_CAMERA_SUCCESS',true)
                 draw();
                 bright();
                 // eyeblink();

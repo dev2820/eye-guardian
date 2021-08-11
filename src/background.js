@@ -252,6 +252,13 @@ ipcMain.on('ESTIMATE_DISTANCE',(evt,payload)=>{
 ipcMain.on('SET_FACE_DISTANCE',(evt,payload)=>{
   setting.faceProcess.faceLength = payload;
 })
+
+ipcMain.on('LOAD_CAMERA_SUCCESS',(evt,payload)=>{
+  settingWindow.send('LOAD_CAMERA_SUCCESS',true)
+})
+ipcMain.on('LOAD_CAMERA_FAILED',(evt,payload)=>{
+  settingWindow.send('LOAD_CAMERA_FAILED',true)
+})
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === 'win32') {

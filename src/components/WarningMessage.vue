@@ -6,8 +6,9 @@
             }"
     >
         <div class="message flip-item" v-for="(message,index) in messages" :key="index">
-            <font-awesome-icon icon="exclamation-triangle" class="icon"/>
-            <p class="text">{{messageFilter(message)}}</p>
+            <font-awesome-icon v-if="message.type==='warning'" icon="exclamation-triangle" class="icon"/>
+            <font-awesome-icon v-if="message.type==='normal'" icon="info-circle" class="icon"/>
+            <p class="text">{{messageFilter(message.content)}}</p>
         </div>
     </transition-group>
 </template>
@@ -43,8 +44,8 @@ export default {
         })
     },
     methods:{
-        messageFilter(type){
-            switch(type){
+        messageFilter(content){
+            switch(content){
                 case 'eye-blink':{
                     return '눈 깜빡임 경고'
                 }
@@ -54,11 +55,20 @@ export default {
                 case 'distance-warning':{
                     return '얼굴이 너무 가깝네요. 떨어지세요.'
                 }
-                case 'detect-face': {
-                    return '얼굴이 감지되었습니다.'
+                case 'capture-face': {
+                    return '얼굴 거리 설정이 완료되었습니다.'
                 }
                 case 'no-face': {
                     return '얼굴이 감지되지 않습니다.'
+                }
+                case 'ready-to-capture': {
+                    return '5초뒤 얼굴 거리를 설정합니다. 정자세를 취해주세요'
+                }
+                case 'success-capture': {
+                    return ''
+                }
+                case 'cant-detect-camera': {
+                    return '카메라가 준비되면 다시 시도해 주십시오'
                 }
                 default: {
                     return ''

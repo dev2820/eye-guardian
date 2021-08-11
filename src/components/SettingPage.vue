@@ -3,6 +3,18 @@
         <h2>setting page</h2>
         <img src="../assets/test.jpg"/>
         <img src="images/test.jpg"/>
+        <div v-if="loadCameraStatus === 'loading'">
+            <font-awesome-icon icon="spinner" class="icon" spin/>
+            카메라 로드중...
+        </div>
+        <div v-else-if="loadCameraStatus === 'success'">
+            <font-awesome-icon icon="check" class="icon"/>
+            카메라 로드 성공!
+        </div>
+        <div v-else-if="loadCameraStatus === 'failed'">
+            <font-awesome-icon icon="times" class="icon"/>
+            카메라 로드 실패...
+        </div>
         <section>
             경고문 위치
             <div>
@@ -38,14 +50,15 @@
         </section>
         <section>
             디버깅용 섹션, 추후 지울 것
-            <button @click="insertMessage('eye-blink')">insert eye-blink warning</button>
-            <button @click="insertMessage('too-close')">insert too-close warning</button>
-            <button @click="insertMessage('bright-warning')">insert bright warning</button>
+            <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
+            <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
+            <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
             <button @click="clearMessage()">clear message</button>
         </section>
         <section>
             얼굴 거리 설정
             <button @click="saveDistanceStd()">저장</button>
+            <span v-if="timer>0">{{timer}}</span>
         </section>
         <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>
         <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
@@ -77,6 +90,8 @@ export default {
             duration: 3,
             darkness: 0,
             blueLightFigure: 0,
+            loadCameraStatus: 'loading',
+            timer:0
         }
     },
     components: { 
@@ -94,6 +109,19 @@ export default {
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
             this.insertMessage(payload.type);
         })
+        ipc.on('LOAD_CAMERA_SUCCESS',()=>{
+            this.loadCameraStatus = 'success' 
+        })        
+        ipc.on('LOAD_CAMERA_FAILED',()=>{
+            this.loadCameraStatus = 'failed' 
+        })
+        ipc.on('RUN_TIMER',()=>{
+            this.timer=5;
+            setTimeout(()=>this.timer--,1*1000);
+            setTimeout(()=>this.timer--,2*1000);
+            setTimeout(()=>this.timer--,3*1000);
+            setTimeout(()=>this.timer--,4*1000);
+        })
     },
     methods: {
         showGuideText(e,guideType) {
@@ -110,41 +138,38 @@ export default {
         showScreenFilter(boolean){
             this.isScreenFilterOn = boolean;
             ipc.send('SET_FILTER_SHOW',boolean)
-            // this.$store.dispatch('showFilter');
         },
         saveDistanceStd(){
-            // ipc.send('SAVE_DISTANCE', null)
-            ipc.send('ESTIMATE_DISTANCE',1);
+            if(this.loadCameraStatus === 'success'){
+                ipc.send('ESTIMATE_DISTANCE',1);
+            }
+            else {
+                ipc.send('INSERT_MESSAGE',{content:'cant-detect-camera',type:'warning'});
+            }
         },
         setDarkness(e){
             this.darkness = e.target.value;
             ipc.send('SET_DARKNESS',e.target.value);
-            // this.$store.dispatch('setDarkness',e.target.value);
         },
         setBlueLightFigure(e){
             this.blueLightFigure = e.target.value;
             ipc.send('SET_BLUELIGHTFIGURE',e.target.value);
-            // this.$store.dispatch('setBlueLightFigure',e.target.value);
         },
         hideGuideText(){
             this.showGuide=false;
         },
         changeMessageMode(mode) {
             ipc.send('SET_WARNING_MODE',mode);
-            // this.$store.dispatch('setWarningMode',mode);
         },
-        insertMessage(type) {
-            ipc.send('INSERT_MESSAGE',type);
-            // this.$store.dispatch('insertWarningMessage',{type,duration:this.duration});
+        insertMessage(content,type) {
+            ipc.send('INSERT_MESSAGE',{content,type});
         },
         clearMessage(){
             // ipc.send('SET_WARNING_MODE',mode);
-            // this.$store.dispatch('clearWarningMEssage');
         },
         setWarningDuration(e){
             this.duration = e.target.value;
             ipc.send('SET_WARNING_DURATION',e.target.value);
-            // this.$store.dispatch('setWarningDuration',e.target.value);
         },
         playStretchGuide(){
             ipc.send('SHOW_STRETCH_GUIDE');
