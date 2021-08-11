@@ -123,7 +123,7 @@ app.on('ready', async () => {
     createProtocol('app')
   }
   settingWindow = createWindow('','index.html',{
-    width: 800, 
+    width: 1000, 
     height: 600,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
@@ -180,7 +180,7 @@ app.on('ready', async () => {
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
     },
     useContentSize: true,
-    show:true//추후 안보이게 변경할 예정
+    // show:false
   },false)
   tray = createTray(path.join(__static,'/images/icon.ico'));
 })
@@ -246,19 +246,47 @@ ipcMain.on('SET_WARNING_DURATION',(evt,payload)=>{
   warningMessageWindow.send('SET_WARNING_DURATION',payload)
 })
 
+//얼굴 거리 감지
 ipcMain.on('ESTIMATE_DISTANCE',(evt,payload)=>{
   faceProcessWindow.send('ESTIMATE_DISTANCE')
 })
 ipcMain.on('SET_FACE_DISTANCE',(evt,payload)=>{
   setting.faceProcess.faceLength = payload;
 })
-
+//카메라 감지 성공 여부
 ipcMain.on('LOAD_CAMERA_SUCCESS',(evt,payload)=>{
   settingWindow.send('LOAD_CAMERA_SUCCESS',true)
 })
 ipcMain.on('LOAD_CAMERA_FAILED',(evt,payload)=>{
   settingWindow.send('LOAD_CAMERA_FAILED',true)
 })
+//각 알람 On Off 여부
+ipcMain.on('SET_DISTANCE_WARNING',(evt,payload)=>{
+  setting.faceProcess.distanceWarningOn = payload
+  faceProcessWindow.send('SET_DISTANCE_WARNING',payload)
+})
+ipcMain.on('SET_SITTED_WARNING',(evt,payload)=>{
+  setting.faceProcess.sittedWarningOn = payload
+  faceProcessWindow.send('SET_SITTED_WARNING',payload)
+})
+ipcMain.on('SET_BRIGHT_WARNING',(evt,payload)=>{
+  setting.faceProcess.brightWarningOn = payload
+  faceProcessWindow.send('SET_BRIGHT_WARNING',payload)
+})
+ipcMain.on('SET_EYEBLINK_WARNING',(evt,payload)=>{
+  setting.faceProcess.eyeblinkWarningOn = payload
+  faceProcessWindow.send('SET_EYEBLINK_WARNING',payload)
+})
+ipcMain.on('SET_AUTO_DARKNESS_CONTROL',(evt,payload)=>{
+  setting.faceProcess.autoDarknessControl = payload
+  faceProcessWindow.send('SET_AUTO_DARKNESS_CONTROL',payload)
+})
+ipcMain.on('SET_STRETCH_GUIDE',(evt,payload)=>{
+  setting.stretchGuideScreen.isStretchGuideOn=payload;
+  faceProcessWindow.send('SET_STRETCH_GUIDE')
+})
+
+
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === 'win32') {
