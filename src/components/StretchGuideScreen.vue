@@ -1,7 +1,7 @@
 <template>
     <div class="background">
         {{isplay}}{{isended}}
-        <video ref="stretchVideo" src="local-video://Stretch.mp4" type="video/mp4"></video>
+        <video ref="stretchVideo" src="local-video://videos/Stretch.mp4" type="video/mp4"></video>
     </div>
 </template>
 
