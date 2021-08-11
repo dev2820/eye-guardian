@@ -6,10 +6,10 @@
             }"
     >
         <audio ref="warning-sound">
-            <source src="../assets/music/warning.wav" type="audio/wav" volume="1"/>
+            <source src="local-audio://musics/warning.wav" type="audio/wav" volume="1"/>
         </audio>
         <audio ref="normal-sound">
-            <source src="../assets/music/normal.wav" type="audio/wav" volume="1"/>
+            <source src="local-audio://musics/normal.wav" type="audio/wav" volume="1"/>
         </audio>
         
             
@@ -34,6 +34,7 @@ export default {
         return {
             mode:'regular-top',
             messages: [],
+            isPlaySound: false,
             duration:3
         }
     },
@@ -42,19 +43,25 @@ export default {
         ipc.on('INIT',(evt,payload)=>{
             this.mode = payload.warningMessage.mode;
             this.duration = payload.warningMessage.duration;
+            this.isPlaySound = payload.warningMessage.isPlaySound;
         })
         ipc.on('SET_WARNING_MODE',(evt,payload)=>{
             this.mode = payload;
         })
         ipc.on('INSERT_MESSAGE',(evt,payload)=>{
             this.messages.unshift(payload);
-            this.playSound(payload.type)
+            if(this.isPlaySound) {
+                this.playSound(payload.type)
+            }
             setTimeout(()=>{
                 this.messages.pop()
             },this.duration*1000)
         })
         ipc.on('SET_WARNING_DURATION',(evt,payload)=>{
             this.duration = parseInt(payload);
+        })
+        ipc.on('SET_IS_PLAY_SOUND',(evt,payload)=>{
+            this.isPlaySound = payload;
         })
     },
     methods:{
