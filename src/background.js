@@ -40,6 +40,23 @@ function registerLocalVideoProtocol () {
   })
 }
 
+function registerLocalAudioProtocol () {
+  protocol.registerFileProtocol('local-audio', (request, callback) => {
+    const url = request.url.replace(/^local-audio:\/\//, '')
+    // Decode URL to prevent errors when loading filenames with UTF-8 chars or chars like "#"
+    const decodedUrl = decodeURI(url) // Needed in case URL contains spaces
+    try {
+      // eslint-disable-next-line no-undef
+      return callback(path.join(__static, decodedUrl))
+    } catch (error) {
+      console.error(
+        'ERROR: registerLocalAudioProtocol: Could not get file path:',
+        error
+      )
+    }
+  })
+}
+
 function createWindow(devPath,prodPath,options,isSettingWindow) {
   let window = new BrowserWindow(options)
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -110,7 +127,8 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  registerLocalVideoProtocol()
+  registerLocalVideoProtocol();
+  registerLocalAudioProtocol();
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
@@ -244,6 +262,9 @@ ipcMain.on('INSERT_MESSAGE',(evt,payload)=>{
 ipcMain.on('SET_WARNING_DURATION',(evt,payload)=>{
   setting.warningMessage.duration=payload;
   warningMessageWindow.send('SET_WARNING_DURATION',payload)
+})
+ipcMain.on('SET_IS_PLAY_SOUND',(evt,payload)=>{
+  warningMessageWindow.send('SET_IS_PLAY_SOUND',payload)
 })
 
 //얼굴 거리 감지

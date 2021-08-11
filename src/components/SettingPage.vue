@@ -26,6 +26,10 @@
                     경고문 유지 시간
                     <custom-input-number :value="duration" @change="setWarningDuration" :min="1" :max="10"/>
                 </div>
+                <div>
+                    경고음 컨트롤
+                    <custom-check-box @on="setIsPlaySound(true)" @off="setIsPlaySound(false)" :checked="isPlaySound"/>
+                </div>
             </section>
             <section>
                 <h3>화면 접근 경고<toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle></h3>
@@ -54,7 +58,7 @@
                 <div>
                     blueLight 설정
                     <tooltip alt="????">
-                        <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>    
+                        <font-awesome-icon icon="question-circle" class="icon"/>    
                     </tooltip>
                     <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
                 </div>
@@ -105,6 +109,7 @@ export default {
             loadCameraStatus: 'loading',
             timer:0,
             messageMode:'regular-top',
+            isPlaySound:false,
             isStretchGuideOn:false,
             autoDarknessControl:false,
             isDistanceWarningOn:false,
@@ -128,12 +133,14 @@ export default {
             this.duration = parseInt(payload.warningMessage.duration);
             this.darkness = parseFloat(payload.screenFilter.darkness);
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
+            this.isPlaySound = payload.warningMessage.isPlaySound;
+            this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
             this.autoDarknessControl = payload.faceProcess.autoDarknessControl
             this.isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn
             this.isSittedWarningOn = payload.faceProcess.isSittedWarningOn
             this.isBrightWarningOn = payload.faceProcess.isBrightWarningOn
             this.isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn
-            this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
+            
         })
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
             this.insertMessage(payload.type);
@@ -187,11 +194,11 @@ export default {
         },
         setDarkness(e){
             this.darkness = parseFloat(e.target.value);
-            ipc.send('SET_DARKNESS',e.target.value);
+            ipc.send('SET_DARKNESS',this.darkness);
         },
         setBlueLightFigure(e){
             this.blueLightFigure = parseFloat(e.target.value);
-            ipc.send('SET_BLUELIGHTFIGURE',e.target.value);
+            ipc.send('SET_BLUELIGHTFIGURE',this.blueLightFigure);
         },
         changeMessageMode(e) {
             if(e.target.value!==this.messageMode) {
@@ -204,8 +211,8 @@ export default {
             ipc.send('INSERT_MESSAGE',{content,type});
         },
         setWarningDuration(e){
-            this.duration = e.target.value;
-            ipc.send('SET_WARNING_DURATION',e.target.value);
+            this.duration = parseInt(e.target.value);
+            ipc.send('SET_WARNING_DURATION',this.duration);
         },
         playStretchGuide(){
             ipc.send('SHOW_STRETCH_GUIDE');
@@ -213,6 +220,10 @@ export default {
         setStretchGuide(boolean) {
             this.isStretchGuideOn = boolean;
             ipc.send('SET_STRETCH_GUIDE',boolean);
+        },
+        setIsPlaySound(boolean) {
+            this.isPlaySound = boolean;
+            ipc.send('SET_IS_PLAY_SOUND',boolean);
         }
     }
 }
