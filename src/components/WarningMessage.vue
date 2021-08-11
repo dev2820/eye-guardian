@@ -5,6 +5,14 @@
                 'mini':mode==='mini',
             }"
     >
+        <audio ref="warning-sound">
+            <source src="../assets/music/warning.wav" type="audio/wav" volume="1"/>
+        </audio>
+        <audio ref="normal-sound">
+            <source src="../assets/music/normal.wav" type="audio/wav" volume="1"/>
+        </audio>
+        
+            
         <div class="message flip-item" v-for="(message,index) in messages" :key="index"
             :class="{
                 'normal':message.type==='normal',
@@ -13,7 +21,7 @@
         >
             <font-awesome-icon v-if="message.type==='warning'" icon="exclamation-triangle" class="icon"/>
             <font-awesome-icon v-if="message.type==='normal'" icon="info-circle" class="icon"/>
-            <p class="text">{{messageFilter(message.content)}}</p>
+            <p class="delimeter">|</p><p class="text">{{messageFilter(message.content)}}</p>
         </div>
     </transition-group>
 </template>
@@ -40,6 +48,7 @@ export default {
         })
         ipc.on('INSERT_MESSAGE',(evt,payload)=>{
             this.messages.unshift(payload);
+            this.playSound(payload.type)
             setTimeout(()=>{
                 this.messages.pop()
             },this.duration*1000)
@@ -49,13 +58,21 @@ export default {
         })
     },
     methods:{
+        playSound(type){
+            if(type==='normal') {
+                this.$refs['normal-sound'].play();
+            }
+            else if(type==='warning') {
+                this.$refs['warning-sound'].play();
+            }
+        },
         messageFilter(content){
             switch(content){
                 case 'eye-blink':{
                     return '눈 깜빡임 경고'
                 }
                 case 'bright-warning':{
-                    return '주변이 너무 어둡습니다. 지금은 아니지만 추후 자동으로 화면 밝기를 조정할 예정입니다.'
+                    return '주변이 너무 어둡습니다.'
                 }
                 case 'distance-warning':{
                     return '얼굴이 너무 가깝네요. 떨어지세요.'
@@ -114,7 +131,7 @@ export default {
     justify-content: flex-start;
     flex-direction:column-reverse;
     height:80px;
-    width:700px;
+    width:500px;
     left:50%;
     margin-left:-350px;
     bottom:150px;
@@ -128,23 +145,35 @@ export default {
     bottom:45px;
 }
 #warning-message-queue .message {
+    display:flex;
+    flex-direction:row;
     position:relative;
     border-radius:8px;
     text-align:center;
     font-weight:bold;
     font-size:1.3em;
-    padding:10px;
+    padding:10px 20px;
     margin-top:10px;
+    color:#EBEEF5;
+}
+#warning-message-queue .message .icon {
+    margin:auto 0;
+}
+#warning-message-queue .message .delimeter {
+    margin:auto 10px;
+}
+#warning-message-queue .message .text {
+    flex-grow:1;
+    margin:auto 0;
+    text-align:center;
 }
 .normal {
-    opacity:0.5;
+    opacity:0.9;
     background-color:var(--success-color);
-    color:#EBEEF5;
 }
 .warning {
     opacity:0.9;
     background-color:var(--danger-color);
-    color:#EBEEF5;
 }
 .flip-item {
     transition:all 0.3s;
