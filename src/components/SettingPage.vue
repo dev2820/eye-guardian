@@ -1,82 +1,94 @@
 <template>
-    <div>
-        <h2>setting page</h2>
-        <img src="../assets/test.jpg"/>
-        <img src="images/test.jpg"/>
-        <div v-if="loadCameraStatus === 'loading'">
-            <font-awesome-icon icon="spinner" class="icon" spin/>
-            카메라 로드중...
+    <div id="setting-page">
+        <div id="main-image">
+            <img src="../assets/images/test.jpg"/>
         </div>
-        <div v-else-if="loadCameraStatus === 'success'">
-            <font-awesome-icon icon="check" class="icon"/>
-            카메라 로드 성공!
-        </div>
-        <div v-else-if="loadCameraStatus === 'failed'">
-            <font-awesome-icon icon="times" class="icon"/>
-            카메라 로드 실패...
-        </div>
-        <section>
-            경고문 위치
-            <div>
-                <button @click="changeMessageMode('regular-top')">regular-top</button>
-                <button @click="changeMessageMode('regular-bottom')">regular-bottom</button>
-                <button @click="changeMessageMode('mini')">mini</button>
+        <div id="settings">
+            <h2>setting page</h2>
+            <div v-if="loadCameraStatus === 'loading'">
+                <font-awesome-icon icon="spinner" class="icon" spin/>
+                카메라 로드중...
             </div>
-            <div>
-                경고문 유지 시간
-                <input type="number" :value="duration" @change="setWarningDuration($event)" min="1" max="10"/>
+            <div v-else-if="loadCameraStatus === 'success'">
+                <font-awesome-icon icon="check" class="icon"/>
+                카메라 로드 성공!
             </div>
-        </section>
-        <section>
-            화면 접근 경고
-            
-        </section>
-        <section>
-            눈 깜빡임 경고
-        </section>
-        <section>
-            장시간 착석 경고
-            스트레칭 가이드 
-            <!-- <toggle :checked="" @on="" @off=""></toggle> -->
-            <button @click="playStretchGuide">스트레칭 가이드 보여주기</button>
-        </section>
-        <section>
-            화면 필터
-            {{isScreenFilterOn}}
-            <button @click="showScreenFilter(true)">screen filter on</button>
-            <button @click="showScreenFilter(false)">screen filter off</button>
-            blueLight 설정<input type="range" :value="blueLightFigure" @change="setBlueLightFigure($event)" min="0" max="0.5" step="0.01">
-            화면 명도 설정<input type="range" :value="darkness" @change="setDarkness($event)" min="0" max="0.5" step="0.01">
-        </section>
-        <section>
-            디버깅용 섹션, 추후 지울 것
-            <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
-            <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
-            <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
-            <button @click="clearMessage()">clear message</button>
-        </section>
-        <section>
-            얼굴 거리 설정
-            <button @click="saveDistanceStd()">저장</button>
-            <span v-if="timer>0">{{timer}}</span>
-        </section>
-        <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>
-        <tooltip :show="showGuide" :position="guidePosition">{{guideText}}</tooltip>
-        <hr/>
-        <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>
-        <hr/>
-        {{isScreenFilterOn}}
-        {{duration}}
-        {{darkness}}
-        {{blueLightFigure}}
-        <Toggle></Toggle>
+            <div v-else-if="loadCameraStatus === 'failed'">
+                <font-awesome-icon icon="times" class="icon"/>
+                카메라 로드 실패...
+            </div>
+            <section>
+                경고문 위치
+                <div>
+                    <custom-select :options="['regular-top','regular-bottom','mini']" @select="changeMessageMode" :checked="messageMode"/>
+                </div>
+                <div>
+                    경고문 유지 시간
+                    <custom-input-number :value="duration" @change="setWarningDuration" :min="1" :max="10"/>
+                </div>
+            </section>
+            <section>
+                <h3>화면 접근 경고<toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle></h3>
+            </section>
+            <section>
+                <h3>눈 깜빡임 경고<toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle></h3>
+            </section>
+            <section>
+                <h3>장시간 착석 경고<toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle></h3>
+                <label>
+                    스트레칭 가이드<custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
+                </label>
+                <!-- <toggle :checked="" @on="" @off=""></toggle> -->
+                <button @click="playStretchGuide">스트레칭 가이드 보여주기</button>
+            </section>
+            <section>
+                <h3>밝기 경고<toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle></h3>
+                <h4>화면 필터<toggle @on="showScreenFilter(true)" @off="showScreenFilter(false)" :checked="isScreenFilterOn"></toggle></h4>
+                <label title="사용자의 환경에 맞춰 자동으로 밝기를 조절합니다.">
+                    auto<custom-check-box @on="setAutoDarknessControl(true)" @off="setAutoDarknessControl(false)" :checked="autoDarknessControl"/>
+                </label>
+                <div>
+                    darkness 설정
+                    <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="autoDarknessControl"/>
+                </div>
+                <div>
+                    blueLight 설정
+                    <tooltip alt="????">
+                        <font-awesome-icon icon="question-circle" class="icon" @mouseenter="showGuideText($event,'guide1')" @mouseleave="hideGuideText()"/>    
+                    </tooltip>
+                    <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
+                </div>
+            </section>
+            <section>
+                디버깅용 섹션, 추후 지울 것
+                <div>
+                    <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
+                <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
+                <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
+                </div>
+            </section>
+            <section>
+                <span>
+                    얼굴 거리 설정
+                    <tooltip alt="사용자와 모니터 사이의 거리 측정에 사용될 기준값을 설정합니다. 모니터와 적정거리를 유지하고 버튼을 누르면 측정합니다.">
+                        <font-awesome-icon icon="question-circle" class="icon"/>
+                    </tooltip>
+                </span>
+                <button @click="saveDistanceStd()">저장</button>
+                <span v-if="timer>0">{{timer}}</span>
+            </section>
+        </div>
     </div>
 </template>
 <script>
 
 import { ipcRenderer as ipc } from 'electron'
-import Tooltip from './Tooltip.vue'
-import Toggle from './Toggle.vue'
+import CustomInputRange from './widgets/CustomInputRange.vue'
+import CustomCheckBox from './widgets/CustomCheckBox.vue'
+import CustomInputNumber from './widgets/CustomInputNumber.vue'
+import CustomSelect from './widgets/CustomSelect.vue'
+import Tooltip from './widgets/Tooltip.vue'
+import Toggle from './widgets/Toggle.vue'
 export default {
     data(){
         return {
@@ -91,10 +103,21 @@ export default {
             darkness: 0,
             blueLightFigure: 0,
             loadCameraStatus: 'loading',
-            timer:0
+            timer:0,
+            messageMode:'regular-top',
+            isStretchGuideOn:false,
+            autoDarknessControl:false,
+            isDistanceWarningOn:false,
+            isSittedWarningOn:false,
+            isBrightWarningOn:false,
+            isEyeblinkWarningOn:false,
         }
     },
-    components: { 
+    components: {
+        CustomInputRange,
+        CustomCheckBox,
+        CustomInputNumber,
+        CustomSelect, 
         Tooltip,
         Toggle 
     },
@@ -105,6 +128,12 @@ export default {
             this.duration = parseInt(payload.warningMessage.duration);
             this.darkness = parseFloat(payload.screenFilter.darkness);
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
+            this.autoDarknessControl = payload.faceProcess.autoDarknessControl
+            this.isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn
+            this.isSittedWarningOn = payload.faceProcess.isSittedWarningOn
+            this.isBrightWarningOn = payload.faceProcess.isBrightWarningOn
+            this.isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn
+            this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
         })
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
             this.insertMessage(payload.type);
@@ -147,25 +176,46 @@ export default {
                 ipc.send('INSERT_MESSAGE',{content:'cant-detect-camera',type:'warning'});
             }
         },
+        setDistanceWarning(boolean){
+            this.isDistanceWarningOn = boolean
+            ipc.send('SET_DISTANCE_WARNING',boolean);
+        },
+        setSittedWarning(boolean){
+            this.isSittedWarningOn = boolean
+            ipc.send('SET_SITTED_WARNING',boolean);
+        },
+        setBrightWarning(boolean){
+            this.isBrightWarningOn = boolean
+            ipc.send('SET_BRIGHT_WARNING',boolean);
+        },
+        setEyeblinkWarning(boolean){
+            this.isEyeblinkWarningOn = boolean
+            ipc.send('SET_EYEBLINK_WARNING',boolean);
+        },
+        setAutoDarknessControl(boolean){
+            this.autoDarknessControl = boolean;
+            ipc.send('SET_AUTO_DARKNESS_CONTROL',boolean);
+        },
         setDarkness(e){
-            this.darkness = e.target.value;
+            this.darkness = parseFloat(e.target.value);
             ipc.send('SET_DARKNESS',e.target.value);
         },
         setBlueLightFigure(e){
-            this.blueLightFigure = e.target.value;
+            this.blueLightFigure = parseFloat(e.target.value);
             ipc.send('SET_BLUELIGHTFIGURE',e.target.value);
         },
         hideGuideText(){
             this.showGuide=false;
         },
-        changeMessageMode(mode) {
-            ipc.send('SET_WARNING_MODE',mode);
+        changeMessageMode(e) {
+            if(e.target.value!==this.messageMode) {
+                this.messageMode=e.target.value;
+            ipc.send('SET_WARNING_MODE',e.target.value);
+            ipc.send('INSERT_MESSAGE',{content:'message-position',type:'normal'});
+            }
         },
         insertMessage(content,type) {
             ipc.send('INSERT_MESSAGE',{content,type});
-        },
-        clearMessage(){
-            // ipc.send('SET_WARNING_MODE',mode);
         },
         setWarningDuration(e){
             this.duration = e.target.value;
@@ -173,12 +223,27 @@ export default {
         },
         playStretchGuide(){
             ipc.send('SHOW_STRETCH_GUIDE');
+        },
+        setStretchGuide(boolean) {
+            this.isStretchGuideOn = boolean;
+            ipc.send('SET_STRETCH_GUIDE',boolean);
         }
     }
 }
 </script>
 
 <style>
+#setting-page {
+    display:flex;
+    flex-direction:row;
+}
+#setting-page #main-image {
+    width:300px;
+}
+#setting-page #settings {
+    flex-grow:1;
+    position:relative;
+}
 img {
     width:100px;
     height:100px;

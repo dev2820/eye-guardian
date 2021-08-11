@@ -5,7 +5,12 @@
                 'mini':mode==='mini',
             }"
     >
-        <div class="message flip-item" v-for="(message,index) in messages" :key="index">
+        <div class="message flip-item" v-for="(message,index) in messages" :key="index"
+            :class="{
+                'normal':message.type==='normal',
+                'warning':message.type==='warning'
+            }"
+        >
             <font-awesome-icon v-if="message.type==='warning'" icon="exclamation-triangle" class="icon"/>
             <font-awesome-icon v-if="message.type==='normal'" icon="info-circle" class="icon"/>
             <p class="text">{{messageFilter(message.content)}}</p>
@@ -70,6 +75,9 @@ export default {
                 case 'cant-detect-camera': {
                     return '카메라가 준비되면 다시 시도해 주십시오'
                 }
+                case 'message-position': {
+                    return '이제 이 위치에 메세지가 출력됩니다'
+                }
                 default: {
                     return ''
                 }
@@ -79,11 +87,19 @@ export default {
 }
 </script>
 <style scoped>
+@font-face { 
+    font-family: 'Nanum_Gothic';
+    src: local('Nanum-Gothic'),
+        url('../assets/fonts/Nanum_Gothic/NanumGothic-Regular.woff2'),
+        url('../assets/fonts/Nanum_Gothic/NanumGothic-Regular.ttf');
+    font-display:block;
+}
 #warning-message-queue {
     flex-direction:column;
     position:fixed;
     opacity:1;
     display:flex;
+    font-family: 'Nanum_Gothic'
 }
 #warning-message-queue.regular-top {
     justify-content: flex-start;
@@ -113,8 +129,6 @@ export default {
 }
 #warning-message-queue .message {
     position:relative;
-    background: rgba(127,127,127,0.9);
-    color:#ffdb00;
     border-radius:8px;
     text-align:center;
     font-weight:bold;
@@ -122,8 +136,18 @@ export default {
     padding:10px;
     margin-top:10px;
 }
+.normal {
+    opacity:0.5;
+    background-color:var(--success-color);
+    color:#EBEEF5;
+}
+.warning {
+    opacity:0.9;
+    background-color:var(--danger-color);
+    color:#EBEEF5;
+}
 .flip-item {
-    transition:all 0.5s;
+    transition:all 0.3s;
     display:inline-block;
 }
 .flip-enter, .flip-leave-to {

@@ -3,7 +3,6 @@
         <canvas id="inputCanvas" style="display:none"></canvas>
         <video id="inputVideo" autoplay></video>
         <div>{{detectFace}}</div>
-        <div>{{loadCamera}}</div>
         <div id="detect-box"></div>
     </div>
 </template>
@@ -26,15 +25,25 @@ export default {
     name:'face-process',
     data(){
         return {
-            loadCamera: false,
             detectFace:'no face',
-            faceLength:0
+            faceLength:0,
+            autoDarknessControl:false,
+            isStretchGuideOn:false,
+            isDistanceWarningOn:false,
+            isEyeblinkWarningOn:false,
+            isSittedWarningOn:false,
+            isBrightWarningOn:false,
         }
     },
     mounted(){
         ipc.send('REQUEST_INIT_SCREEN_VALUE','faceProcess')
         ipc.on('INIT',(evt,payload)=>{
             this.faceLength = parseFloat(payload.faceProcess.faceLength);
+            this.isDistanceWarningOn= payload.faceProcess.isDistanceWarningOn;
+            this.isEyeblinkWarningOn= payload.faceProcess.isEyeblinkWarningOn;
+            this.isSittedWarningOn= payload.faceProcess.isSittedWarningOn;
+            this.isBrightWarningOn= payload.faceProcess.isBrightWarningOn;
+            this.autoDarknessControl= payload.faceProcess.autoDarknessControl;
         })
         ipc.on('ESTIMATE_DISTANCE',()=>{
             ipc.send('INSERT_MESSAGE',{content:'ready-to-capture',type:'normal'})
@@ -42,6 +51,24 @@ export default {
                 ()=>this.saveDistance(),
                 5*1000
             )
+        })
+        ipc.on('SET_DISTANCE_WARNING',(evt,payload)=>{
+            this.isDistanceWarningOn = payload;
+        })
+        ipc.on('SET_SITTED_WARNING',(evt,payload)=>{
+            this.isSittedWarningOn = payload;
+        })
+        ipc.on('SET_BRIGHT_WARNING',(evt,payload)=>{
+            this.isBrightWarningOn = payload;
+        })
+        ipc.on('SET_EYEBLINK_WARNING',(evt,payload)=>{
+            this.isEyeblinkWarningOn = payload;
+        })
+        ipc.on('SET_AUTO_DARKNESS_CONTROL',(evt,payload)=>{
+            this.autoDarknessControl = payload;
+        })
+        ipc.on('SET_STRETCH_GUIDE',(evt,payload)=>{
+            this.isStretchGuideOn = payload;
         })
         const dataPath =
             process.env.NODE_ENV === 'development'
@@ -60,7 +87,9 @@ export default {
     methods:{
         generateBrightWarning(){
             ipc.send('INSERT_MESSAGE',{content:'bright-warning',type:'normal'})
-            // ipc.send('SET_DARKNESS',0.5);//0~0.5
+            if(this.autoDarknessControl){//밝기 자동 조절 모드가 켜져있는 경우
+                // ipc.send('SET_DARKNESS',0.5);//0~0.5
+            }
         },
         generateDistanceWarning(){
             ipc.send('INSERT_MESSAGE',{content:'distance-warning',type:'warning'})
@@ -109,9 +138,9 @@ export default {
             );
             
             videoEl.addEventListener('play',async ()=>{
+                //faceapi가 모델을 불러오고 화면 작동을 시작하는 시점을 settingPage에 알려주기 위한 코드
                 const img = this.getImgfromWebcam(videoEl,canvas);
                 await faceapi.detectSingleFace(img)
-                this.loadCamera = true;
                 ipc.send('LOAD_CAMERA_SUCCESS',true)
                 draw();
                 bright();
@@ -134,24 +163,26 @@ export default {
             }
             
             let bright = async () =>{
-                const context = canvas.getContext('2d');
-                const data= context.getImageData(0,0,canvas.width,canvas.height).data;
-                let r=0,g=0,b=0;
-                for(let x= 0, len= data.length; x < len; x+=4) {
-                    r += data[x];
-                    g += data[x+1];
-                    b += data[x+2];
-                }
-                const colorSum = Math.sqrt(0.299 * (r ** 2)
-                    + 0.587 * (g ** 2)
-                    + 0.114 * (b ** 2));
-                const brightness= Math.floor(colorSum /(canvas.width*canvas.height));
-                // console.log('brightness',brightness)
-                if(brightness<=0) {
-                    //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-                }
-                else if( 0 < brightness && brightness < 50){
-                    this.generateBrightWarning();
+                if(this.brightWarningOn) {
+                    const context = canvas.getContext('2d');
+                    const data= context.getImageData(0,0,canvas.width,canvas.height).data;
+                    let r=0,g=0,b=0;
+                    for(let x= 0, len= data.length; x < len; x+=4) {
+                        r += data[x];
+                        g += data[x+1];
+                        b += data[x+2];
+                    }
+                    const colorSum = Math.sqrt(0.299 * (r ** 2)
+                        + 0.587 * (g ** 2)
+                        + 0.114 * (b ** 2));
+                    const brightness= Math.floor(colorSum /(canvas.width*canvas.height));
+                    // console.log('brightness',brightness)
+                    if(brightness<=0) {
+                        //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
+                    }
+                    else if( 0 < brightness && brightness < 50){
+                        this.generateBrightWarning();
+                    }
                 }
                 setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
             }
@@ -164,14 +195,15 @@ export default {
             //     //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             // }
             let screenDistance = async () => {
-                if(this.faceLength !== 0){
-                    const img = this.getImgfromWebcam(videoEl,canvas);
-                    const detections = await faceapi.detectSingleFace(img)
-                    if(detections && (this.faceLength*8)/6 < detections.box.width){
-                        this.generateDistanceWarning();
+                if(this.distanceWarningOn) {
+                    if(this.faceLength !== 0){
+                        const img = this.getImgfromWebcam(videoEl,canvas);
+                        const detections = await faceapi.detectSingleFace(img)
+                        if(detections && (this.faceLength*8)/6 < detections.box.width){
+                            this.generateDistanceWarning();
+                        }
                     }
                 }
-                //화면과의 거리 감지하는 로직
                 setTimeout( screenDistance, 10*1000 );//10초에 한번 얼굴 감지
             }
         }
