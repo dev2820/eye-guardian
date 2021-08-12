@@ -29,11 +29,6 @@ export const router = createRouter({
             component: require('@/components/StretchGuideScreen').default
         },
         {
-            path: "/loading",
-            name: 'LoadingPage',
-            component: require('@/components/LoadingPage').default
-        },
-        {
             path: "/:catchAll(.*)",
             redirect: '/'
         }
