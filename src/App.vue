@@ -16,11 +16,14 @@ export default {
   font-family: 'Nanum_Gothic', 'Times New Roman', Times, serif;
 }
 :root {
-  --title-color:green;
-  --background-color: green;
+  --title-color:#2e2c29;
+  --background-color:#2e2c29;
   --success-color:#67C23A;
   --warning-color:#E6A23C;
   --danger-color:#F56C6C;
+  --ongoing-color:#E6A23C;
+  --text-regular-color:#606266;
+  --light-gray:#909399;
 }
 html,body,#app {
   height:100%;

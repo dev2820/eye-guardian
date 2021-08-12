@@ -38,7 +38,7 @@ label.switch input[type=checkbox] {
     height: 0;
 }
 label.switch input[type=checkbox] + span.box{ 
-    position: absolute;
+    display:inline-block;
     width:16px;
     height:16px;
     border:2px solid red;

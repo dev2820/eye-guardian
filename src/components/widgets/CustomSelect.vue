@@ -29,7 +29,6 @@ export default {
 .select {
     display:flex;
     flex-direction:row;
-    justify-content: center;
 }
 .select button {
     width:120px;

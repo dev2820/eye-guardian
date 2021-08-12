@@ -40,7 +40,6 @@ export default {
         ipc.send('REQUEST_INIT_SCREEN_VALUE','warningMessage');
         ipc.on('INIT',(evt,payload)=>{
             this.mode = payload.warningMessage.mode;
-            this.duration = payload.warningMessage.duration;
             this.isPlaySound = payload.warningMessage.isPlaySound;
         })
         ipc.on('SET_WARNING_MODE',(evt,payload)=>{
@@ -126,9 +125,9 @@ export default {
 #warning-message-queue.regular-top {
     justify-content: flex-start;
     height:80px;
-    width:700px;
+    width:600px;
     left:50%;
-    margin-left:-350px;
+    margin-left:-300px;
     top:50px;
     justify-content: left;
 }
@@ -136,9 +135,9 @@ export default {
     justify-content: flex-start;
     flex-direction:column-reverse;
     height:80px;
-    width:500px;
+    width:600px;
     left:50%;
-    margin-left:-350px;
+    margin-left:-300px;
     bottom:150px;
     justify-content: left;
 }

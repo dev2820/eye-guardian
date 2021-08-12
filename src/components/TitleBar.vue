@@ -1,6 +1,6 @@
 <template>
     <div id="title-bar">
-        <img id="main-icon" src="../assets/images/logo.jpg"/>
+        <img id="main-icon" src="../assets/images/logo.png"/>
         <small id="title">{{title}}</small>
         <span class="menus">
             <button @click="minimizeWindow" id="minimize">
@@ -43,6 +43,7 @@ export default {
 #title-bar {
     -webkit-app-region: drag;
     background-color:var(--title-color);
+    color:var(--text-regular-color);
     width:100%;
     height:30px;
     display:flex;
@@ -56,6 +57,7 @@ export default {
     width:135px;
 }
 .menus > button {
+    color:var(--text-regular-color);
     -webkit-app-region: no-drag;
     background:transparent;
     border:none;
@@ -63,11 +65,10 @@ export default {
     width:45px;
     height:30px;
     padding:7px;
-    color:#999999;
     transition:all 0.1s;
 }
 .menus > button:hover {
-    background-color:#cccccc;
+    background:var(--light-gray);
 }
 .menus > button:hover:last-child {
     background-color:var(--danger-color);

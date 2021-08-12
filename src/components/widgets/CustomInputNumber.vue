@@ -38,5 +38,7 @@ export default {
 </script>
 
 <style scoped>
-
+input {
+    display:inline-block;
+}
 </style>

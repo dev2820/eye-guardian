@@ -34,8 +34,8 @@ export default {
 .switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 22px;
+    width: 36px;
+    height: 20px;
 }
 
 .switch input[type=checkbox] { 
@@ -60,8 +60,8 @@ export default {
     content: "";
     height: 16px;
     width: 16px;
-    left: 3px;
-    bottom: 3px;
+    left: 2px;
+    bottom: 2px;
     background-color: white;
     -webkit-transition: 0.3s;
     transition: 0.3s;
@@ -75,9 +75,9 @@ input[type=checkbox]:focus + .slider {
 }
 
 input[type=checkbox]:checked + .slider:before {
-    -webkit-transform: translateX(18px);
-    -ms-transform: translateX(18px);
-    transform: translateX(18px);
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    transform: translateX(16px);
 }
 
 /* Rounded sliders */
