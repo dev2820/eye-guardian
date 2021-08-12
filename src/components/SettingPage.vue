@@ -1,5 +1,12 @@
 <template>
-    <div id="setting-page">
+    <header>
+        <title-bar title="eye guardian" 
+            @minimize="minimizeWindow"
+            @maximize="maximizeWindow"
+            @close="closeWindow"
+        />
+    </header>
+    <main id="setting-page">
         <div id="main-image">
             <img src="../assets/images/test.jpg"/>
         </div>
@@ -82,10 +89,11 @@
                 <span v-if="timer>0">{{timer}}</span>
             </section>
         </div>
-    </div>
+    </main>
 </template>
-<script>
+<script>  
 
+import TitleBar from '../components/TitleBar.vue'
 import { ipcRenderer as ipc } from 'electron'
 import CustomInputRange from './widgets/CustomInputRange.vue'
 import CustomCheckBox from './widgets/CustomCheckBox.vue'
@@ -119,6 +127,7 @@ export default {
         }
     },
     components: {
+        TitleBar,
         CustomInputRange,
         CustomCheckBox,
         CustomInputNumber,
@@ -224,6 +233,15 @@ export default {
         setIsPlaySound(boolean) {
             this.isPlaySound = boolean;
             ipc.send('SET_IS_PLAY_SOUND',boolean);
+        },
+        minimizeWindow() {
+            ipc.send('MINIMIZE','settingPage');
+        },
+        maximizeWindow() {
+            ipc.send('MAXIMIZE','settingPage');
+        },
+        closeWindow() {
+            ipc.send('CLOSE','settingPage');
         }
     }
 }

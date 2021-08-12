@@ -3,7 +3,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'App',
 }
@@ -17,6 +16,8 @@ export default {
   font-family: 'Nanum_Gothic', 'Times New Roman', Times, serif;
 }
 :root {
+  --title-color:green;
+  --background-color: green;
   --success-color:#67C23A;
   --warning-color:#E6A23C;
   --danger-color:#F56C6C;

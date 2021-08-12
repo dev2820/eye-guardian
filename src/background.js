@@ -18,7 +18,8 @@ let settingWindow=null,
 screenFilterWindow=null,
 warningMessageWindow=null,
 faceProcessWindow=null,
-stretchGuideWindow=null;
+stretchGuideWindow=null,
+loadingWindow=null;
 let tray = null;
 
 const setting = JSON.parse(fs.readFileSync(path.join(dataPath,'setting.json')));
@@ -140,15 +141,31 @@ app.on('ready', async () => {
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
     createProtocol('app')
   }
+  loadingWindow = createWindow('/#/loading','index.html#loading',{
+    width:200,
+    height:300,
+    frame:false,
+    transparent:true,
+    webPreferences: {
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+      devTools:false
+    }
+  })
   settingWindow = createWindow('','index.html',{
     width: 1000, 
     height: 600,
+    frame:false,
+    show:false,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   },true)
-
+  settingWindow.once('ready-to-show',()=>{
+    // loadingWindow.close();
+    settingWindow.show();
+  })
   warningMessageWindow = createWindow('/#/warningMessage','index.html#warningMessage',{
     webPreferences: { 
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
@@ -306,6 +323,34 @@ ipcMain.on('SET_STRETCH_GUIDE',(evt,payload)=>{
   setting.stretchGuideScreen.isStretchGuideOn=payload;
   faceProcessWindow.send('SET_STRETCH_GUIDE')
 })
+// minimize, maximize, close
+ipcMain.on('MINIMIZE',(evt,payload)=>{
+  switch(payload){
+    case 'settingPage': {
+      settingWindow.minimize();
+    }
+  }
+})
+ipcMain.on('MAXIMIZE',(evt,payload)=>{
+  switch(payload){
+    case 'settingPage': {
+      if(settingWindow.isMaximized()){
+        settingWindow.unmaximize();
+      }
+      else {
+        settingWindow.maximize();
+      }
+    }
+  }
+})
+ipcMain.on('CLOSE',(evt,payload)=>{
+  switch(payload){
+    case 'settingPage': {
+      settingWindow.close();
+    }
+  }
+})
+
 
 
 // Exit cleanly on request from parent process in development mode.
