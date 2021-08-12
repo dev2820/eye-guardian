@@ -11,7 +11,6 @@
             <img src="../assets/images/test.jpg"/>
         </div>
         <div id="settings">
-            <h2>setting page</h2>
             <div v-if="loadCameraStatus === 'loading'">
                 <font-awesome-icon icon="spinner" class="icon" spin/>
                 카메라 로드중...
@@ -37,48 +36,6 @@
                     경고음 컨트롤
                     <custom-check-box @on="setIsPlaySound(true)" @off="setIsPlaySound(false)" :checked="isPlaySound"/>
                 </div>
-            </section>
-            <section>
-                <h3>화면 접근 경고<toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle></h3>
-            </section>
-            <section>
-                <h3>눈 깜빡임 경고<toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle></h3>
-            </section>
-            <section>
-                <h3>장시간 착석 경고<toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle></h3>
-                <label>
-                    스트레칭 가이드<custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
-                </label>
-                <!-- <toggle :checked="" @on="" @off=""></toggle> -->
-                <button @click="playStretchGuide">스트레칭 가이드 보여주기</button>
-            </section>
-            <section>
-                <h3>밝기 경고<toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle></h3>
-                <h4>화면 필터<toggle @on="showScreenFilter(true)" @off="showScreenFilter(false)" :checked="isScreenFilterOn"></toggle></h4>
-                <label title="사용자의 환경에 맞춰 자동으로 밝기를 조절합니다.">
-                    auto<custom-check-box @on="setAutoDarknessControl(true)" @off="setAutoDarknessControl(false)" :checked="autoDarknessControl"/>
-                </label>
-                <div>
-                    darkness 설정
-                    <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="autoDarknessControl"/>
-                </div>
-                <div>
-                    blueLight 설정
-                    <tooltip alt="????">
-                        <font-awesome-icon icon="question-circle" class="icon"/>    
-                    </tooltip>
-                    <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
-                </div>
-            </section>
-            <section>
-                디버깅용 섹션, 추후 지울 것
-                <div>
-                    <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
-                <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
-                <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
-                </div>
-            </section>
-            <section>
                 <span>
                     얼굴 거리 설정
                     <tooltip alt="사용자와 모니터 사이의 거리 측정에 사용될 기준값을 설정합니다. 모니터와 적정거리를 유지하고 버튼을 누르면 측정합니다.">
@@ -88,13 +45,55 @@
                 <button @click="saveDistanceStd()">저장</button>
                 <span v-if="timer>0">{{timer}}</span>
             </section>
+            <CardUI>
+                <h3>화면 접근 경고<toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle></h3>
+            </CardUI>
+            <CardUI>
+                <h3>눈 깜빡임 경고<toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle></h3>
+            </CardUI>
+            <CardUI>
+                <h3>장시간 착석 경고<toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle></h3>
+                <label>
+                    스트레칭 가이드<custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
+                </label>
+                <!-- <toggle :checked="" @on="" @off=""></toggle> -->
+                <button @click="playStretchGuide">스트레칭 가이드 보여주기</button>
+            </CardUI>
+            <CardUI>
+                <h3>밝기 경고<toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle></h3>
+                <label title="사용자의 환경에 맞춰 자동으로 밝기를 조절합니다.">
+                    auto<custom-check-box @on="setAutoDarknessControl(true)" @off="setAutoDarknessControl(false)" :checked="autoDarknessControl"/>
+                </label>
+                <div>
+                    darkness 설정
+                    <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="autoDarknessControl"/>
+                </div>
+            </CardUI>
+            <CardUI>
+                <h4>화면 필터<toggle @on="showScreenFilter(true)" @off="showScreenFilter(false)" :checked="isScreenFilterOn"></toggle></h4>
+                <div>
+                    blueLight 설정
+                    <tooltip alt="????">
+                        <font-awesome-icon icon="question-circle" class="icon"/>    
+                    </tooltip>
+                    <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
+                </div>
+            </CardUI>
+            <section>
+                디버깅용 섹션, 추후 지울 것
+                <div>
+                    <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
+                <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
+                <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
+                </div>
+            </section>
         </div>
     </main>
 </template>
 <script>  
-
-import TitleBar from '../components/TitleBar.vue'
 import { ipcRenderer as ipc } from 'electron'
+import CardUI from './widgets/CardUI.vue';
+import TitleBar from './TitleBar.vue'
 import CustomInputRange from './widgets/CustomInputRange.vue'
 import CustomCheckBox from './widgets/CustomCheckBox.vue'
 import CustomInputNumber from './widgets/CustomInputNumber.vue'
@@ -127,6 +126,7 @@ export default {
         }
     },
     components: {
+        CardUI,
         TitleBar,
         CustomInputRange,
         CustomCheckBox,
@@ -242,22 +242,29 @@ export default {
         },
         closeWindow() {
             ipc.send('CLOSE','settingPage');
-        }
+        },
     }
 }
 </script>
 
 <style>
-#setting-page {
+header {
+    height:30px;
+}
+main#setting-page {
+    height:calc(100% - 30px);
     display:flex;
     flex-direction:row;
+    background:var(--background-color);
 }
 #setting-page #main-image {
-    width:300px;
+    width:35%;
 }
 #setting-page #settings {
-    flex-grow:1;
+    width:65%;
     position:relative;
+    display:inline-flex;
+    flex-wrap:wrap;
 }
 img {
     width:100px;
