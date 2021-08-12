@@ -146,13 +146,12 @@ app.on('ready', async () => {
     height:360,
     frame:false,
     transparent:true,
-    alwaysOnTop :true,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       devTools:false
     }
-  })
+  },false)
   settingWindow = createWindow('','index.html',{
     width: 1000, 
     height: 600,
