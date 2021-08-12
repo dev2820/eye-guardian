@@ -142,10 +142,11 @@ app.on('ready', async () => {
     createProtocol('app')
   }
   loadingWindow = createWindow('/#/loading','index.html#loading',{
-    width:200,
-    height:300,
+    width:290,
+    height:360,
     frame:false,
     transparent:true,
+    alwaysOnTop :true,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
@@ -157,13 +158,14 @@ app.on('ready', async () => {
     height: 600,
     frame:false,
     show:false,
+    backgroundColor:'#2e2c29',
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   },true)
   settingWindow.once('ready-to-show',()=>{
-    // loadingWindow.close();
+    loadingWindow.close();
     settingWindow.show();
   })
   warningMessageWindow = createWindow('/#/warningMessage','index.html#warningMessage',{
