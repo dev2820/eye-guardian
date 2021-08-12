@@ -1,6 +1,6 @@
 <template>
-    <div id="screen-filter" :class="{hidden:!isScreenFilterOn}">
-        <div id="blue-light" :style="{background:`rgba(255,219,0,${blueLightFigure})`}"></div>
+    <div id="screen-filter">
+        <div id="blue-light" :class="{hidden:!isBlueLightFilterOn}" :style="{background:`rgba(255,219,0,${blueLightFigure})`}"></div>
         <div id="darkness" :style="{background:`rgba(0,0,0,${darkness})`}"></div>
     </div>
 </template>
@@ -22,15 +22,15 @@ export default {
         ipc.send('REQUEST_INIT_SCREEN_VALUE','screenFilter');
         ipc.on('INIT',(evt,payload)=>{
             console.log(payload)
-            this.isScreenFilterOn = payload.screenFilter.show;
+            this.isBlueLightFilterOn = payload.screenFilter.isBlueLightFilterOn;
             this.blueLightFigure = payload.screenFilter.blueLightFigure;
             this.darkness = payload.screenFilter.darkness;
         })
 
-        ipc.on('SET_FILTER_SHOW',(evt,payload)=>{
-            this.isScreenFilterOn = payload;
+        ipc.on('SET_BLUELIGHT_FILTER_SHOW',(evt,payload)=>{
+            this.isBlueLightFilterOn = payload;
         })
-        ipc.on('SET_BLUELIGHTFIGURE',(evt,payload)=>{
+        ipc.on('SET_BLUELIGHT_FIGURE',(evt,payload)=>{
             this.blueLightFigure = payload;
         })
         ipc.on('SET_DARKNESS',(evt,payload)=>{
@@ -46,7 +46,8 @@ export default {
     transition:opacity 1s ease-in-out;
     opacity:1;
 }
-#screen-filter.hidden {
+#blue-light.hidden,
+#darkness.hidden {
     opacity:0;
     transition:opacity 1s ease-in-out;
 }

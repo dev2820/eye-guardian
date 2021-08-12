@@ -8,83 +8,100 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <img src="../assets/images/test.jpg"/>
+            <img id="mascot" src="../assets/images/mascot.png"/>
         </div>
         <div id="settings">
-            <div v-if="loadCameraStatus === 'loading'">
-                <font-awesome-icon icon="spinner" class="icon" spin/>
-                카메라 로드중...
-            </div>
-            <div v-else-if="loadCameraStatus === 'success'">
-                <font-awesome-icon icon="check" class="icon"/>
-                카메라 로드 성공!
-            </div>
-            <div v-else-if="loadCameraStatus === 'failed'">
-                <font-awesome-icon icon="times" class="icon"/>
-                카메라 로드 실패...
-            </div>
-            <section>
-                경고문 위치
-                <div>
+            <section class="status">
+                <div class="camera-load-status">
+                    <status-dot :status="loadCameraStatus"/>
+                    <small class="status-message">{{loadCameraMessage}}</small>
+                </div>
+                <div class="standard-pos-status">
+                    <status-dot :status="standardPosStatus"/>
+                    <small class="status-message">{{standardPosMessage}}</small>
+                </div>
+            </section>
+            <section class="warning-setting">
+                <div class="setting-option warning-position">
+                    <p class="explanation">경고문 위치</p>
                     <custom-select :options="['regular-top','regular-bottom','mini']" @select="changeMessageMode" :checked="messageMode"/>
                 </div>
-                <div>
-                    경고문 유지 시간
-                    <custom-input-number :value="duration" @change="setWarningDuration" :min="1" :max="10"/>
-                </div>
-                <div>
-                    경고음 컨트롤
+                <div class="setting-option warning-sound">
+                    <span class="explanation">경고음 출력</span>
                     <custom-check-box @on="setIsPlaySound(true)" @off="setIsPlaySound(false)" :checked="isPlaySound"/>
                 </div>
-                <span>
-                    얼굴 거리 설정
-                    <tooltip alt="사용자와 모니터 사이의 거리 측정에 사용될 기준값을 설정합니다. 모니터와 적정거리를 유지하고 버튼을 누르면 측정합니다.">
-                        <font-awesome-icon icon="question-circle" class="icon"/>
-                    </tooltip>
-                </span>
-                <button @click="saveDistanceStd()">저장</button>
-                <span v-if="timer>0">{{timer}}</span>
+                <div class="setting-option standard-pos-setting">
+                    <span v-if="timer>0">{{timer}}</span>
+                    <span>정자세 기준 설정하기</span>
+                    <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
+                    <button @click="setStandardPos()">설정</button>
+                </div>
             </section>
-            <CardUI>
-                <h3>화면 접근 경고<toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle></h3>
-            </CardUI>
-            <CardUI>
-                <h3>눈 깜빡임 경고<toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle></h3>
-            </CardUI>
-            <CardUI>
-                <h3>장시간 착석 경고<toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle></h3>
-                <label>
-                    스트레칭 가이드<custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
-                </label>
-                <!-- <toggle :checked="" @on="" @off=""></toggle> -->
-                <button @click="playStretchGuide">스트레칭 가이드 보여주기</button>
-            </CardUI>
-            <CardUI>
-                <h3>밝기 경고<toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle></h3>
-                <label title="사용자의 환경에 맞춰 자동으로 밝기를 조절합니다.">
-                    auto<custom-check-box @on="setAutoDarknessControl(true)" @off="setAutoDarknessControl(false)" :checked="autoDarknessControl"/>
-                </label>
-                <div>
-                    darkness 설정
-                    <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="autoDarknessControl"/>
-                </div>
-            </CardUI>
-            <CardUI>
-                <h4>화면 필터<toggle @on="showScreenFilter(true)" @off="showScreenFilter(false)" :checked="isScreenFilterOn"></toggle></h4>
-                <div>
-                    blueLight 설정
-                    <tooltip alt="????">
-                        <font-awesome-icon icon="question-circle" class="icon"/>    
-                    </tooltip>
-                    <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
-                </div>
-            </CardUI>
+            <section class="alarm-setting">
+                <CardUI>
+                    <div class="title">
+                        <h3>화면 접근 경고</h3><toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
+                    </div>
+                    <small>
+                        디스플레이를 너무 가까이서 보게되면 눈에 이러이러케 안좋습니다.
+                    </small>
+                </CardUI>
+            </section>
+            <section class="alarm-setting">
+                <CardUI>
+                    <div class="title">
+                        <h3>눈 깜빡임 경고</h3><toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
+                    </div>
+                    <small>
+                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                    </small>
+                </CardUI>
+            </section>
+            <section class="alarm-setting">
+                <CardUI>
+                    <div class="title">
+                        <h3>장시간 착석 경고</h3><toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle>
+                    </div>
+                    <label>
+                        스트레칭 가이드<custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
+                    </label>
+                    <!-- <button @click="playStretchGuide">스트레칭 가이드 보여주기</button> -->
+                </CardUI>
+            </section>
+            <section class="alarm-setting">
+                <CardUI>
+                    <div class="title">
+                        <h3>밝기 감지</h3><toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle>
+                    </div>
+                    <label title="사용자의 환경에 맞춰 자동으로 밝기를 조절합니다.">
+                        <custom-check-box @on="setAutoDarknessControl(true)" @off="setAutoDarknessControl(false)" :checked="autoDarknessControl"/><small>밝기 자동 조절</small>
+                    </label>
+                    <div>
+                        darkness 설정
+                        <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="autoDarknessControl"/>
+                    </div>
+                </CardUI>
+            </section>
+            <section class="alarm-setting">
+                <CardUI>
+                    <div class="title">
+                        <h3>편안하게 화면보기</h3><toggle @on="showScreenFilter(true)" @off="showScreenFilter(false)" :checked="isBlueLightFilterOn"></toggle>
+                    </div>
+                    <div>
+                        blueLight 설정
+                        <tooltip alt="????">
+                            <font-awesome-icon icon="question-circle" class="icon"/>    
+                        </tooltip>
+                        <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
+                    </div>
+                </CardUI>
+            </section>
             <section>
                 디버깅용 섹션, 추후 지울 것
                 <div>
                     <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
-                <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
-                <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
+                    <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
+                    <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
                 </div>
             </section>
         </div>
@@ -92,7 +109,7 @@
 </template>
 <script>  
 import { ipcRenderer as ipc } from 'electron'
-import CardUI from './widgets/CardUI.vue';
+import CardUI from './widgets/CardUI.vue'
 import TitleBar from './TitleBar.vue'
 import CustomInputRange from './widgets/CustomInputRange.vue'
 import CustomCheckBox from './widgets/CustomCheckBox.vue'
@@ -100,6 +117,7 @@ import CustomInputNumber from './widgets/CustomInputNumber.vue'
 import CustomSelect from './widgets/CustomSelect.vue'
 import Tooltip from './widgets/Tooltip.vue'
 import Toggle from './widgets/Toggle.vue'
+import StatusDot from './widgets/StatusDot.vue';
 export default {
     data(){
         return {
@@ -109,12 +127,14 @@ export default {
                 top:0,
                 left:0
             },
-            isScreenFilterOn: false,
-            duration: 3,
+            isBlueLightFilterOn: false,
             darkness: 0,
             blueLightFigure: 0,
-            loadCameraStatus: 'loading',
             timer:0,
+            loadCameraStatus: 'ongoing',
+            loadCameraMessage:'카메라 로드중...',
+            standardPosStatus: 'ongoing',
+            standardPosMessage:'정자세 기준값 불러오는중...',
             messageMode:'regular-top',
             isPlaySound:false,
             isStretchGuideOn:false,
@@ -133,13 +153,13 @@ export default {
         CustomInputNumber,
         CustomSelect, 
         Tooltip,
-        Toggle 
+        Toggle,
+        StatusDot 
     },
     mounted(){
         ipc.send('REQUEST_INIT_SCREEN_VALUE','settingPage')
         ipc.on('INIT',(evt,payload)=>{
-            this.isScreenFilterOn = payload.screenFilter.show;
-            this.duration = parseInt(payload.warningMessage.duration);
+            this.isBlueLightFilterOn = payload.screenFilter.isBlueLightFilterOn;
             this.darkness = parseFloat(payload.screenFilter.darkness);
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
             this.isPlaySound = payload.warningMessage.isPlaySound;
@@ -149,16 +169,30 @@ export default {
             this.isSittedWarningOn = payload.faceProcess.isSittedWarningOn
             this.isBrightWarningOn = payload.faceProcess.isBrightWarningOn
             this.isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn
-            
+        
+            if(payload.faceProcess.faceLength<=0) {
+                this.standardPosStatus = 'failed';
+                this.standardPosMessage = '정자세 기준값이 설정되어있지 않습니다. 설정버튼을 눌러 기준값 설정을 완료해주세요.'
+            }
+            else {
+                this.standardPosStatus = 'complete';
+                this.standardPosMessage = '정자세 기준값이 설정되어있습니다.'
+            }
         })
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
             this.insertMessage(payload.type);
         })
         ipc.on('LOAD_CAMERA_SUCCESS',()=>{
-            this.loadCameraStatus = 'success' 
+            this.loadCameraStatus = 'complete';
+            this.loadCameraMessage = '카메라 로드 성공!'
         })        
         ipc.on('LOAD_CAMERA_FAILED',()=>{
             this.loadCameraStatus = 'failed' 
+            this.loadCameraMessage = '카메라 로드 실패...'
+        })
+        ipc.on('SET_FACE_DISTANCE_SUCCESS',()=>{
+            this.standardPosStatus = 'complete';
+            this.standardPosMessage = '정자세 기준값이 설정되어있습니다.'
         })
         ipc.on('RUN_TIMER',()=>{
             this.timer=5;
@@ -170,11 +204,11 @@ export default {
     },
     methods: {
         showScreenFilter(boolean){
-            this.isScreenFilterOn = boolean;
+            this.isBlueLightFilterOn = boolean;
             ipc.send('SET_FILTER_SHOW',boolean)
         },
-        saveDistanceStd(){
-            if(this.loadCameraStatus === 'success'){
+        setStandardPos(){
+            if(this.loadCameraStatus === 'complete'){
                 ipc.send('ESTIMATE_DISTANCE',1);
             }
             else {
@@ -219,10 +253,6 @@ export default {
         insertMessage(content,type) {
             ipc.send('INSERT_MESSAGE',{content,type});
         },
-        setWarningDuration(e){
-            this.duration = parseInt(e.target.value);
-            ipc.send('SET_WARNING_DURATION',this.duration);
-        },
         playStretchGuide(){
             ipc.send('SHOW_STRETCH_GUIDE');
         },
@@ -247,7 +277,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 header {
     height:30px;
 }
@@ -256,12 +286,17 @@ main#setting-page {
     display:flex;
     flex-direction:row;
     background:var(--background-color);
+    color:var(--text-regular-color);
+}
+main#setting-page * {
+    user-select: none;
 }
 #setting-page #main-image {
-    width:35%;
+    flex-grow:1;
+    position:relative;
 }
 #setting-page #settings {
-    width:65%;
+    width:600px;
     position:relative;
     display:inline-flex;
     flex-wrap:wrap;
@@ -274,5 +309,47 @@ section {
     display:flex;
     flex-direction: column;
     margin-bottom:10px;
+}
+section.status > div {
+    display:flex;
+    flex-direction:row;
+}
+section.status > div > *{
+    margin:auto 0;
+}
+section.status .status-message {
+    margin-left: 5px;
+}
+section.warning-setting {
+    width:100%;
+}
+.setting-option {
+    margin-bottom:10px;
+}
+.setting-option .explanation {
+    margin-right:5px;
+    margin-bottom:5px;
+}
+.setting-option .unit {
+    margin-left:5px;
+}
+.alarm-setting .title {
+    display:flex;
+    flex-direction:row;
+    justify-content: space-between;
+}
+button {
+    padding: 5px;
+    width:100px;
+    margin-left:20px;
+}
+img#mascot {
+    position:absolute;
+    width:300px;
+    height:300px;
+    left:50%;
+    margin-left:-150px;
+    top:50%;
+    margin-top:-150px;
 }
 </style>

@@ -141,11 +141,12 @@ app.on('ready', async () => {
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
     createProtocol('app')
   }
-  loadingWindow = createWindow('/#/loading','index.html#loading',{
+  loadingWindow = createWindow('loading.html','loading.html',{
     width:290,
     height:360,
     frame:false,
     transparent:true,
+    alwaysOnTop:true,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
@@ -157,7 +158,6 @@ app.on('ready', async () => {
     height: 600,
     frame:false,
     show:false,
-    backgroundColor:'#2e2c29',
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
@@ -256,17 +256,17 @@ ipcMain.on('HIDE_STRETCH_GUIDE',(evt,payload)=>{
 })
 
 //set screenFilter
-ipcMain.on('SET_FILTER_SHOW',(evt,payload)=>{
-  setting.screenFilter.show=payload;
-  screenFilterWindow.send('SET_FILTER_SHOW',payload)
+ipcMain.on('SET_BLUELIGHT_FILTER_SHOW',(evt,payload)=>{
+  setting.screenFilter.isBlueLightFilterOn=payload;
+  screenFilterWindow.send('SET_BLUELIGHT_FILTER_SHOW',payload)
 })
 ipcMain.on('SET_DARKNESS',(evt,payload)=>{
   setting.screenFilter.darkness=payload;
   screenFilterWindow.send('SET_DARKNESS',payload)
 })
-ipcMain.on('SET_BLUELIGHTFIGURE',(evt,payload)=>{
+ipcMain.on('SET_BLUELIGHT_FIGURE',(evt,payload)=>{
   setting.screenFilter.blueLightFigure=payload;
-  screenFilterWindow.send('SET_BLUELIGHTFIGURE',payload)
+  screenFilterWindow.send('SET_BLUELIGHT_FIGURE',payload)
 })
 
 //set warningMessage
@@ -276,10 +276,6 @@ ipcMain.on('SET_WARNING_MODE',(evt,payload)=>{
 })
 ipcMain.on('INSERT_MESSAGE',(evt,payload)=>{
   warningMessageWindow.send('INSERT_MESSAGE',payload)
-})
-ipcMain.on('SET_WARNING_DURATION',(evt,payload)=>{
-  setting.warningMessage.duration=payload;
-  warningMessageWindow.send('SET_WARNING_DURATION',payload)
 })
 ipcMain.on('SET_IS_PLAY_SOUND',(evt,payload)=>{
   warningMessageWindow.send('SET_IS_PLAY_SOUND',payload)
@@ -291,6 +287,7 @@ ipcMain.on('ESTIMATE_DISTANCE',(evt,payload)=>{
 })
 ipcMain.on('SET_FACE_DISTANCE',(evt,payload)=>{
   setting.faceProcess.faceLength = payload;
+  settingWindow.send('SET_FACE_DISTANCE_SUCCESS',true)
 })
 //카메라 감지 성공 여부
 ipcMain.on('LOAD_CAMERA_SUCCESS',(evt,payload)=>{
