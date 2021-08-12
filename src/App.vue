@@ -22,6 +22,10 @@ export default {
   --warning-color:#E6A23C;
   --danger-color:#F56C6C;
 }
+html,body,#app {
+  height:100%;
+  width:100%;
+}
 @font-face { 
   font-family: 'Nanum_Gothic';
   src: local('Nanum-Gothic'), url('./assets/fonts/Nanum_Gothic/NanumGothic-Regular.ttf');
