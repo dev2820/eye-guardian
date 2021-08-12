@@ -45,7 +45,7 @@ label.switch input[type=checkbox] + span.box{
 }
 label.switch input[type=checkbox]:checked + span.box {
     background-position:center;
-    background:radial-gradient(red,red 3px, white 5px,white 100%);
+    background:radial-gradient(red,red 3px, transparent 5px,transparent 100%);
 }
 .round {
     border-radius:50%;
