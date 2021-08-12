@@ -11,8 +11,6 @@
         <audio ref="normal-sound">
             <source src="local-audio://musics/normal.wav" type="audio/wav" volume="1"/>
         </audio>
-        
-            
         <div class="message flip-item" v-for="(message,index) in messages" :key="index"
             :class="{
                 'normal':message.type==='normal',
@@ -116,7 +114,7 @@ export default {
     src: local('Nanum-Gothic'),
         url('../assets/fonts/Nanum_Gothic/NanumGothic-Regular.woff2'),
         url('../assets/fonts/Nanum_Gothic/NanumGothic-Regular.ttf');
-    font-display:block;
+    /* font-display:block; */
 }
 #warning-message-queue {
     flex-direction:column;
