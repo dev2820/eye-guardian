@@ -27,7 +27,7 @@ export default {
         return {
             detectFace:'no face',
             faceLength:0,
-            autoDarknessControl:false,
+            isAutoDarknessControlOn:false,
             isStretchGuideOn:false,
             isDistanceWarningOn:false,
             isEyeblinkWarningOn:false,
@@ -43,7 +43,7 @@ export default {
             this.isEyeblinkWarningOn= payload.faceProcess.isEyeblinkWarningOn;
             this.isSittedWarningOn= payload.faceProcess.isSittedWarningOn;
             this.isBrightWarningOn= payload.faceProcess.isBrightWarningOn;
-            this.autoDarknessControl= payload.faceProcess.autoDarknessControl;
+            this.isAutoDarknessControlOn= payload.faceProcess.isAutoDarknessControlOn;
         })
         ipc.on('ESTIMATE_DISTANCE',()=>{
             ipc.send('INSERT_MESSAGE',{content:'ready-to-capture',type:'normal'})
@@ -86,8 +86,8 @@ export default {
     },
     methods:{
         generateBrightWarning(){
-            ipc.send('INSERT_MESSAGE',{content:'bright-warning',type:'normal'})
-            if(this.autoDarknessControl){//밝기 자동 조절 모드가 켜져있는 경우
+            // ipc.send('INSERT_MESSAGE',{content:'bright-warning',type:'normal'})
+            if(this.isAutoDarknessControlOn){//밝기 자동 조절 모드가 켜져있는 경우
                 // ipc.send('SET_DARKNESS',0.5);//0~0.5
             }
         },

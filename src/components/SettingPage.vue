@@ -31,10 +31,10 @@
                     <custom-check-box @on="setIsPlaySound(true)" @off="setIsPlaySound(false)" :checked="isPlaySound"/>
                 </div>
                 <div class="setting-option standard-pos-setting">
-                    <span v-if="timer>0">{{timer}}</span>
-                    <span>정자세 기준 설정하기</span>
+                    <span class="explanation">정자세 기준 설정하기</span>
                     <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
                     <button @click="setStandardPos()">설정</button>
+                    <span v-if="timer>0">{{timer}}</span>
                 </div>
             </section>
             <section class="alarm-setting">
@@ -71,21 +71,17 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <h3>밝기 감지</h3><toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle>
+                        <h3>밝기 자동 조절</h3><toggle @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"></toggle>
                     </div>
-                    <label title="사용자의 환경에 맞춰 자동으로 밝기를 조절합니다.">
-                        <custom-check-box @on="setAutoDarknessControl(true)" @off="setAutoDarknessControl(false)" :checked="autoDarknessControl"/><small>밝기 자동 조절</small>
-                    </label>
-                    <div>
-                        darkness 설정
-                        <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="autoDarknessControl"/>
-                    </div>
+                    <small>수동조절</small>
+                    <!-- <font-awesome-icon icon="sun"/> -->
+                    <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="isAutoDarknessControlOn"/>
                 </CardUI>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <h3>편안하게 화면보기</h3><toggle @on="showScreenFilter(true)" @off="showScreenFilter(false)" :checked="isBlueLightFilterOn"></toggle>
+                        <h3>편안하게 화면보기</h3><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
                     </div>
                     <div>
                         blueLight 설정
@@ -122,15 +118,11 @@ export default {
     data(){
         return {
             guideText:'',
-            showGuide:false,
-            guidePosition: {
-                top:0,
-                left:0
-            },
-            isBlueLightFilterOn: false,
-            darkness: 0,
-            blueLightFigure: 0,
             timer:0,
+            isBlueLightFilterOn: false,
+            blueLightFigure: 0,
+            isAutoDarknessControlOn:false,
+            darkness: 0,
             loadCameraStatus: 'ongoing',
             loadCameraMessage:'카메라 로드중...',
             standardPosStatus: 'ongoing',
@@ -138,7 +130,6 @@ export default {
             messageMode:'regular-top',
             isPlaySound:false,
             isStretchGuideOn:false,
-            autoDarknessControl:false,
             isDistanceWarningOn:false,
             isSittedWarningOn:false,
             isBrightWarningOn:false,
@@ -164,7 +155,7 @@ export default {
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
             this.isPlaySound = payload.warningMessage.isPlaySound;
             this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
-            this.autoDarknessControl = payload.faceProcess.autoDarknessControl
+            this.isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn
             this.isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn
             this.isSittedWarningOn = payload.faceProcess.isSittedWarningOn
             this.isBrightWarningOn = payload.faceProcess.isBrightWarningOn
@@ -203,9 +194,9 @@ export default {
         })
     },
     methods: {
-        showScreenFilter(boolean){
+        showBlueLightFilter(boolean){
             this.isBlueLightFilterOn = boolean;
-            ipc.send('SET_FILTER_SHOW',boolean)
+            ipc.send('SET_BLUELIGHT_FILTER_SHOW',boolean)
         },
         setStandardPos(){
             if(this.loadCameraStatus === 'complete'){
@@ -231,8 +222,8 @@ export default {
             this.isEyeblinkWarningOn = boolean
             ipc.send('SET_EYEBLINK_WARNING',boolean);
         },
-        setAutoDarknessControl(boolean){
-            this.autoDarknessControl = boolean;
+        setIsAutoDarknessControlOn(boolean){
+            this.isAutoDarknessControlOn = boolean;
             ipc.send('SET_AUTO_DARKNESS_CONTROL',boolean);
         },
         setDarkness(e){
@@ -241,13 +232,13 @@ export default {
         },
         setBlueLightFigure(e){
             this.blueLightFigure = parseFloat(e.target.value);
-            ipc.send('SET_BLUELIGHTFIGURE',this.blueLightFigure);
+            ipc.send('SET_BLUELIGHT_FIGURE',this.blueLightFigure);
         },
         changeMessageMode(e) {
             if(e.target.value!==this.messageMode) {
                 this.messageMode=e.target.value;
-            ipc.send('SET_WARNING_MODE',e.target.value);
-            ipc.send('INSERT_MESSAGE',{content:'message-position',type:'normal'});
+                ipc.send('SET_WARNING_MODE',e.target.value);
+                ipc.send('INSERT_MESSAGE',{content:'message-position',type:'normal'});
             }
         },
         insertMessage(content,type) {
@@ -327,11 +318,22 @@ section.warning-setting {
     margin-bottom:10px;
 }
 .setting-option .explanation {
-    margin-right:5px;
     margin-bottom:5px;
 }
 .setting-option .unit {
     margin-left:5px;
+}
+.setting-option.warning-sound {
+    display:flex;
+}
+.setting-option.warning-sound *{
+    margin:auto 0;
+}
+.setting-option.warning-sound > .explanation{
+    margin-right:5px;
+}
+.setting-option.standard-pos-setting > .explanation{
+    margin-right:5px;
 }
 .alarm-setting .title {
     display:flex;

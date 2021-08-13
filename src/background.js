@@ -314,7 +314,7 @@ ipcMain.on('SET_EYEBLINK_WARNING',(evt,payload)=>{
   faceProcessWindow.send('SET_EYEBLINK_WARNING',payload)
 })
 ipcMain.on('SET_AUTO_DARKNESS_CONTROL',(evt,payload)=>{
-  setting.faceProcess.autoDarknessControl = payload
+  setting.faceProcess.isAutoDarknessControlOn = payload
   faceProcessWindow.send('SET_AUTO_DARKNESS_CONTROL',payload)
 })
 ipcMain.on('SET_STRETCH_GUIDE',(evt,payload)=>{
