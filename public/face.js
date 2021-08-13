@@ -10,14 +10,17 @@ let isDistanceWarningOn=false;
 let isEyeblinkWarningOn=false;
 let isSittedWarningOn=false;
 
-faceapi.env.monkeyPatch({
-    Canvas: HTMLCanvasElement,
-    Image: HTMLImageElement,
-    ImageData: ImageData,
-    Video: HTMLVideoElement,
-    createCanvasElement: () => document.createElement('canvas'),
-    createImageElement: () => document.createElement('img')
-});
+const videoEl = document.getElementById('inputVideo')
+const canvas = document.getElementById('inputCanvas')
+
+// faceapi.env.monkeyPatch({
+//     Canvas: HTMLCanvasElement,
+//     Image: HTMLImageElement,
+//     ImageData: ImageData,
+//     Video: HTMLVideoElement,
+//     createCanvasElement: () => document.createElement('canvas'),
+//     createImageElement: () => document.createElement('img')
+// });
 
 ipcRenderer.send('REQUEST_INIT_SCREEN_VALUE','faceProcess')
 ipcRenderer.on('INIT',(evt,payload)=>{
@@ -51,7 +54,6 @@ ipcRenderer.on('SET_STRETCH_GUIDE',(evt,payload)=>{
 })
 
 function loadCamera(){
-    const videoEl = document.getElementById('inputVideo')
     navigator.getMedia = navigator.getUserMedia ||
                         navigator.webkitGetUserMedia ||
                         navigator.mozGetuserMedia ||
@@ -71,7 +73,14 @@ function loadCamera(){
 
 videoEl.addEventListener('play',async ()=>{
     //faceapi가 모델을 불러오고 화면 작동을 시작하는 시점을 settingPage에 알려주기 위한 코드
-    showVideo();
+    // const img = getImgfromWebcam(videoEl,canvas);
+    // await faceapi.detectSingleFace(img)
+    ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
+    // draw();
+    // bright();
+    // eyeblink();
+    // sitted();
+    // screenDistance();
 },false)
 
 function generateBrightWarning(){
@@ -80,9 +89,11 @@ function generateBrightWarning(){
         // ipcRenderer.send('SET_DARKNESS',0.5);//0~0.5
     }
 }
+
 function generateDistanceWarning(){
     ipcRenderer.send('INSERT_MESSAGE',{content:'distance-warning',type:'warning'})
 }
+
 async function saveDistance() {
     const videoEl = document.getElementById('inputVideo')
     const canvas = document.getElementById('inputCanvas')
@@ -97,6 +108,7 @@ async function saveDistance() {
         ipcRenderer.send('INSERT_MESSAGE',{content:'no-face',type:'warning'})
     }
 }
+
 function getImgfromWebcam(videoEl,canvas){
     const context = canvas.getContext('2d');
     context.drawImage(videoEl, 0, 0, 300, 150);
@@ -104,100 +116,66 @@ function getImgfromWebcam(videoEl,canvas){
     img.src = canvas.toDataURL('image/jpeg');
     return img;
 }
-function showVideo(){
-    const videoEl = document.getElementById('inputVideo')
-    const canvas = document.getElementById('inputCanvas')
-    const box = document.getElementById('detect-box')
-    navigator.getMedia = navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetuserMedia ||
-    navigator.msGetUserMedia;
-    navigator.getMedia(
-        { video: true },
-        async (stream) => {
-            videoEl.srcObject = stream;
-            videoEl.play();
-        },
-        (err) => {
-            ipcRenderer.send('LOAD_CAMERA_FAILED',true)
-            console.error(err)
-        }
-    );
-    
-    videoEl.addEventListener('play',async ()=>{
-        //faceapi가 모델을 불러오고 화면 작동을 시작하는 시점을 settingPage에 알려주기 위한 코드
-        const img = getImgfromWebcam(videoEl,canvas);
-        await faceapi.detectSingleFace(img)
-        ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
-        // draw();
-        // bright();
-        // eyeblink();
-        sitted();
-        screenDistance();
-    },false)
-    
-    let draw = async () => {
-        const img = getImgfromWebcam(videoEl,canvas);
-        const detections = await faceapi.detectSingleFace(img)
-        if(detections){
-            box.style.width = 0//detections.box.width+'px';
-            box.style.height = 0//detections.box.height+'px';
-            box.style.top = 0//detections.box.y+'px';
-            box.style.left = 0//detections.box.x+'px';
-        }
-        detectFace = detections?detections.classScore : 'no face'
-        setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+
+async function draw(){
+    const img = getImgfromWebcam(videoEl,canvas);
+    const detections = await faceapi.detectSingleFace(img)
+    if(detections){
+        box.style.width = 0//detections.box.width+'px';
+        box.style.height = 0//detections.box.height+'px';
+        box.style.top = 0//detections.box.y+'px';
+        box.style.left = 0//detections.box.x+'px';
     }
-    
-    let bright = async () =>{
-        if(brightWarningOn) {
-            const context = canvas.getContext('2d');
-            const data= context.getImageData(0,0,canvas.width,canvas.height).data;
-            let r=0,g=0,b=0;
-            for(let x= 0, len= data.length; x < len; x+=4) {
-                r += data[x];
-                g += data[x+1];
-                b += data[x+2];
-            }
-            const colorSum = Math.sqrt(0.299 * (r ** 2)
-                + 0.587 * (g ** 2)
-                + 0.114 * (b ** 2));
-            const brightness= Math.floor(colorSum /(canvas.width*canvas.height));
-            // console.log('brightness',brightness)
-            if(brightness<=0) {
-                //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-            }
-            else if( 0 < brightness && brightness < 50){
-                generateBrightWarning();
-            }
-        }
-        setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
-    }
-    // let eyeblink = async () => {
-    //     //눈 깜빡임 감지 로직 
-    //     //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-    // }
-    let sitted = async () => {
-        //앉아있는지 감지하는 로직
-        //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-        const net = await posenet.load({
-            inputResolution: { width: 300, height: 150 },
-        });
-        const pose = await net.estimateSinglePose(videoEl, {
-            flipHorizontal:true
-        })
-        console.log(pose)
-    }
-    let screenDistance = async () => {
-        if(distanceWarningOn) {
-            if(faceLength !== 0){
-                const img = getImgfromWebcam(videoEl,canvas);
-                const detections = await faceapi.detectSingleFace(img)
-                if(detections && (faceLength*8)/6 < detections.box.width){
-                    generateDistanceWarning();
-                }
-            }
-        }
-        setTimeout( screenDistance, 10*1000 );//10초에 한번 얼굴 감지
-    }
+    detectFace = detections?detections.classScore : 'no face'
+    setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
 }
+
+async function bright() {
+    if(brightWarningOn) {
+        const context = canvas.getContext('2d');
+        const data= context.getImageData(0,0,canvas.width,canvas.height).data;
+        let r=0,g=0,b=0;
+        for(let x= 0, len= data.length; x < len; x+=4) {
+            r += data[x];
+            g += data[x+1];
+            b += data[x+2];
+        }
+        const colorSum = Math.sqrt(0.299 * (r ** 2)
+            + 0.587 * (g ** 2)
+            + 0.114 * (b ** 2));
+        const brightness= Math.floor(colorSum /(canvas.width*canvas.height));
+        // console.log('brightness',brightness)
+        if(brightness<=0) {
+            //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
+        }
+        else if( 0 < brightness && brightness < 50){
+            generateBrightWarning();
+        }
+    }
+    setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
+}
+
+async function sitted() {
+    const net = await posenet.load({
+        inputResolution: { width: 300, height: 150 },
+    });
+    const pose = await net.estimateSinglePose(videoEl, {
+        flipHorizontal:true
+    })
+    console.log(pose)
+}
+
+async function screenDistnace(){
+    if(distanceWarningOn) {
+        if(faceLength !== 0){
+            const img = getImgfromWebcam(videoEl,canvas);
+            const detections = await faceapi.detectSingleFace(img)
+            if(detections && (faceLength*8)/6 < detections.box.width){
+                generateDistanceWarning();
+            }
+        }
+    }
+    setTimeout( screenDistance, 10*1000 );//10초에 한번 얼굴 감지
+}
+
+loadCamera();
