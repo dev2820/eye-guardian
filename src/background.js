@@ -141,7 +141,7 @@ app.on('ready', async () => {
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
     createProtocol('app')
   }
-  loadingWindow = createWindow('loading.html','loading.html',{
+  loadingWindow = createWindow('loading/index.html','loading/index.html',{
     width:290,
     height:360,
     frame:false,
