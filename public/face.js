@@ -1,8 +1,10 @@
 const { ipcRenderer } = require('electron')
 const path = require('path');
-const posenet = require('@tensorflow-models/posenet')
-const net = await posenet.load({
+let net;
+require('@tensorflow-models/posenet').load({
     inputResolution: { width: 300, height: 150 },
+}).then((value)=>{
+    net = value;
 });
 
 const NOSE = 0;
@@ -102,8 +104,6 @@ function generateDistanceWarning(){
     ipcRenderer.send('INSERT_MESSAGE',{content:'distance-warning',type:'warning'})
 }
 
-const videoEl = document.getElementById('inputVideo')
-const canvas = document.getElementById('inputCanvas')
 
 async function saveDistance() {
     const pose = await net.estimateSinglePose(videoEl, {
@@ -142,6 +142,7 @@ async function draw(){
 }
 
 async function bright() {
+    console.log('hey')
     const context = canvasEl.getContext('2d');
     const data= context.getImageData(0,0,canvasEl.width,canvasEl.height).data;
     let r=0,g=0,b=0;
@@ -154,7 +155,8 @@ async function bright() {
     + 0.587 * (g ** 2)
     + 0.114 * (b ** 2));
     const brightness= Math.floor(colorSum /(canvasEl.width*canvasEl.height));
-    // console.log('brightness',brightness)
+
+    console.log('brightness',brightness)
     if(brightness<=0) {
         //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
     }
