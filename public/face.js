@@ -31,6 +31,8 @@ let isDistanceWarningOn=false;
 let isEyeblinkWarningOn=false;
 let isSittedWarningOn=false;
 
+const videoEl = document.getElementById('inputVideo');
+const canvasEl = document.getElementById('inputCanvas');
 ipcRenderer.send('REQUEST_INIT_SCREEN_VALUE','faceProcess')
 ipcRenderer.on('INIT',(evt,payload)=>{
     faceLength = parseFloat(payload.faceProcess.faceLength);
@@ -117,11 +119,11 @@ async function saveDistance() {
     }
 }
 
-function getImgfromWebcam(videoEl,canvas){
-    const context = canvas.getContext('2d');
+function getImgfromWebcam(videoEl,canvasEl){
+    const context = canvasEl.getContext('2d');
     context.drawImage(videoEl, 0, 0, 300, 150);
     const img = new Image();
-    img.src = canvas.toDataURL('image/jpeg');
+    img.src = canvasEl.toDataURL('image/jpeg');
     return img;
 }
 
@@ -140,8 +142,8 @@ async function draw(){
 }
 
 async function bright() {
-    const context = canvas.getContext('2d');
-    const data= context.getImageData(0,0,canvas.width,canvas.height).data;
+    const context = canvasEl.getContext('2d');
+    const data= context.getImageData(0,0,canvasEl.width,canvasEl.height).data;
     let r=0,g=0,b=0;
     for(let x= 0, len= data.length; x < len; x+=4) {
         r += data[x];
@@ -151,7 +153,7 @@ async function bright() {
     const colorSum = Math.sqrt(0.299 * (r ** 2)
     + 0.587 * (g ** 2)
     + 0.114 * (b ** 2));
-    const brightness= Math.floor(colorSum /(canvas.width*canvas.height));
+    const brightness= Math.floor(colorSum /(canvasEl.width*canvasEl.height));
     // console.log('brightness',brightness)
     if(brightness<=0) {
         //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
