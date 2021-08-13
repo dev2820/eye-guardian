@@ -1,7 +1,7 @@
 <template>
     <div id="face-process">
         <canvas id="inputCanvas" style="display:none"></canvas>
-        <video id="inputVideo" autoplay></video>
+        <video id="inputVideo" autoplay playsinline></video>
         <div>{{detectFace}}</div>
         <div id="detect-box"></div>
     </div>
@@ -10,9 +10,9 @@
 <script>
 import * as faceapi from 'face-api.js';
 import { ipcRenderer as ipc } from 'electron'
-// const bodyPix = require('@tensorflow-models/body-pix');
-import * as posenet from '@tensorflow-models/posenet';
-// importccc { exec } from 'child_process'
+import * as posenet from '@tensorflow-models/posenet'
+import tf from '@tensorflow/tfjs';
+// import { exec } from 'child_process'
 // import fs from 'fs'
 import path from 'path'
 faceapi.env.monkeyPatch({
@@ -143,7 +143,7 @@ export default {
                 // bright();
                 // eyeblink();
                 sitted();
-                // screenDistance();
+                screenDistance();
             },false)
             
             let draw = async () => {
@@ -189,26 +189,14 @@ export default {
             // }
             let sitted = async () => {
                 //앉아있는지 감지하는 로직
-                setTimeout( sitted, 10*1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-
-                // const net = await bodyPix.load({
-                //     architecture: 'MobileNetV1',
-                //     outputStride: 16,
-                //     multiplier: 0.75,
-                //     quantBytes: 2
-                // });
-                // const segmentation = await net.segmentPerson(videoEl);
-                // console.log(segmentation);
-
-
-                const net = await posenet.load();
-                const img = this.getImgfromWebcam(videoEl,canvas);
-                const context = canvas.getContext('2d');
-                
-                const pose = await net.estimateSinglePose(context.getImageData(0,0,300,150), {
-                    flipHorizontal: false
+                //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+                const net = await posenet.load({
+                    inputResolution: { width: 300, height: 150 },
                 });
-                console.log(pose);
+                const pose = await net.estimateSinglePose(videoEl, {
+                    flipHorizontal:true
+                })
+                console.log(pose)
             }
             let screenDistance = async () => {
                 if(this.distanceWarningOn) {

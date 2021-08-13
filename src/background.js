@@ -209,8 +209,8 @@ app.on('ready', async () => {
     frame:false,
     show:false
   },false)
-
-  faceProcessWindow = createWindow('/#/faceProcess','index.html#faceProcess',{
+  // faceProcessWindow = createWindow('/#/faceProcess','index.html#faceProcess',{
+  faceProcessWindow = createWindow('face.html','face.html',{
     webPreferences: { 
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
