@@ -40,7 +40,7 @@ export default {
         ipc.send('REQUEST_INIT_SCREEN_VALUE','warningMessage');
         ipc.on('INIT',(evt,payload)=>{
             this.mode = payload.warningMessage.mode;
-            this.warningVolume = payload.warningMessage.warningVolume;
+            this.warningVolume = parseFloat(payload.warningMessage.warningVolume);
         })
         ipc.on('SET_WARNING_MODE',(evt,payload)=>{
             this.mode = payload;
@@ -54,11 +54,10 @@ export default {
                 this.messages.pop()
             },this.duration*1000)
         })
-        ipc.on('SET_WARNING_DURATION',(evt,payload)=>{
-            this.duration = parseInt(payload);
-        })
         ipc.on('SET_WARNING_VOLUME',(evt,payload)=>{
             this.warningVolume = parseFloat(payload);
+            this.$refs['warning-sound'].querySelector('source').volume=this.warningVolume;
+            this.$refs['normal-sound'].querySelector('source').volume=this.warningVolume;
         })
     },
     methods:{

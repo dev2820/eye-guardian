@@ -176,7 +176,7 @@ app.on('ready', async () => {
     fullscreen:true,
     frame:false,
     transparent:true,
-    // alwaysOnTop :true,
+    alwaysOnTop :true,
     focusable:false,
     resizable:false,
   },false)
