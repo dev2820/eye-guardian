@@ -1,6 +1,5 @@
 const { ipcRenderer } = require('electron')
 const path = require('path');
-// const faceapi = require('face-api.js');
 
 let detectFace='no face';
 let faceLength=0;
@@ -9,15 +8,6 @@ let isStretchGuideOn=false;
 let isDistanceWarningOn=false;
 let isEyeblinkWarningOn=false;
 let isSittedWarningOn=false;
-
-// faceapi.env.monkeyPatch({
-//     Canvas: HTMLCanvasElement,
-//     Image: HTMLImageElement,
-//     ImageData: ImageData,
-//     Video: HTMLVideoElement,
-//     createCanvasElement: () => document.createElement('canvas'),
-//     createImageElement: () => document.createElement('img')
-// });
 
 ipcRenderer.send('REQUEST_INIT_SCREEN_VALUE','faceProcess')
 ipcRenderer.on('INIT',(evt,payload)=>{
@@ -70,14 +60,12 @@ function loadCamera(){
 
 videoEl.addEventListener('play',async ()=>{
     //faceapi가 모델을 불러오고 화면 작동을 시작하는 시점을 settingPage에 알려주기 위한 코드
-    // const img = getImgfromWebcam(videoEl,canvas);
-    // await faceapi.detectSingleFace(img)
     ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
     // draw();
-    // bright();
+    bright();
     // eyeblink();
     // sitted();
-    // screenDistance();
+    screenDistance();
 },false)
 
 function generateBrightWarning(){
@@ -92,10 +80,6 @@ function generateDistanceWarning(){
 }
 
 async function saveDistance() {
-    const videoEl = document.getElementById('inputVideo')
-    const canvas = document.getElementById('inputCanvas')
-    const img = getImgfromWebcam(videoEl,canvas);
-    const detections = await faceapi.detectSingleFace(img);
     if(detections){
         faceLength = detections.box.width;
         ipcRenderer.send('INSERT_MESSAGE',{content:'capture-face',type:'normal'});
@@ -114,19 +98,6 @@ function getImgfromWebcam(videoEl,canvas){
     return img;
 }
 
-async function draw(){
-    const img = getImgfromWebcam(videoEl,canvas);
-    const detections = await faceapi.detectSingleFace(img)
-    if(detections){
-        box.style.width = 0//detections.box.width+'px';
-        box.style.height = 0//detections.box.height+'px';
-        box.style.top = 0//detections.box.y+'px';
-        box.style.left = 0//detections.box.x+'px';
-    }
-    detectFace = detections?detections.classScore : 'no face'
-    setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-}
-
 async function bright() {
     if(brightWarningOn) {
         const context = canvas.getContext('2d');
@@ -138,59 +109,33 @@ async function bright() {
             b += data[x+2];
         }
     };
-    
-    videoEl.addEventListener('play',async ()=>{
-        //faceapi가 모델을 불러오고 화면 작동을 시작하는 시점을 settingPage에 알려주기 위한 코드
-        const img = getImgfromWebcam(videoEl,canvas);
-        pose.keypoints[2] - pose.keypoints[1]
-        ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
-        // draw();
-        // bright();
-        // eyeblink();
-        sitted();
-        screenDistance();
-    },false)
-    
-    let draw = async () => {
-        const img = getImgfromWebcam(videoEl,canvas);
-        const detections = await faceapi.detectSingleFace(img)
-        if(detections){
-            box.style.width = 0//detections.box.width+'px';
-            box.style.height = 0//detections.box.height+'px';
-            box.style.top = 0//detections.box.y+'px';
-            box.style.left = 0//detections.box.x+'px';
-        }
-        else if( 0 < brightness && brightness < 50){
-            generateBrightWarning();
-        }
-    }
-    // let eyeblink = async () => {
-    //     //눈 깜빡임 감지 로직 
-    //     //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-    // }
-    let sitted = async () => {
-        //앉아있는지 감지하는 로직
-        //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-        const net = await posenet.load({
-            inputResolution: { width: 300, height: 150 },
-        });
-        const pose = await net.estimateSinglePose(videoEl, {
-            flipHorizontal:true
-        })
-        console.log(pose)
-    }
-    let screenDistance = async () => {
-        if(distanceWarningOn) {
-            if(faceLength !== 0){
-                const net = await posenet.load({
-                    inputResolution: { width: 300, height: 150 },
-                });
-                const pose = await net.estimateSinglePose(videoEl, {
-                    flipHorizontal:true
-                })
-                if(pose && (faceLength*8)/6 < pose.keypoints[2] - pose.keypoints[1]){
-                    generateDistanceWarning();
-                }
+}
+async function eyeblink() {
+    //눈 깜빡임 감지 로직 
+    //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+}
+async function sitted() {
+    //앉아있는지 감지하는 로직
+    //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+    const net = await posenet.load({
+        inputResolution: { width: 300, height: 150 },
+    });
+    const pose = await net.estimateSinglePose(videoEl, {
+        flipHorizontal:true
+    })
+    console.log(pose)
+}
+async function screenDistance() {
+    if(distanceWarningOn) {
+        if(faceLength !== 0){
+            const net = await posenet.load({
+                inputResolution: { width: 300, height: 150 },
+            });
+            const pose = await net.estimateSinglePose(videoEl, {
+                flipHorizontal:true
+            })
+            if(pose && (faceLength*8)/6 < pose.keypoints[2] - pose.keypoints[1]){
+                generateDistanceWarning();
             }
         }
     }
