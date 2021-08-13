@@ -32,7 +32,6 @@ export default {
             isDistanceWarningOn:false,
             isEyeblinkWarningOn:false,
             isSittedWarningOn:false,
-            isBrightWarningOn:false,
         }
     },
     mounted(){
@@ -42,7 +41,6 @@ export default {
             this.isDistanceWarningOn= payload.faceProcess.isDistanceWarningOn;
             this.isEyeblinkWarningOn= payload.faceProcess.isEyeblinkWarningOn;
             this.isSittedWarningOn= payload.faceProcess.isSittedWarningOn;
-            this.isBrightWarningOn= payload.faceProcess.isBrightWarningOn;
             this.isAutoDarknessControlOn= payload.faceProcess.isAutoDarknessControlOn;
         })
         ipc.on('ESTIMATE_DISTANCE',()=>{
@@ -57,9 +55,6 @@ export default {
         })
         ipc.on('SET_SITTED_WARNING',(evt,payload)=>{
             this.isSittedWarningOn = payload;
-        })
-        ipc.on('SET_BRIGHT_WARNING',(evt,payload)=>{
-            this.isBrightWarningOn = payload;
         })
         ipc.on('SET_EYEBLINK_WARNING',(evt,payload)=>{
             this.isEyeblinkWarningOn = payload;

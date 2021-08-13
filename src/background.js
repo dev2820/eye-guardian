@@ -298,19 +298,15 @@ ipcMain.on('LOAD_CAMERA_FAILED',(evt,payload)=>{
 })
 //각 알람 On Off 여부
 ipcMain.on('SET_DISTANCE_WARNING',(evt,payload)=>{
-  setting.faceProcess.distanceWarningOn = payload
+  setting.faceProcess.isDistanceWarningOn = payload
   faceProcessWindow.send('SET_DISTANCE_WARNING',payload)
 })
 ipcMain.on('SET_SITTED_WARNING',(evt,payload)=>{
-  setting.faceProcess.sittedWarningOn = payload
+  setting.faceProcess.isSittedWarningOn = payload
   faceProcessWindow.send('SET_SITTED_WARNING',payload)
 })
-ipcMain.on('SET_BRIGHT_WARNING',(evt,payload)=>{
-  setting.faceProcess.brightWarningOn = payload
-  faceProcessWindow.send('SET_BRIGHT_WARNING',payload)
-})
 ipcMain.on('SET_EYEBLINK_WARNING',(evt,payload)=>{
-  setting.faceProcess.eyeblinkWarningOn = payload
+  setting.faceProcess.isEyeblinkWarningOn = payload
   faceProcessWindow.send('SET_EYEBLINK_WARNING',payload)
 })
 ipcMain.on('SET_AUTO_DARKNESS_CONTROL',(evt,payload)=>{
