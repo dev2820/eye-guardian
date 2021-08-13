@@ -139,8 +139,8 @@ export default {
                 const img = this.getImgfromWebcam(videoEl,canvas);
                 await faceapi.detectSingleFace(img)
                 ipc.send('LOAD_CAMERA_SUCCESS',true)
-                draw();
-                bright();
+                // draw();
+                // bright();
                 // eyeblink();
                 sitted();
                 screenDistance();
@@ -150,10 +150,10 @@ export default {
                 const img = this.getImgfromWebcam(videoEl,canvas);
                 const detections = await faceapi.detectSingleFace(img)
                 if(detections){
-                    box.style.width = detections.box.width+'px';
-                    box.style.height = detections.box.height+'px';
-                    box.style.top = detections.box.y+'px';
-                    box.style.left = detections.box.x+'px';
+                    box.style.width = 0//detections.box.width+'px';
+                    box.style.height = 0//detections.box.height+'px';
+                    box.style.top = 0//detections.box.y+'px';
+                    box.style.left = 0//detections.box.x+'px';
                 }
                 this.detectFace = detections?detections.classScore : 'no face'
                 setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
