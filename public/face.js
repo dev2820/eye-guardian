@@ -1,6 +1,24 @@
 const { ipcRenderer } = require('electron')
 const path = require('path');
 
+const NOSE = 0;
+const LEFTEYE = 1;
+const RIGHTEYE = 2;
+const LEFTEAR = 3;
+const RIGHTEAR = 4;
+const LEFTSHOULDER = 5;
+const RIGHTSHOULDER = 6
+const LEFTELBOW = 7;
+const RIGHTELBOW = 8;
+const LEFTWRIST = 9;
+const RIGHTWRIST = 10;
+const LEFTHIP = 11;
+const RIGHTHIP = 12;
+const LEFTKNEE = 13;
+const RIGHTKNEE = 14;
+const LEFTANKLE = 15;
+const RIGHTANKLE = 16;
+
 let detectFace='no face';
 let faceLength=0;
 let isAutoDarknessControlOn=false;
