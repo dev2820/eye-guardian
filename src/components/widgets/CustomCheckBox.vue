@@ -54,7 +54,7 @@ label.switch input[type=checkbox] + span.box{
     display:inline-flex;
     width:16px;
     height:16px;
-    border:2px solid red;
+    border:2px solid #2196F3;
     margin:auto 0;
 }
 label.switch input[type=checkbox] + span.box .checked {
@@ -68,7 +68,7 @@ label.switch input[type=checkbox] + span.box .checked {
     background: transparent;
 }
 label.switch input[type=checkbox]:checked + span.box .checked {
-    background: red;
+    background: #2196F3;
 }
 .round {
     border-radius:50%;

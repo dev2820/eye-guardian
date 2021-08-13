@@ -155,7 +155,7 @@ app.on('ready', async () => {
   },false)
   settingWindow = createWindow('','index.html',{
     width: 1000, 
-    height: 600,
+    height: 700,
     frame:false,
     show:false,
     webPreferences: {
