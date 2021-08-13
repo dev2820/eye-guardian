@@ -189,7 +189,7 @@ export default {
             // }
             let sitted = async () => {
                 //앉아있는지 감지하는 로직
-                //setTimeout( sitted, 10*1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+                setTimeout( sitted, 10*1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
 
                 // const net = await bodyPix.load({
                 //     architecture: 'MobileNetV1',
@@ -204,7 +204,8 @@ export default {
                 const net = await posenet.load();
                 const img = this.getImgfromWebcam(videoEl,canvas);
                 const context = canvas.getContext('2d');
-                const pose = await net.estimateSinglePose(context, {
+                
+                const pose = await net.estimateSinglePose(context.getImageData(0,0,300,150), {
                     flipHorizontal: false
                 });
                 console.log(pose);
