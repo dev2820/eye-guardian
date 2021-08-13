@@ -10,7 +10,9 @@
 <script>
 import * as faceapi from 'face-api.js';
 import { ipcRenderer as ipc } from 'electron'
-// import { exec } from 'child_process'
+// const bodyPix = require('@tensorflow-models/body-pix');
+import * as posenet from '@tensorflow-models/posenet';
+// importccc { exec } from 'child_process'
 // import fs from 'fs'
 import path from 'path'
 faceapi.env.monkeyPatch({
@@ -137,21 +139,21 @@ export default {
                 const img = this.getImgfromWebcam(videoEl,canvas);
                 await faceapi.detectSingleFace(img)
                 ipc.send('LOAD_CAMERA_SUCCESS',true)
-                draw();
-                bright();
+                // draw();
+                // bright();
                 // eyeblink();
-                // sitted();
-                screenDistance();
+                sitted();
+                // screenDistance();
             },false)
             
             let draw = async () => {
                 const img = this.getImgfromWebcam(videoEl,canvas);
                 const detections = await faceapi.detectSingleFace(img)
                 if(detections){
-                    box.style.width = detections.box.width+'px';
-                    box.style.height = detections.box.height+'px';
-                    box.style.top = detections.box.y+'px';
-                    box.style.left = detections.box.x+'px';
+                    box.style.width = 0//detections.box.width+'px';
+                    box.style.height = 0//detections.box.height+'px';
+                    box.style.top = 0//detections.box.y+'px';
+                    box.style.left = 0//detections.box.x+'px';
                 }
                 this.detectFace = detections?detections.classScore : 'no face'
                 setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
@@ -185,10 +187,28 @@ export default {
             //     //눈 깜빡임 감지 로직 
             //     //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             // }
-            // let sitted = async () => {
-            //     //앉아있는지 감지하는 로직
-            //     //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-            // }
+            let sitted = async () => {
+                //앉아있는지 감지하는 로직
+                //setTimeout( sitted, 10*1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+
+                // const net = await bodyPix.load({
+                //     architecture: 'MobileNetV1',
+                //     outputStride: 16,
+                //     multiplier: 0.75,
+                //     quantBytes: 2
+                // });
+                // const segmentation = await net.segmentPerson(videoEl);
+                // console.log(segmentation);
+
+
+                const net = await posenet.load();
+                const img = this.getImgfromWebcam(videoEl,canvas);
+                const context = canvas.getContext('2d');
+                const pose = await net.estimateSinglePose(context, {
+                    flipHorizontal: false
+                });
+                console.log(pose);
+            }
             let screenDistance = async () => {
                 if(this.distanceWarningOn) {
                     if(this.faceLength !== 0){
