@@ -32,6 +32,8 @@ let isStretchGuideOn=false;
 let isDistanceWarningOn=false;
 let isEyeblinkWarningOn=false;
 let isSittedWarningOn=false;
+let sittingHeight = 0;
+let sitCount=0;
 
 const videoEl = document.getElementById('inputVideo');
 const canvasEl = document.getElementById('inputCanvas');
@@ -89,7 +91,7 @@ videoEl.addEventListener('play',async ()=>{
 
     bright();
     // eyeblink();
-    // sitted();
+    sitted();
     screenDistance();
 },false)
 
@@ -98,6 +100,10 @@ function generateBrightWarning(){
     if(isAutoDarknessControlOn){//밝기 자동 조절 모드가 켜져있는 경우
         // ipcRenderer.send('SET_DARKNESS',0.5);//0~0.5
     }
+}
+
+function generateSitWarning(){
+    ipcRenderer.send('INSERT_MESSAGE',{content:'sit-up-time',type:'warning'})
 }
 
 function generateDistanceWarning(){
@@ -111,6 +117,7 @@ async function saveDistance() {
     })
     if(pose){
         faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
+        sittingHeight = pose.keypoints[0].position.y;
         ipcRenderer.send('INSERT_MESSAGE',{content:'capture-face',type:'normal'});
         ipcRenderer.send('SET_FACE_DISTANCE',faceLength);
     }
@@ -142,8 +149,8 @@ async function draw(){
 }
 
 async function bright() {
-    console.log('hey')
     const context = canvasEl.getContext('2d');
+    context.drawImage(videoEl, 0, 0, 300, 150);
     const data= context.getImageData(0,0,canvasEl.width,canvasEl.height).data;
     let r=0,g=0,b=0;
     for(let x= 0, len= data.length; x < len; x+=4) {
@@ -156,7 +163,7 @@ async function bright() {
     + 0.114 * (b ** 2));
     const brightness= Math.floor(colorSum /(canvasEl.width*canvasEl.height));
 
-    console.log('brightness',brightness)
+    // console.log('brightness',brightness)
     if(brightness<=0) {
         //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
     }
@@ -175,14 +182,23 @@ async function eyeblink() {
 }
 
 async function sitted() {
-    if(isSittedWarningOn){//isStretchGuideOn
+    if(isSittedWarningOn && sittingHeight){//isStretchGuideOn
         //앉아있는지 감지하는 로직
-        //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
         const pose = await net.estimateSinglePose(videoEl, {
             flipHorizontal:true
         })
-        
+        if(pose){
+            if(pose.keypoints[0].position.y < sittingHeight - faceLength*2 )
+                sitCount = 0;
+            else
+                sitCount++;
+                
+            console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
+        }
     }
+    if(sitCount == 10)
+        generateSitWarning();
+    setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
 }
 
 async function screenDistance() {

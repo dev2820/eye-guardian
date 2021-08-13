@@ -136,8 +136,6 @@ export default {
             
             videoEl.addEventListener('play',async ()=>{
                 //faceapi가 모델을 불러오고 화면 작동을 시작하는 시점을 settingPage에 알려주기 위한 코드
-                const img = this.getImgfromWebcam(videoEl,canvas);
-                await faceapi.detectSingleFace(img)
                 ipc.send('LOAD_CAMERA_SUCCESS',true)
                 // draw();
                 // bright();

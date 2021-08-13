@@ -98,6 +98,9 @@ export default {
                 case 'message-position': {
                     return '이제 이 위치에 메세지가 출력됩니다'
                 }
+                case 'sit-up-time':{
+                    return '일어날 시간입니다. 용사여'
+                }
                 default: {
                     return ''
                 }
