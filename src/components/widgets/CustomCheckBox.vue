@@ -1,5 +1,5 @@
 <template>
-    <span>
+    <span class="custom-check-box">
         <label class="switch">
             <input type="checkbox" @click="handler" :checked="checked"/>
             <span class="box round"></span>
@@ -32,16 +32,27 @@ export default {
 </script>
 
 <style scoped>
+span.custom-check-box {
+    position:relative;
+    display:inline-flex;
+}
+label.switch {
+    margin:auto 0;
+    position:relative;
+    display:inline-flex;
+}
 label.switch input[type=checkbox] { 
     opacity: 0;
     width: 0;
     height: 0;
+    margin:auto 0;
 }
 label.switch input[type=checkbox] + span.box{ 
     display:inline-block;
     width:16px;
     height:16px;
     border:2px solid red;
+    margin:auto 0;
 }
 label.switch input[type=checkbox]:checked + span.box {
     background-position:center;
