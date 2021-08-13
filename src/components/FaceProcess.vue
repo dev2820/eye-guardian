@@ -1,7 +1,7 @@
 <template>
     <div id="face-process">
         <canvas id="inputCanvas" style="display:none"></canvas>
-        <video id="inputVideo" autoplay></video>
+        <video id="inputVideo" autoplay playsinline></video>
         <div>{{detectFace}}</div>
         <div id="detect-box"></div>
     </div>
@@ -10,6 +10,8 @@
 <script>
 import * as faceapi from 'face-api.js';
 import { ipcRenderer as ipc } from 'electron'
+import * as posenet from '@tensorflow-models/posenet'
+import tf from '@tensorflow/tfjs';
 // import { exec } from 'child_process'
 // import fs from 'fs'
 import path from 'path'
@@ -140,7 +142,7 @@ export default {
                 draw();
                 bright();
                 // eyeblink();
-                // sitted();
+                sitted();
                 screenDistance();
             },false)
             
@@ -185,10 +187,17 @@ export default {
             //     //눈 깜빡임 감지 로직 
             //     //setTimeout( eyeblink, 60 );//10~30프레임 0.06초마다 얼굴을 감지한다.
             // }
-            // let sitted = async () => {
-            //     //앉아있는지 감지하는 로직
-            //     //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-            // }
+            let sitted = async () => {
+                //앉아있는지 감지하는 로직
+                //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+                const net = await posenet.load({
+                    inputResolution: { width: 300, height: 150 },
+                });
+                const pose = await net.estimateSinglePose(videoEl, {
+                    flipHorizontal:true
+                })
+                console.log(pose)
+            }
             let screenDistance = async () => {
                 if(this.distanceWarningOn) {
                     if(this.faceLength !== 0){
