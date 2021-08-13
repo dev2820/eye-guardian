@@ -1,5 +1,9 @@
 const { ipcRenderer } = require('electron')
 const path = require('path');
+const posenet = require('@tensorflow-models/posenet')
+const net = await posenet.load({
+    inputResolution: { width: 300, height: 150 },
+});
 
 const NOSE = 0;
 const LEFTEYE = 1;
@@ -100,14 +104,11 @@ const videoEl = document.getElementById('inputVideo')
 const canvas = document.getElementById('inputCanvas')
 
 async function saveDistance() {
-    const net = await posenet.load({
-        inputResolution: { width: 300, height: 150 },
-    });
     const pose = await net.estimateSinglePose(videoEl, {
         flipHorizontal:true
     })
     if(pose){
-        faceLength = pose.keypoints[2] - pose.keypoints[1];
+        faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
         ipcRenderer.send('INSERT_MESSAGE',{content:'capture-face',type:'normal'});
         ipcRenderer.send('SET_FACE_DISTANCE',faceLength);
     }
@@ -125,21 +126,16 @@ function getImgfromWebcam(videoEl,canvas){
 }
 
 async function draw(){
-    // const img = getImgfromWebcam(videoEl,canvas);
-    // const detections = await faceapi.detectSingleFace(img)
-    const net = await posenet.load({
-        inputResolution: { width: 300, height: 150 },
-    });
     const pose = await net.estimateSinglePose(videoEl, {
         flipHorizontal:true
     })
     if(pose){
-        box.style.width = (pose.keypoints[4] - pose.keypoints[3]) +'px';
+        box.style.width = (pose.keypoints[4].position.x - pose.keypoints[3].position.x) +'px';
         box.style.height = 10+'px';
-        box.style.top = pose.keypoints[4]+'px';
-        box.style.left = detections.box.x+'px';
+        box.style.top = pose.keypoints[3].position.y+'px';
+        box.style.left = pose.keypoints[3].position.x+'px';
     }
-    detectFace = detections?detections.classScore : 'no face'
+    detectFace = pose?pose.score : 'no face'
     setTimeout( draw, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
 }
 
@@ -178,9 +174,6 @@ async function sitted() {
     if(isSittedWarningOn){//isStretchGuideOn
         //앉아있는지 감지하는 로직
         //setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
-        const net = await posenet.load({
-            inputResolution: { width: 300, height: 150 },
-        });
         const pose = await net.estimateSinglePose(videoEl, {
             flipHorizontal:true
         })
@@ -191,13 +184,10 @@ async function sitted() {
 async function screenDistance() {
     if(isDistanceWarningOn) {
         if(faceLength !== 0){
-            const net = await posenet.load({
-                inputResolution: { width: 300, height: 150 },
-            });
             const pose = await net.estimateSinglePose(videoEl, {
                 flipHorizontal:true
             })
-            if(pose && (faceLength*8)/6 < pose.keypoints[2] - pose.keypoints[1]){
+            if(pose && (faceLength*8)/6 < pose.keypoints[2].position.x - pose.keypoints[1].position.x){
                 generateDistanceWarning();
             }
         }
