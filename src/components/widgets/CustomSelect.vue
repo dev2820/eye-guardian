@@ -36,6 +36,8 @@ export default {
     text-align:center;
     border:1px solid black;
     cursor:pointer;
+    margin-right:10px;
+    border-radius:4px;
 }
 .select button.selected {
     background:#111111;

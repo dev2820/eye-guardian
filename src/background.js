@@ -277,8 +277,8 @@ ipcMain.on('SET_WARNING_MODE',(evt,payload)=>{
 ipcMain.on('INSERT_MESSAGE',(evt,payload)=>{
   warningMessageWindow.send('INSERT_MESSAGE',payload)
 })
-ipcMain.on('SET_IS_PLAY_SOUND',(evt,payload)=>{
-  warningMessageWindow.send('SET_IS_PLAY_SOUND',payload)
+ipcMain.on('SET_WARNING_VOLUME',(evt,payload)=>{
+  warningMessageWindow.send('SET_WARNING_VOLUME',payload)
 })
 
 //얼굴 거리 감지

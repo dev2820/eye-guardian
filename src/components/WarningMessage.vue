@@ -6,10 +6,10 @@
             }"
     >
         <audio ref="warning-sound">
-            <source src="local-audio://musics/warning.wav" type="audio/wav" volume="1"/>
+            <source src="local-audio://musics/warning.wav" type="audio/wav" :volume="warningVolume"/>
         </audio>
         <audio ref="normal-sound">
-            <source src="local-audio://musics/normal.wav" type="audio/wav" volume="1"/>
+            <source src="local-audio://musics/normal.wav" type="audio/wav" :volume="warningVolume"/>
         </audio>
         <div class="message flip-item" v-for="(message,index) in messages" :key="index"
             :class="{
@@ -32,7 +32,7 @@ export default {
         return {
             mode:'regular-top',
             messages: [],
-            isPlaySound: false,
+            warningVolume:0,
             duration:3
         }
     },
@@ -40,14 +40,14 @@ export default {
         ipc.send('REQUEST_INIT_SCREEN_VALUE','warningMessage');
         ipc.on('INIT',(evt,payload)=>{
             this.mode = payload.warningMessage.mode;
-            this.isPlaySound = payload.warningMessage.isPlaySound;
+            this.warningVolume = payload.warningMessage.warningVolume;
         })
         ipc.on('SET_WARNING_MODE',(evt,payload)=>{
             this.mode = payload;
         })
         ipc.on('INSERT_MESSAGE',(evt,payload)=>{
             this.messages.unshift(payload);
-            if(this.isPlaySound) {
+            if(this.warningVolume>0) {
                 this.playSound(payload.type)
             }
             setTimeout(()=>{
@@ -57,8 +57,8 @@ export default {
         ipc.on('SET_WARNING_DURATION',(evt,payload)=>{
             this.duration = parseInt(payload);
         })
-        ipc.on('SET_IS_PLAY_SOUND',(evt,payload)=>{
-            this.isPlaySound = payload;
+        ipc.on('SET_WARNING_VOLUME',(evt,payload)=>{
+            this.warningVolume = parseFloat(payload);
         })
     },
     methods:{

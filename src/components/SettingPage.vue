@@ -28,13 +28,21 @@
                 </div>
                 <div class="setting-option warning-sound">
                     <span class="explanation">경고음 출력</span>
-                    <custom-check-box @on="setIsPlaySound(true)" @off="setIsPlaySound(false)" :checked="isPlaySound"/>
+                    <div class="control-volume">
+                        <span class="icon">
+                            <font-awesome-icon v-if="warningVolume>0" icon="volume-up"/>
+                            <font-awesome-icon v-else icon="volume-mute"/>
+                        </span>
+                        <custom-input-range :value="warningVolume" @change="setWarningVolume($event)" :min="0" :max="1" :step="0.01"/>
+                    </div>
                 </div>
                 <div class="setting-option standard-pos-setting">
-                    <span class="explanation">정자세 기준 설정하기</span>
-                    <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
-                    <button @click="setStandardPos()">설정</button>
-                    <span v-if="timer>0">{{timer}}</span>
+                    <span class="explanation">
+                        정자세 기준 설정하기
+                        <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
+                    </span>
+                    <custom-button class="button" @click="setStandardPos()">설정</custom-button>
+                    <!-- <span v-if="timer>0">{{timer}}</span> -->
                 </div>
             </section>
             <section class="alarm-setting">
@@ -42,7 +50,7 @@
                     <div class="title">
                         <h3>화면 접근 경고</h3><toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
                     </div>
-                    <small>
+                    <small class="explanation">
                         디스플레이를 너무 가까이서 보게되면 눈에 이러이러케 안좋습니다.
                     </small>
                 </CardUI>
@@ -52,7 +60,7 @@
                     <div class="title">
                         <h3>눈 깜빡임 경고</h3><toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
                     </div>
-                    <small>
+                    <small class="explanation">
                         화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
                     </small>
                 </CardUI>
@@ -62,9 +70,10 @@
                     <div class="title">
                         <h3>장시간 착석 경고</h3><toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle>
                     </div>
-                    <label>
-                        스트레칭 가이드<custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
-                    </label>
+                    <div class="stretch-guide-option">
+                        <small class="option-explanation">스트레칭 가이드</small>
+                        <custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
+                    </div>
                     <!-- <button @click="playStretchGuide">스트레칭 가이드 보여주기</button> -->
                 </CardUI>
             </section>
@@ -73,9 +82,11 @@
                     <div class="title">
                         <h3>밝기 자동 조절</h3><toggle @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"></toggle>
                     </div>
-                    <small>수동조절</small>
-                    <!-- <font-awesome-icon icon="sun"/> -->
-                    <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="isAutoDarknessControlOn"/>
+                    <div class="bright-option">
+                        <small class="option-explanation">수동조절</small>
+                        <!-- <font-awesome-icon icon="sun"/> -->
+                        <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="isAutoDarknessControlOn"/>
+                    </div>
                 </CardUI>
             </section>
             <section class="alarm-setting">
@@ -83,11 +94,8 @@
                     <div class="title">
                         <h3>편안하게 화면보기</h3><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
                     </div>
-                    <div>
-                        blueLight 설정
-                        <tooltip alt="????">
-                            <font-awesome-icon icon="question-circle" class="icon"/>    
-                        </tooltip>
+                    <div class="bluelight-option">
+                        <small class="option-explanation">blueLight</small>
                         <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
                     </div>
                 </CardUI>
@@ -114,11 +122,13 @@ import CustomSelect from './widgets/CustomSelect.vue'
 import Tooltip from './widgets/Tooltip.vue'
 import Toggle from './widgets/Toggle.vue'
 import StatusDot from './widgets/StatusDot.vue';
+import CustomButton from './widgets/CustomButton.vue'
 export default {
     data(){
         return {
             guideText:'',
             timer:0,
+            warningVolume:0,
             isBlueLightFilterOn: false,
             blueLightFigure: 0,
             isAutoDarknessControlOn:false,
@@ -128,7 +138,6 @@ export default {
             standardPosStatus: 'ongoing',
             standardPosMessage:'정자세 기준값 불러오는중...',
             messageMode:'regular-top',
-            isPlaySound:false,
             isStretchGuideOn:false,
             isDistanceWarningOn:false,
             isSittedWarningOn:false,
@@ -145,15 +154,16 @@ export default {
         CustomSelect, 
         Tooltip,
         Toggle,
-        StatusDot 
+        StatusDot,
+        CustomButton 
     },
     mounted(){
         ipc.send('REQUEST_INIT_SCREEN_VALUE','settingPage')
         ipc.on('INIT',(evt,payload)=>{
+            this.warningVolume = payload.warningMessage.warningVolume;
             this.isBlueLightFilterOn = payload.screenFilter.isBlueLightFilterOn;
             this.darkness = parseFloat(payload.screenFilter.darkness);
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
-            this.isPlaySound = payload.warningMessage.isPlaySound;
             this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
             this.isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn
             this.isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn
@@ -251,9 +261,9 @@ export default {
             this.isStretchGuideOn = boolean;
             ipc.send('SET_STRETCH_GUIDE',boolean);
         },
-        setIsPlaySound(boolean) {
-            this.isPlaySound = boolean;
-            ipc.send('SET_IS_PLAY_SOUND',boolean);
+        setWarningVolume(e) {
+            this.warningVolume = parseFloat(e.target.value);
+            ipc.send('SET_WARNING_VOLUME',this.warningVolume);
         },
         minimizeWindow() {
             ipc.send('MINIMIZE','settingPage');
@@ -278,6 +288,7 @@ main#setting-page {
     flex-direction:row;
     background:var(--background-color);
     color:var(--text-regular-color);
+    padding:30px 0;
 }
 main#setting-page * {
     user-select: none;
@@ -285,6 +296,15 @@ main#setting-page * {
 #setting-page #main-image {
     flex-grow:1;
     position:relative;
+}
+#setting-page #main-image img#mascot {
+    position:absolute;
+    width:300px;
+    height:300px;
+    left:50%;
+    margin-left:-150px;
+    top:50%;
+    margin-top:-150px;
 }
 #setting-page #settings {
     width:600px;
@@ -315,19 +335,21 @@ section.warning-setting {
     width:100%;
 }
 .setting-option {
+    display:flex;
+    flex-direction:column;
     margin-bottom:10px;
 }
 .setting-option .explanation {
     margin-bottom:5px;
 }
-.setting-option .unit {
-    margin-left:5px;
-}
-.setting-option.warning-sound {
+.setting-option.warning-sound .control-volume {
     display:flex;
 }
-.setting-option.warning-sound *{
+.setting-option.warning-sound .control-volume *{
     margin:auto 0;
+}
+.setting-option.warning-sound .control-volume .icon {
+    width:20px;
 }
 .setting-option.warning-sound > .explanation{
     margin-right:5px;
@@ -339,19 +361,36 @@ section.warning-setting {
     display:flex;
     flex-direction:row;
     justify-content: space-between;
+    margin-bottom:5px;
 }
-button {
-    padding: 5px;
+.alarm-setting .stretch-guide-option .option-explanation,
+.alarm-setting .bright-option .option-explanation,
+.alarm-setting .bluelight-option .option-explanation{
+    margin-right:5px;
+}
+
+.alarm-setting .stretch-guide-option {
+    display:flex;
+}
+.alarm-setting .stretch-guide-option *{
+    margin:auto 0;
+}
+
+.alarm-setting .bright-option {
+    display:flex;
+}
+.alarm-setting .bright-option *{
+    margin:auto 0;
+}
+
+.alarm-setting .bluelight-option {
+    display:flex;
+}
+.alarm-setting .bluelight-option *{
+    margin:auto 0;
+}
+
+.button {
     width:100px;
-    margin-left:20px;
-}
-img#mascot {
-    position:absolute;
-    width:300px;
-    height:300px;
-    left:50%;
-    margin-left:-150px;
-    top:50%;
-    margin-top:-150px;
 }
 </style>

@@ -11,7 +11,9 @@ import {
     faTimes,
     faInfoCircle,
     faWindowMaximize,
-    faSun
+    faSun,
+    faVolumeMute,
+    faVolumeUp
 } from '@fortawesome/free-solid-svg-icons'
 import {
     faSquare,
@@ -29,6 +31,8 @@ library.add(faWindowMinimize);
 library.add(faWindowMaximize);
 library.add(faSquare);
 library.add(faSun);
+library.add(faVolumeMute);
+library.add(faVolumeUp);
 
 const app = createApp(App);
 app.component('font-awesome-icon',FontAwesomeIcon)

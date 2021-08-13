@@ -17,7 +17,7 @@ export default {
 }
 :root {
   --title-color:#2e2c29;
-  --background-color:#2e2c29;
+  --background-color:#fff;
   --success-color:#67C23A;
   --warning-color:#E6A23C;
   --danger-color:#F56C6C;

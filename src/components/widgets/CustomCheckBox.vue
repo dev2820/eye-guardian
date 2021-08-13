@@ -2,7 +2,9 @@
     <span class="custom-check-box">
         <label class="switch">
             <input type="checkbox" @click="handler" :checked="checked"/>
-            <span class="box round"></span>
+            <span class="box round">
+                <span class="checked round"></span>
+            </span>
         </label>
     </span>
 </template>
@@ -48,15 +50,25 @@ label.switch input[type=checkbox] {
     margin:auto 0;
 }
 label.switch input[type=checkbox] + span.box{ 
-    display:inline-block;
+    position:relative;
+    display:inline-flex;
     width:16px;
     height:16px;
     border:2px solid red;
     margin:auto 0;
 }
-label.switch input[type=checkbox]:checked + span.box {
-    background-position:center;
-    background:radial-gradient(red,red 3px, transparent 5px,transparent 100%);
+label.switch input[type=checkbox] + span.box .checked {
+    position:absolute;
+    width:8px;
+    height:8px;
+    left:50%;
+    top:50%;
+    margin-left:-4px;
+    margin-top:-4px;
+    background: transparent;
+}
+label.switch input[type=checkbox]:checked + span.box .checked {
+    background: red;
 }
 .round {
     border-radius:50%;
