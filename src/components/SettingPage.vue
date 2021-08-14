@@ -157,7 +157,7 @@ export default {
         StatusDot,
         CustomButton 
     },
-    mounted(){
+    created(){
         ipc.send('REQUEST_INIT_SCREEN_VALUE','settingPage')
         ipc.on('INIT',(evt,payload)=>{
             this.warningVolume = payload.warningMessage.warningVolume;

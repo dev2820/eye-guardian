@@ -16,7 +16,9 @@ export default {
   font-family: 'Nanum_Gothic', 'Times New Roman', Times, serif;
 }
 :root {
-  --primary-color:#01D503;
+  /*another green 01D503 */
+  --primary-color:#67C23A;
+  --primary-color-light:#c2e7b0;
   --title-color:#32353B;
   --background-color:#32353B;
   --success-color:#67C23A;
