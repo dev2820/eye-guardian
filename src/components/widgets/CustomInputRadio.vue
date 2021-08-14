@@ -1,7 +1,7 @@
 <template>
-    <span class="custom-check-box">
+    <span class="custom-input-radio">
         <label class="switch">
-            <input type="checkbox" @click="handler" :checked="checked"/>
+            <input type="radio" @click="handler" :checked="checked"/>
             <span class="box round">
                 <span class="checked round"></span>
             </span>
@@ -11,7 +11,7 @@
 
 <script>
 export default {
-    name: "CustomCheckBox",
+    name: "CustomInputRadio",
     props: {
         checked: {
             type:Boolean,
@@ -34,7 +34,7 @@ export default {
 </script>
 
 <style scoped>
-span.custom-check-box {
+span.custom-input-radio {
     position:relative;
     display:inline-flex;
 }
@@ -43,21 +43,21 @@ label.switch {
     position:relative;
     display:inline-flex;
 }
-label.switch input[type=checkbox] { 
+label.switch input[type=radio] { 
     opacity: 0;
     width: 0;
     height: 0;
     margin:auto 0;
 }
-label.switch input[type=checkbox] + span.box{ 
+label.switch input[type=radio] + span.box{ 
     position:relative;
     display:inline-flex;
     width:16px;
     height:16px;
-    border:2px solid #2196F3;
+    border:2px solid var(--primary-color);
     margin:auto 0;
 }
-label.switch input[type=checkbox] + span.box .checked {
+label.switch input[type=radio] + span.box .checked {
     position:absolute;
     width:8px;
     height:8px;
@@ -67,8 +67,8 @@ label.switch input[type=checkbox] + span.box .checked {
     margin-top:-4px;
     background: transparent;
 }
-label.switch input[type=checkbox]:checked + span.box .checked {
-    background: #2196F3;
+label.switch input[type=radio]:checked + span.box .checked {
+    background: var(--primary-color);
 }
 .round {
     border-radius:50%;

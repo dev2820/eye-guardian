@@ -57,7 +57,7 @@ input[type=range]::-webkit-slider-runnable-track {
     width:100%;
     height:2px;
     /* background:#3071a9; */
-    background-color:#2196F3;
+    background-color:var(--primary-color);
 }
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;

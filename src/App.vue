@@ -16,18 +16,21 @@ export default {
   font-family: 'Nanum_Gothic', 'Times New Roman', Times, serif;
 }
 :root {
-  --title-color:#2e2c29;
-  --background-color:#fff;
+  --primary-color:#01D503;
+  --title-color:#32353B;
+  --background-color:#32353B;
   --success-color:#67C23A;
   --warning-color:#E6A23C;
   --danger-color:#F56C6C;
   --ongoing-color:#E6A23C;
-  --text-regular-color:#606266;
+  /* --text-regular-color:#606266; */
+  --text-regular-color:#E4E7ED;
   --light-gray:#909399;
 }
 html,body,#app {
   height:100%;
   width:100%;
+  overflow:hidden;
 }
 @font-face { 
   font-family: 'Nanum_Gothic';

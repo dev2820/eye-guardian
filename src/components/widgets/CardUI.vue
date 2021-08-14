@@ -13,7 +13,7 @@ export default {
 <style>
 .card {
     width:280px;
-    height:100px;
+    height:120px;
     margin:0 20px 10px 0;
     border-radius:4px;
     padding:10px;
