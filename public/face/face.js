@@ -77,6 +77,7 @@ function loadCamera(){
         { video: true },
         async (stream) => {
             videoEl.srcObject = stream;
+            ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
             videoEl.play();
         },
         (err) => {
@@ -87,8 +88,6 @@ function loadCamera(){
 }
 
 videoEl.addEventListener('play',async ()=>{
-    ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
-
     bright();
     // eyeblink();
     sitted();
