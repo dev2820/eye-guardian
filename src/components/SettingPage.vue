@@ -8,7 +8,11 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <img id="mascot" src="../assets/images/mascot.png"/>
+            <img id="mascot" src="../assets/images/mascot.svg"/>
+            <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
+            <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="100" cy="50" rx="50" ry="10" />
+            </svg>
         </div>
         <div id="settings">
             <section class="status">
@@ -306,6 +310,16 @@ main#setting-page * {
     margin-left:-150px;
     top:50%;
     margin-top:-150px;
+    animation:floating 2s infinite ease-in-out;
+}
+#setting-page #main-image #shadow {
+    fill:rgba(0,0,0,0.5);
+    position:absolute;
+    top:450px;
+    left:50%;
+    width:200px;
+    margin-left:-100px;
+    animation:stretch 2s infinite ease-in-out;
 }
 #setting-page #settings {
     width:600px;
@@ -396,11 +410,28 @@ section.warning-setting {
 .button {
     width:100px;
 }
-
+@keyframes floating {
+    0% {
+        transform:translateY(0px)
+    }
+    50% {
+        transform:translateY(-10px)
+    }
+    100% {
+        transform:translateY(0px)
+    }
+}
+@keyframes stretch {
+    0% {
+        transform: scaleX(1.2);
+    }
+    50% {
+        transform: scaleX(1);
+    }
+    100% {
+        transform: scaleX(1.2);
+    }
+}
 ::-webkit-scrollbar              { width:5px; }
-::-webkit-scrollbar-track        { /* 3 */ }
-::-webkit-scrollbar-track-piece  { /* 4 */ }
 ::-webkit-scrollbar-thumb        { background:#666 }
-::-webkit-scrollbar-corner       { /* 6 */ }
-::-webkit-resizer                { /* 7 */ }
 </style>
