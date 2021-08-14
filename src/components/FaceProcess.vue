@@ -164,12 +164,13 @@ export default {
                 }
             );
             
-            videoEl.addEventListener('play', ()=>{
-                ipc.on('SAVE_DISTANCE', saveDistance)
-                draw();
-                bright();
-                eyeblink();
-                // sitted();
+            videoEl.addEventListener('play',async ()=>{
+                //faceapi가 모델을 불러오고 화면 작동을 시작하는 시점을 settingPage에 알려주기 위한 코드
+                ipc.send('LOAD_CAMERA_SUCCESS',true)
+                // draw();
+                // bright();
+                // eyeblink();
+                sitted();
                 screenDistance();
             },false)
             

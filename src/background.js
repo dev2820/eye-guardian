@@ -146,19 +146,32 @@ app.on('ready', async () => {
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
     createProtocol("app");
   }
-  settingWindow = createWindow(
-    "",
-    "index.html",
-    {
-      width: 800,
-      height: 600,
-      webPreferences: {
-        nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-        contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
-      },
-    },
-    true
-  );
+  loadingWindow = createWindow('loading/index.html','loading/index.html',{
+    width:290,
+    height:360,
+    frame:false,
+    transparent:true,
+    alwaysOnTop:true,
+    webPreferences: {
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+      devTools:false
+    }
+  },false)
+  settingWindow = createWindow('','index.html',{
+    width: 1000, 
+    height: 700,
+    frame:false,
+    show:false,
+    webPreferences: {
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
+    }
+  },true)
+  settingWindow.once('ready-to-show',()=>{
+    loadingWindow.close();
+    settingWindow.show();
+  })
 
   warningMessageWindow = createWindow(
     "/#/warningMessage",
@@ -217,7 +230,7 @@ app.on('ready', async () => {
       show: false,
   },false)
   // faceProcessWindow = createWindow('/#/faceProcess','index.html#faceProcess',{
-  faceProcessWindow = createWindow('face.html','face.html',{
+  faceProcessWindow = createWindow('face/index.html','face/index.html',{
     webPreferences: { 
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
