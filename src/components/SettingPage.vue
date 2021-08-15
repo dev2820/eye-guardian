@@ -20,6 +20,10 @@
                     <status-dot :status="loadCameraStatus"/>
                     <small class="status-message">{{loadCameraMessage}}</small>
                 </div>
+                <div class="model-load-status">
+                    <status-dot :status="loadModelStatus"/>
+                    <small class="status-message">{{loadModelMessage}}</small>
+                </div>
                 <div class="standard-pos-status">
                     <status-dot :status="standardPosStatus"/>
                     <small class="status-message">{{standardPosMessage}}</small>
@@ -144,6 +148,8 @@ export default {
             loadCameraMessage:'카메라 로드중...',
             standardPosStatus: 'ongoing',
             standardPosMessage:'정자세 기준값 불러오는중...',
+            loadModelStatus:'ongoing',
+            loadModelMessage:'얼굴감지 모델 불러오는중...',
             standardPosSetStatus: 'complete',
             messageMode:'regular-top',
             isStretchGuideOn:false,
@@ -199,6 +205,16 @@ export default {
             this.loadCameraStatus = 'failed' 
             this.loadCameraMessage = '카메라 로드 실패...'
         })
+
+        ipc.on('LOAD_MODEL_SUCCESS',()=>{
+            this.loadModelStatus = 'complete';
+            this.loadModelMessage = '얼굴감지 모델 불러오기 성공!'
+        })  
+        ipc.on('LOAD_MODEL_FAILED',()=>{
+            this.loadModelStatus = 'failed';
+            this.loadModelMessage = '얼굴감지 모델 불러오기 실패...'
+        })  
+
         ipc.on('SET_FACE_DISTANCE_SUCCESS',()=>{
             this.standardPosStatus = 'complete';
             this.standardPosSetStatus = 'complete'

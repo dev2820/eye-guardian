@@ -81,7 +81,6 @@ ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
     isStretchGuideOn = payload;
 });
-
 function loadCamera() {
     navigator.getMedia =
         navigator.getUserMedia ||
@@ -92,6 +91,7 @@ function loadCamera() {
         { video: true },
         async (stream) => {
             videoEl.srcObject = stream;
+            ipcRenderer.send("LOAD_CAMERA_SUCCESS", true);
         },
         (err) => {
             ipcRenderer.send("LOAD_CAMERA_FAILED", true);
@@ -102,7 +102,7 @@ function loadCamera() {
 videoEl.addEventListener('loadeddata',()=>{
     const waitForLoadModel = () => {
         if(net && eyeblinkModel) {
-            ipcRenderer.send("LOAD_CAMERA_SUCCESS", true);
+            ipcRenderer.send("LOAD_MODEL_SUCCESS", true);
             bright();
             eyeblink();
             sitted();

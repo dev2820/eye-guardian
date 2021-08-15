@@ -163,7 +163,7 @@ app.on("ready", async () => {
     "index.html",
     {
       width: 1000,
-      height: 700,
+      height: 720,
       frame: false,
       show: false,
       backgroundColor: "#32353B",
@@ -350,6 +350,27 @@ ipcMain.on("LOAD_CAMERA_FAILED", (evt, payload) => {
   };
   sendAfterReady();
 });
+ipcMain.on("LOAD_MODEL_SUCCESS", (evt, payload) => {
+  const sendAfterReady = () => {
+    if (settingWindow.isReady) {
+      settingWindow.send("LOAD_MODEL_SUCCESS", true);
+    } else {
+      setTimeout(sendAfterReady, 1000);
+    }
+  };
+  sendAfterReady();
+});
+ipcMain.on("LOAD_MODEL_FAILED", (evt, payload) => {
+  const sendAfterReady = () => {
+    if (settingWindow.isReady) {
+      settingWindow.send("LOAD_MODEL_FAILED", true);
+    } else {
+      setTimeout(sendAfterReady, 1000);
+    }
+  };
+  sendAfterReady();
+});
+
 //각 알람 On Off 여부
 ipcMain.on("SET_DISTANCE_WARNING", (evt, payload) => {
   setting.faceProcess.isDistanceWarningOn = payload;
