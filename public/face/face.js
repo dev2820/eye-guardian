@@ -1,21 +1,6 @@
 const { ipcRenderer } = require("electron");
-const path = require("path");
 let net, eyeblinkModel;
-require("@tensorflow-models/posenet")
-  .load({
-    inputResolution: { width: 300, height: 150 },
-  })
-  .then((value) => {
-    net = value;
-  });
-const faceLandmarksDetection = require("@tensorflow-models/face-landmarks-detection");
-faceLandmarksDetection
-  .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh, {
-    maxFaces: 1,
-  })
-  .then((value) => {
-    eyeblinkModel = value;
-  });
+
 const NOSE = 0;
 const LEFTEYE = 1;
 const RIGHTEYE = 2;
@@ -43,9 +28,33 @@ let isEyeblinkWarningOn = false;
 let isSittedWarningOn = false;
 let sittingHeight = 0;
 let sitCount = 0;
-let rafID;
+let second = 0;
+let timer;
+let darkness=0;
+
+const cameraWidth = 600;
+const cameraHeight = 300;
 const videoEl = document.getElementById("inputVideo");
 const canvasEl = document.getElementById("inputCanvas");
+
+const brightInterval = new Proxy([],{
+  get:(target, index) => 0.7 - (index / 200)
+})
+async function loadModel() {
+  net = await posenet.load({
+    inputResolution: { width: cameraWidth, height: cameraHeight },
+  });
+
+  eyeblinkModel = await faceLandmarksDetection.load(
+    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+    {
+      maxFaces: 1,
+    }
+  );
+}
+
+loadModel();
+
 ipcRenderer.send("REQUEST_INIT_SCREEN_VALUE", "faceProcess");
 ipcRenderer.on("INIT", (evt, payload) => {
   faceLength = parseFloat(payload.faceProcess.faceLength);
@@ -60,7 +69,7 @@ ipcRenderer.on("ESTIMATE_DISTANCE", () => {
     content: "ready-to-capture",
     type: "normal",
   });
-  setTimeout(() => saveDistance(), 5 * 1000);
+  setTimeout(saveDistance, 5 * 1000);
 });
 ipcRenderer.on("SET_DISTANCE_WARNING", (evt, payload) => {
   isDistanceWarningOn = payload;
@@ -77,7 +86,6 @@ ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
   isStretchGuideOn = payload;
 });
-
 function loadCamera() {
   navigator.getMedia =
     navigator.getUserMedia ||
@@ -89,7 +97,6 @@ function loadCamera() {
     async (stream) => {
       videoEl.srcObject = stream;
       ipcRenderer.send("LOAD_CAMERA_SUCCESS", true);
-      setTimeout(videoEl.play, 5000);
     },
     (err) => {
       ipcRenderer.send("LOAD_CAMERA_FAILED", true);
@@ -97,14 +104,22 @@ function loadCamera() {
     }
   );
 }
-
 videoEl.addEventListener(
-  "play",
+  "loadeddata",
   () => {
-    bright();
-    eyeblink();
-    sitted();
-    screenDistance();
+    const waitForLoadModel = () => {
+      if (net && eyeblinkModel) {
+        ipcRenderer.send("LOAD_MODEL_SUCCESS", true);
+        bright();
+        eyeblink();
+        startTimer();
+        sitted();
+        screenDistance();
+      } else {
+        setTimeout(waitForLoadModel, 1000);
+      }
+    };
+    waitForLoadModel();
   },
   false
 );
@@ -116,13 +131,16 @@ function generateBrightWarning() {
     // ipcRenderer.send('SET_DARKNESS',0.5);//0~0.5
   }
 }
-function distancePoints(a, b) {
-  return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
-}
 
 function generateSitWarning() {
   ipcRenderer.send("INSERT_MESSAGE", {
     content: "sit-up-time",
+    type: "warning",
+  });
+}
+function generateEyeblinkWarning() {
+  ipcRenderer.send("INSERT_MESSAGE", {
+    content: "eye-blink",
     type: "warning",
   });
 }
@@ -157,23 +175,26 @@ async function saveDistance() {
 
 function getImgfromWebcam(videoEl, canvasEl) {
   const context = canvasEl.getContext("2d");
-  context.drawImage(videoEl, 0, 0, 300, 150);
+  context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
   const img = new Image();
   img.src = canvasEl.toDataURL("image/jpeg");
   return img;
 }
+function distancePoints(a, b) {
+  return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+}
+function startTimer() {
+  timer = setInterval(() => {
+    second = second + 0.1;
+  }, 100);
+}
 async function eyeblink() {
-  console.log(eyeblinkModel);
-  console.log(isEyeblinkWarningOn);
-
   if (eyeblinkModel && isEyeblinkWarningOn) {
     const predictions = await eyeblinkModel.estimateFaces({
       input: videoEl,
-      // returnTensors: false,
-      // flipHorizontal: false,
     });
 
-    console.log(predictions);
+    // console.log(predictions);
     if (predictions.length > 0) {
       predictions.forEach((prediction) => {
         const keypoints = prediction.scaledMesh;
@@ -183,30 +204,22 @@ async function eyeblink() {
         if (leftEyelid <= 5 && rightEyelid <= 5) {
           // console.log(leftEyelid);
           // console.log(rightEyelid);
-          console.log("closed");
+          // console.log("closed");
+          if (second >= 6) generateEyeblinkWarning();
+          clearInterval(timer);
+          second = 0;
+          startTimer();
         }
       });
-
-      // if (renderPointcloud && state.renderPointcloud != null) {
-      //   const pointsData = predictions.map((prediction) => {
-      //     let scaledMesh = prediction.scaledMesh;
-      //     return scaledMesh.map((point) => [-point[0], -point[1], -point[2]]);
-      //   });
-
-      //   let flattenedPointsData = [];
-      //   for (let i = 0; i < pointsData.length; i++) {
-      //     flattenedPointsData = flattenedPointsData.concat(pointsData[i]);
-      //   }
-      // }
-      setTimeout(eyeblink, 100);
-      // rafID = requestAnimationFrame(eyeblink);
     }
   }
+
+  setTimeout(eyeblink, 50);
 }
 async function bright() {
   const context = canvasEl.getContext("2d");
-  context.drawImage(videoEl, 0, 0, 300, 150);
-  const data = context.getImageData(0, 0, canvasEl.width, canvasEl.height).data;
+  context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
+  const data = context.getImageData(0, 0, cameraWidth, cameraHeight).data;
   let r = 0,
     g = 0,
     b = 0;
@@ -216,56 +229,41 @@ async function bright() {
     b += data[x + 2];
   }
   const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
-  const brightness = Math.floor(colorSum / (canvasEl.width * canvasEl.height));
+  const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
   // console.log('brightness',brightness)
-  if (brightness <= 0) {
-    //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-  } else if (0 < brightness && brightness < 50) {
+  //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
+  if (0 < brightness && brightness < 50)
     generateBrightWarning();
+  
+  if(isAutoDarknessControlOn && brightness !== 0){
+    const now = brightInterval[brightness];
+    if(darkness - 0.1 > now || darkness + 0.1 < now){
+      darkness = now;
+      ipcRenderer.send('SET_DARKNESS', now);
+    }
   }
-}
-
-async function draw() {
-  const pose = await net.estimateSinglePose(videoEl, {
-    flipHorizontal: true,
-  });
-  if (pose) {
-    box.style.width =
-      pose.keypoints[4].position.x - pose.keypoints[3].position.x + "px";
-    box.style.height = 10 + "px";
-    box.style.top = pose.keypoints[3].position.y + "px";
-    box.style.left = pose.keypoints[3].position.x + "px";
-  }
-  detectFace = pose ? pose.score : "no face";
-  setTimeout(draw, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
-}
-
-async function bright() {
-  const context = canvasEl.getContext("2d");
-  context.drawImage(videoEl, 0, 0, 300, 150);
-  const data = context.getImageData(0, 0, canvasEl.width, canvasEl.height).data;
-  let r = 0,
-    g = 0,
-    b = 0;
-  for (let x = 0, len = data.length; x < len; x += 4) {
-    r += data[x];
-    g += data[x + 1];
-    b += data[x + 2];
-  }
-  const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
-  const brightness = Math.floor(colorSum / (canvasEl.width * canvasEl.height));
-
-  // console.log('brightness',brightness)
-  if (brightness <= 0) {
-    //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-  } else if (0 < brightness && brightness < 50) {
-    this.generateBrightWarning();
-  }
+     
   setTimeout(bright, 30 * 1000); //30초마다 밝기 테스트하도록 되어있음
 }
 
+// async function draw() {
+//   const pose = await net.estimateSinglePose(videoEl, {
+//     flipHorizontal: true,
+//   });
+//   if (pose) {
+//     box.style.width =
+//       pose.keypoints[4].position.x - pose.keypoints[3].position.x + "px";
+//     box.style.height = 10 + "px";
+//     box.style.top = pose.keypoints[3].position.y + "px";
+//     box.style.left = pose.keypoints[3].position.x + "px";
+//   }
+//   detectFace = pose ? pose.score : "no face";
+//   setTimeout(draw, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
+// }
+
 async function sitted() {
+  // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
   if (isSittedWarningOn && sittingHeight) {
     //isStretchGuideOn
     //앉아있는지 감지하는 로직
@@ -280,7 +278,10 @@ async function sitted() {
       // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
     }
   }
-  if (sitCount % 10 == 0 && sitCount !== 0) generateSitWarning();
+  if (sitCount % 3600 == 0 && sitCount !== 0) {
+    ipcRenderer.send('SHOW_STRETCH_GUIDE');
+    generateSitWarning();
+  }
   setTimeout(sitted, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 }
 

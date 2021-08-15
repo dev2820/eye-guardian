@@ -8,7 +8,7 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <img id="mascot" src="../assets/images/mascot.svg"/>
+            <img id="mascot" src="../assets/images/mascot3.svg"/>
             <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
             <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="100" cy="50" rx="50" ry="10" />
@@ -19,6 +19,10 @@
                 <div class="camera-load-status">
                     <status-dot :status="loadCameraStatus"/>
                     <small class="status-message">{{loadCameraMessage}}</small>
+                </div>
+                <div class="model-load-status">
+                    <status-dot :status="loadModelStatus"/>
+                    <small class="status-message">{{loadModelMessage}}</small>
                 </div>
                 <div class="standard-pos-status">
                     <status-dot :status="standardPosStatus"/>
@@ -45,7 +49,10 @@
                         정자세 기준 설정하기
                         <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
                     </span>
-                    <custom-button class="button" @click="setStandardPos()">설정</custom-button>
+                    <custom-button class="button" @click="setStandardPos()">
+                        <span v-if="standardPosSetStatus==='complete'">설정</span>
+                        <font-awesome-icon v-else-if="standardPosSetStatus==='ongoing'" icon="spinner" spin/>
+                    </custom-button>
                     <!-- <span v-if="timer>0">{{timer}}</span> -->
                 </div>
             </section>
@@ -141,6 +148,9 @@ export default {
             loadCameraMessage:'카메라 로드중...',
             standardPosStatus: 'ongoing',
             standardPosMessage:'정자세 기준값 불러오는중...',
+            loadModelStatus:'ongoing',
+            loadModelMessage:'얼굴감지 모델 불러오는중...',
+            standardPosSetStatus: 'complete',
             messageMode:'regular-top',
             isStretchGuideOn:false,
             isDistanceWarningOn:false,
@@ -195,8 +205,19 @@ export default {
             this.loadCameraStatus = 'failed' 
             this.loadCameraMessage = '카메라 로드 실패...'
         })
+
+        ipc.on('LOAD_MODEL_SUCCESS',()=>{
+            this.loadModelStatus = 'complete';
+            this.loadModelMessage = '얼굴감지 모델 불러오기 성공!'
+        })  
+        ipc.on('LOAD_MODEL_FAILED',()=>{
+            this.loadModelStatus = 'failed';
+            this.loadModelMessage = '얼굴감지 모델 불러오기 실패...'
+        })  
+
         ipc.on('SET_FACE_DISTANCE_SUCCESS',()=>{
             this.standardPosStatus = 'complete';
+            this.standardPosSetStatus = 'complete'
             this.standardPosMessage = '정자세 기준값이 설정되어있습니다.'
         })
         ipc.on('RUN_TIMER',()=>{
@@ -215,6 +236,7 @@ export default {
         setStandardPos(){
             if(this.loadCameraStatus === 'complete'){
                 ipc.send('ESTIMATE_DISTANCE',1);
+                this.standardPosSetStatus = "ongoing"
             }
             else {
                 ipc.send('INSERT_MESSAGE',{content:'cant-detect-camera',type:'warning'});
@@ -304,13 +326,13 @@ main#setting-page * {
 }
 #setting-page #main-image img#mascot {
     position:absolute;
-    width:300px;
-    height:300px;
+    width:200px;
+    height:200px;
     left:50%;
-    margin-left:-150px;
+    margin-left:-100px;
     top:50%;
-    margin-top:-150px;
-    animation:floating 2s infinite ease-in-out;
+    margin-top:-100px;
+    animation:floating 4s infinite ease-in-out;
 }
 #setting-page #main-image #shadow {
     fill:rgba(0,0,0,0.5);
@@ -414,11 +436,17 @@ section.warning-setting {
     0% {
         transform:translateY(0px)
     }
+    25% {
+        transform:translateY(-10px);
+    }
     50% {
-        transform:translateY(-10px)
+        transform:translateY(0px);
+    }
+    75% {
+        transform:translateY(-10px);
     }
     100% {
-        transform:translateY(0px)
+        transform:translateY(0px) rotateZ(360deg);
     }
 }
 @keyframes stretch {
@@ -430,6 +458,14 @@ section.warning-setting {
     }
     100% {
         transform: scaleX(1.2);
+    }
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }
 ::-webkit-scrollbar              { width:5px; }

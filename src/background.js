@@ -163,7 +163,7 @@ app.on("ready", async () => {
     "index.html",
     {
       width: 1000,
-      height: 700,
+      height: 720,
       frame: false,
       show: false,
       backgroundColor: "#32353B",
@@ -171,6 +171,7 @@ app.on("ready", async () => {
         nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
+      icon: path.join(__static, "/images/logo.ico")
     },
     true
   );
@@ -255,7 +256,7 @@ app.on("ready", async () => {
     },
     false
   );
-  tray = createTray(path.join(__static, "/images/icon.ico"));
+  tray = createTray(path.join(__static, "/images/logo.ico"));
 });
 
 ipcMain.on("REQUEST_INIT_SCREEN_VALUE", (evt, payload) => {
@@ -349,6 +350,27 @@ ipcMain.on("LOAD_CAMERA_FAILED", (evt, payload) => {
   };
   sendAfterReady();
 });
+ipcMain.on("LOAD_MODEL_SUCCESS", (evt, payload) => {
+  const sendAfterReady = () => {
+    if (settingWindow.isReady) {
+      settingWindow.send("LOAD_MODEL_SUCCESS", true);
+    } else {
+      setTimeout(sendAfterReady, 1000);
+    }
+  };
+  sendAfterReady();
+});
+ipcMain.on("LOAD_MODEL_FAILED", (evt, payload) => {
+  const sendAfterReady = () => {
+    if (settingWindow.isReady) {
+      settingWindow.send("LOAD_MODEL_FAILED", true);
+    } else {
+      setTimeout(sendAfterReady, 1000);
+    }
+  };
+  sendAfterReady();
+});
+
 //각 알람 On Off 여부
 ipcMain.on("SET_DISTANCE_WARNING", (evt, payload) => {
   setting.faceProcess.isDistanceWarningOn = payload;

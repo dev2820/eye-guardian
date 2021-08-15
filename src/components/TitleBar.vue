@@ -1,6 +1,6 @@
 <template>
     <div id="title-bar">
-        <img id="main-icon" src="../assets/images/logo.png"/>
+        <img id="main-icon" src="../assets/images/logo32x32.png"/>
         <small id="title">{{title}}</small>
         <span class="menus">
             <button @click="minimizeWindow" id="minimize">
