@@ -34,11 +34,13 @@ module.exports = {
                 },
                 win: {
                     icon: "dist_electron/icons/icon.ico",
+                    target: ["nsis"]
                 },
                 linux: {
                     icon: "dist_electron/icons"
                 },
                 nsis: {
+                    installerIcon: "public/images/logo.ico",
                     oneClick: true,
                     createDesktopShortcut: true
                 }
