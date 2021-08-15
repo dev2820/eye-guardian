@@ -31,6 +31,7 @@ let sitCount = 0;
 let second = 0;
 let timer;
 let darkness=0;
+let brighttimer;
 
 const cameraWidth = 600;
 const cameraHeight = 300;
@@ -82,6 +83,9 @@ ipcRenderer.on("SET_EYEBLINK_WARNING", (evt, payload) => {
 });
 ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
   isAutoDarknessControlOn = payload;
+  darkness=0;
+  clearTimeout(brighttimer);
+  bright();
 });
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
   isStretchGuideOn = payload;
@@ -235,7 +239,7 @@ async function bright() {
   //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
   if (0 < brightness && brightness < 50)
     generateBrightWarning();
-  
+    
   if(isAutoDarknessControlOn && brightness !== 0){
     const now = brightInterval[brightness];
     if(darkness - 0.1 > now || darkness + 0.1 < now){
@@ -244,7 +248,7 @@ async function bright() {
     }
   }
      
-  setTimeout(bright, 30 * 1000); //30초마다 밝기 테스트하도록 되어있음
+  brighttimer = setTimeout(bright, 30 * 1000); //30초마다 밝기 테스트하도록 되어있음
 }
 
 // async function draw() {
