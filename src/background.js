@@ -288,7 +288,6 @@ ipcMain.on('ESTIMATE_DISTANCE',(evt,payload)=>{
 ipcMain.on('SET_FACE_DISTANCE',(evt,payload)=>{
   setting.faceProcess.faceLength = payload.faceLength;
   setting.faceProcess.faceHeight = payload.faceHeight;
-  console.log(setting)
   settingWindow.send('SET_FACE_DISTANCE_SUCCESS',true)
 })
 //카메라 감지 성공 여부
