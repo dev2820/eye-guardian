@@ -1,16 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
-</head>
-<body>
-    <canvas id="inputCanvas" style="display:none"></canvas>
-    <video id="inputVideo" width="300" height="150" autoplay playsinline></video>
-    <script type="text/javascript" src="face.js"></script>
-</body>
+
+    <script src="https://unpkg.com/@tensorflow/tfjs-core@2.4.0/dist/tf-core.js"></script>
+    <script src="https://unpkg.com/@tensorflow/tfjs-converter@2.4.0/dist/tf-converter.js"></script>
+    <!-- <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.4.0/dist/tf-backend-webgl.js"></script> -->
+    <script src="https://unpkg.com/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js"></script>
+
+    <script src="Stats.js"></script>
+    <script src="triangulation.js"></script>
+  </head>
+  <body>
+    <div  class="canvas-wrapper">
+      <canvas id="inputCanvas" style="display:none"></canvas>
+      <video
+        id="inputVideo"
+        width="300"
+        height="150"
+        autoplay
+        playsinline
+      ></video>
+    </div>
+      </div>
+    </div>
+  </body>
+
+  <script type="text/javascript" src="face.js"></script>
 </html>
