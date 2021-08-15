@@ -28,7 +28,9 @@ let isEyeblinkWarningOn = false;
 let isSittedWarningOn = false;
 let sittingHeight = 0;
 let sitCount = 0;
-let rafID;
+let second = 0;
+let timer;
+
 const cameraWidth = 600;
 const cameraHeight = 300;
 const videoEl = document.getElementById("inputVideo");
@@ -106,6 +108,7 @@ videoEl.addEventListener(
         ipcRenderer.send("LOAD_MODEL_SUCCESS", true);
         bright();
         eyeblink();
+        startTimer();
         sitted();
         screenDistance();
       } else {
@@ -124,13 +127,16 @@ function generateBrightWarning() {
     // ipcRenderer.send('SET_DARKNESS',0.5);//0~0.5
   }
 }
-function distancePoints(a, b) {
-  return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
-}
 
 function generateSitWarning() {
   ipcRenderer.send("INSERT_MESSAGE", {
     content: "sit-up-time",
+    type: "warning",
+  });
+}
+function generateEyeblinkWarning() {
+  ipcRenderer.send("INSERT_MESSAGE", {
+    content: "eye-blink",
     type: "warning",
   });
 }
@@ -170,15 +176,21 @@ function getImgfromWebcam(videoEl, canvasEl) {
   img.src = canvasEl.toDataURL("image/jpeg");
   return img;
 }
+function distancePoints(a, b) {
+  return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+}
+function startTimer() {
+  timer = setInterval(() => {
+    second = second + 0.1;
+  }, 100);
+}
 async function eyeblink() {
   if (eyeblinkModel && isEyeblinkWarningOn) {
     const predictions = await eyeblinkModel.estimateFaces({
       input: videoEl,
-      // returnTensors: false,
-      // flipHorizontal: false,
     });
 
-    console.log(predictions);
+    // console.log(predictions);
     if (predictions.length > 0) {
       predictions.forEach((prediction) => {
         const keypoints = prediction.scaledMesh;
@@ -188,23 +200,15 @@ async function eyeblink() {
         if (leftEyelid <= 5 && rightEyelid <= 5) {
           // console.log(leftEyelid);
           // console.log(rightEyelid);
-          console.log("closed");
+          // console.log("closed");
+          if (second >= 6) generateEyeblinkWarning();
+          clearInterval(timer);
+          console.log(second);
+          second = 0;
+          startTimer();
         }
       });
-
-      // if (renderPointcloud && state.renderPointcloud != null) {
-      //   const pointsData = predictions.map((prediction) => {
-      //     let scaledMesh = prediction.scaledMesh;
-      //     return scaledMesh.map((point) => [-point[0], -point[1], -point[2]]);
-      //   });
-
-      //   let flattenedPointsData = [];
-      //   for (let i = 0; i < pointsData.length; i++) {
-      //     flattenedPointsData = flattenedPointsData.concat(pointsData[i]);
-      //   }
-      // }
     }
-    // rafID = requestAnimationFrame(eyeblink);
   }
 
   setTimeout(eyeblink, 50);
