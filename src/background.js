@@ -171,6 +171,7 @@ app.on("ready", async () => {
         nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
+      icon: path.join(__static, "/images/logo.ico")
     },
     true
   );
@@ -255,7 +256,7 @@ app.on("ready", async () => {
     },
     false
   );
-  tray = createTray(path.join(__static, "/images/icon.ico"));
+  tray = createTray(path.join(__static, "/images/logo.ico"));
 });
 
 ipcMain.on("REQUEST_INIT_SCREEN_VALUE", (evt, payload) => {
