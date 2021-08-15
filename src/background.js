@@ -68,15 +68,8 @@ function createWindow(devPath,prodPath,options,isSettingWindow) {
     // Load the index.html when not in development
     window.loadURL(`app://./${prodPath}`)
   }
-  if(isSettingWindow){
-    window.on('close', (e) => {//설정 화면을 꺼도 꺼지지 않게 함
-      e.preventDefault();
-      window.hide();
-    })
-  }
-  else {
-    window.on('closed', () => { window = null })
-  }
+  
+  window.on('closed', () => { window = null })
   return window
 }
 function createTray(icon) {
@@ -158,11 +151,17 @@ app.on('ready', async () => {
     height: 700,
     frame:false,
     show:false,
+    backgroundColor:'#32353B',
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   },true)
+  settingWindow.on('close', (e) => {//설정 화면을 꺼도 꺼지지 않게 함
+    e.preventDefault();
+    settingWindow.hide();
+  })
+  settingWindow.isReady = false;
   settingWindow.once('ready-to-show',()=>{
     loadingWindow.close();
     settingWindow.show();
@@ -224,6 +223,7 @@ app.on('ready', async () => {
 ipcMain.on('REQUEST_INIT_SCREEN_VALUE',(evt,payload)=>{
   switch(payload) {
     case 'settingPage': {
+      settingWindow.isReady=true;
       settingWindow.send('INIT',setting);
       break;
     }
@@ -293,10 +293,26 @@ ipcMain.on('SET_FACE_DISTANCE',(evt,payload)=>{
 })
 //카메라 감지 성공 여부
 ipcMain.on('LOAD_CAMERA_SUCCESS',(evt,payload)=>{
-  settingWindow.send('LOAD_CAMERA_SUCCESS',true)
+  const sendAfterReady = () =>{
+    if(settingWindow.isReady) {
+      settingWindow.send('LOAD_CAMERA_SUCCESS',true)
+    }
+    else {
+      setTimeout(sendAfterReady,1000);
+    }
+  }
+  sendAfterReady();
 })
 ipcMain.on('LOAD_CAMERA_FAILED',(evt,payload)=>{
-  settingWindow.send('LOAD_CAMERA_FAILED',true)
+  const sendAfterReady = () =>{
+    if(settingWindow.isReady) {
+      settingWindow.send('LOAD_CAMERA_FAILED',true)
+    }
+    else {
+      setTimeout(sendAfterReady,1000);
+    }
+  }
+  sendAfterReady();
 })
 //각 알람 On Off 여부
 ipcMain.on('SET_DISTANCE_WARNING',(evt,payload)=>{

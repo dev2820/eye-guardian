@@ -78,6 +78,7 @@ function loadCamera(){
         { video: true },
         async (stream) => {
             videoEl.srcObject = stream;
+            ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
             videoEl.play();
         },
         (err) => {
@@ -88,8 +89,6 @@ function loadCamera(){
 }
 
 videoEl.addEventListener('play',async ()=>{
-    ipcRenderer.send('LOAD_CAMERA_SUCCESS',true)
-
     bright();
     // eyeblink();
     sitted();
@@ -170,7 +169,7 @@ async function bright() {
         //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
     }
     else if( 0 < brightness && brightness < 50){
-        this.generateBrightWarning();
+        generateBrightWarning();
     }
     setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
 }
