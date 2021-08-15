@@ -67,11 +67,11 @@ export default {
     transition: 0.3s;
 }
 input[type=checkbox]:checked + .slider {
-    background-color: #2196F3;
+    background-color: var(--primary-color);
 }
 
 input[type=checkbox]:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px var(--primary-color);
 }
 
 input[type=checkbox]:checked + .slider:before {

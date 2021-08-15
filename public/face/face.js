@@ -34,9 +34,6 @@ const RIGHTKNEE = 14;
 const LEFTANKLE = 15;
 const RIGHTANKLE = 16;
 
-const NUM_KEYPOINTS = 468;
-const NUM_IRIS_KEYPOINTS = 5;
-
 let detectFace = "no face";
 let faceLength = 0;
 let isAutoDarknessControlOn = false;
@@ -52,6 +49,7 @@ const canvasEl = document.getElementById("inputCanvas");
 ipcRenderer.send("REQUEST_INIT_SCREEN_VALUE", "faceProcess");
 ipcRenderer.on("INIT", (evt, payload) => {
   faceLength = parseFloat(payload.faceProcess.faceLength);
+  sittingHeight = parseFloat(payload.faceProcess.faceHeight);
   isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
   isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
   isSittedWarningOn = payload.faceProcess.isSittedWarningOn;
@@ -79,9 +77,7 @@ ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
   isStretchGuideOn = payload;
 });
-function distancePoints(a, b) {
-  return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
-}
+
 function loadCamera() {
   navigator.getMedia =
     navigator.getUserMedia ||
@@ -92,6 +88,8 @@ function loadCamera() {
     { video: true },
     async (stream) => {
       videoEl.srcObject = stream;
+      ipcRenderer.send("LOAD_CAMERA_SUCCESS", true);
+      videoEl.play();
     },
     (err) => {
       ipcRenderer.send("LOAD_CAMERA_FAILED", true);
@@ -99,6 +97,7 @@ function loadCamera() {
     }
   );
 }
+
 videoEl.addEventListener(
   "play",
   async () => {
@@ -139,11 +138,15 @@ async function saveDistance() {
   if (pose) {
     faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
     sittingHeight = pose.keypoints[0].position.y;
+    console.log(sittingHeight);
     ipcRenderer.send("INSERT_MESSAGE", {
       content: "capture-face",
       type: "normal",
     });
-    ipcRenderer.send("SET_FACE_DISTANCE", faceLength);
+    ipcRenderer.send("SET_FACE_DISTANCE", {
+      faceLength: faceLength,
+      faceHeight: sittingHeight,
+    });
   } else {
     ipcRenderer.send("INSERT_MESSAGE", { content: "no-face", type: "warning" });
   }
@@ -192,6 +195,33 @@ async function eyeblink() {
       }
 
       rafID = requestAnimationFrame(eyeblink);
+      async function bright() {
+        const context = canvasEl.getContext("2d");
+        context.drawImage(videoEl, 0, 0, 300, 150);
+        const data = context.getImageData(0, 0, canvasEl.width, canvasEl.height)
+          .data;
+        let r = 0,
+          g = 0,
+          b = 0;
+        for (let x = 0, len = data.length; x < len; x += 4) {
+          r += data[x];
+          g += data[x + 1];
+          b += data[x + 2];
+        }
+        const colorSum = Math.sqrt(
+          0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2
+        );
+        const brightness = Math.floor(
+          colorSum / (canvasEl.width * canvasEl.height)
+        );
+
+        // console.log('brightness',brightness)
+        if (brightness <= 0) {
+          //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
+        } else if (0 < brightness && brightness < 50) {
+          generateBrightWarning();
+        }
+      }
     }
   }
 }
@@ -246,10 +276,10 @@ async function sitted() {
         sitCount = 0;
       else sitCount++;
 
-      console.log(sitCount, sittingHeight, pose.keypoints[0].position.y);
+      // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
     }
   }
-  if (sitCount == 10) generateSitWarning();
+  if (sitCount % 10 == 0 && sitCount !== 0) generateSitWarning();
   setTimeout(sitted, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 }
 

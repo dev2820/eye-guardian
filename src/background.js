@@ -12,17 +12,19 @@ const dataPath =
     ? path.join(__dirname, "../data")
     : path.join(process.resourcesPath, "data");
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true }, stream: true }
-])
-let settingWindow=null,
-screenFilterWindow=null,
-warningMessageWindow=null,
-faceProcessWindow=null,
-stretchGuideWindow=null,
-loadingWindow=null;
+  { scheme: "app", privileges: { secure: true, standard: true }, stream: true },
+]);
+let settingWindow = null,
+  screenFilterWindow = null,
+  warningMessageWindow = null,
+  faceProcessWindow = null,
+  stretchGuideWindow = null,
+  loadingWindow = null;
 let tray = null;
 
-const setting = JSON.parse(fs.readFileSync(path.join(dataPath,'setting.json')));
+const setting = JSON.parse(
+  fs.readFileSync(path.join(dataPath, "setting.json"))
+);
 
 function registerLocalVideoProtocol() {
   protocol.registerFileProtocol("local-video", (request, callback) => {
@@ -41,25 +43,25 @@ function registerLocalVideoProtocol() {
   });
 }
 
-function registerLocalAudioProtocol () {
-  protocol.registerFileProtocol('local-audio', (request, callback) => {
-    const url = request.url.replace(/^local-audio:\/\//, '')
+function registerLocalAudioProtocol() {
+  protocol.registerFileProtocol("local-audio", (request, callback) => {
+    const url = request.url.replace(/^local-audio:\/\//, "");
     // Decode URL to prevent errors when loading filenames with UTF-8 chars or chars like "#"
-    const decodedUrl = decodeURI(url) // Needed in case URL contains spaces
+    const decodedUrl = decodeURI(url); // Needed in case URL contains spaces
     try {
       // eslint-disable-next-line no-undef
-      return callback(path.join(__static, decodedUrl))
+      return callback(path.join(__static, decodedUrl));
     } catch (error) {
       console.error(
-        'ERROR: registerLocalAudioProtocol: Could not get file path:',
+        "ERROR: registerLocalAudioProtocol: Could not get file path:",
         error
-      )
+      );
     }
-  })
+  });
 }
 
-function createWindow(devPath,prodPath,options,isSettingWindow) {
-  let window = new BrowserWindow(options)
+function createWindow(devPath, prodPath, options, isSettingWindow) {
+  let window = new BrowserWindow(options);
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     window.loadURL(process.env.WEBPACK_DEV_SERVER_URL + devPath);
@@ -68,17 +70,10 @@ function createWindow(devPath,prodPath,options,isSettingWindow) {
     // Load the index.html when not in development
     window.loadURL(`app://./${prodPath}`);
   }
-  if (isSettingWindow) {
-    window.on("close", (e) => {
-      //설정 화면을 꺼도 꺼지지 않게 함
-      e.preventDefault();
-      window.hide();
-    });
-  } else {
-    window.on("closed", () => {
-      window = null;
-    });
-  }
+
+  window.on("closed", () => {
+    window = null;
+  });
   return window;
 }
 function createTray(icon) {
@@ -132,7 +127,7 @@ app.on("activate", () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', async () => {
+app.on("ready", async () => {
   registerLocalVideoProtocol();
   registerLocalAudioProtocol();
   if (isDevelopment && !process.env.IS_TEST) {
@@ -146,32 +141,49 @@ app.on('ready', async () => {
   if (!process.env.WEBPACK_DEV_SERVER_URL) {
     createProtocol("app");
   }
-  loadingWindow = createWindow('loading/index.html','loading/index.html',{
-    width:290,
-    height:360,
-    frame:false,
-    transparent:true,
-    alwaysOnTop:true,
-    webPreferences: {
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
-      devTools:false
-    }
-  },false)
-  settingWindow = createWindow('','index.html',{
-    width: 1000, 
-    height: 700,
-    frame:false,
-    show:false,
-    webPreferences: {
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
-    }
-  },true)
-  settingWindow.once('ready-to-show',()=>{
+  loadingWindow = createWindow(
+    "loading/index.html",
+    "loading/index.html",
+    {
+      width: 290,
+      height: 360,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      webPreferences: {
+        nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+        contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+        devTools: false,
+      },
+    },
+    false
+  );
+  settingWindow = createWindow(
+    "",
+    "index.html",
+    {
+      width: 1000,
+      height: 700,
+      frame: false,
+      show: false,
+      backgroundColor: "#32353B",
+      webPreferences: {
+        nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+        contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+      },
+    },
+    true
+  );
+  settingWindow.on("close", (e) => {
+    //설정 화면을 꺼도 꺼지지 않게 함
+    e.preventDefault();
+    settingWindow.hide();
+  });
+  settingWindow.isReady = false;
+  settingWindow.once("ready-to-show", () => {
     loadingWindow.close();
     settingWindow.show();
-  })
+  });
 
   warningMessageWindow = createWindow(
     "/#/warningMessage",
@@ -228,22 +240,30 @@ app.on('ready', async () => {
       useContentSize: true,
       frame: false,
       show: false,
-  },false)
-  // faceProcessWindow = createWindow('/#/faceProcess','index.html#faceProcess',{
-  faceProcessWindow = createWindow('face/index.html','face/index.html',{
-    webPreferences: { 
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
     },
-    useContentSize: true,
-    // show:false
-  },false)
-  tray = createTray(path.join(__static,'/images/icon.ico'));
-})
+    false
+  );
+  // faceProcessWindow = createWindow('/#/faceProcess','index.html#faceProcess',{
+  faceProcessWindow = createWindow(
+    "face/index.html",
+    "face/index.html",
+    {
+      webPreferences: {
+        nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+        contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
+      },
+      useContentSize: true,
+      // show:false
+    },
+    false
+  );
+  tray = createTray(path.join(__static, "/images/icon.ico"));
+});
 
 ipcMain.on("REQUEST_INIT_SCREEN_VALUE", (evt, payload) => {
   switch (payload) {
     case "settingPage": {
+      settingWindow.isReady = true;
       settingWindow.send("INIT", setting);
       break;
     }
@@ -273,99 +293,111 @@ ipcMain.on("SHOW_STRETCH_GUIDE", (evt, payload) => {
 });
 ipcMain.on("HIDE_STRETCH_GUIDE", (evt, payload) => {
   stretchGuideWindow.hide();
-})
+});
 
 //set screenFilter
-ipcMain.on('SET_BLUELIGHT_FILTER_SHOW',(evt,payload)=>{
-  setting.screenFilter.isBlueLightFilterOn=payload;
-  screenFilterWindow.send('SET_BLUELIGHT_FILTER_SHOW',payload)
-})
-ipcMain.on('SET_DARKNESS',(evt,payload)=>{
-  setting.screenFilter.darkness=payload;
-  screenFilterWindow.send('SET_DARKNESS',payload)
-})
-ipcMain.on('SET_BLUELIGHT_FIGURE',(evt,payload)=>{
-  setting.screenFilter.blueLightFigure=payload;
-  screenFilterWindow.send('SET_BLUELIGHT_FIGURE',payload)
-})
+ipcMain.on("SET_BLUELIGHT_FILTER_SHOW", (evt, payload) => {
+  setting.screenFilter.isBlueLightFilterOn = payload;
+  screenFilterWindow.send("SET_BLUELIGHT_FILTER_SHOW", payload);
+});
+ipcMain.on("SET_DARKNESS", (evt, payload) => {
+  setting.screenFilter.darkness = payload;
+  screenFilterWindow.send("SET_DARKNESS", payload);
+});
+ipcMain.on("SET_BLUELIGHT_FIGURE", (evt, payload) => {
+  setting.screenFilter.blueLightFigure = payload;
+  screenFilterWindow.send("SET_BLUELIGHT_FIGURE", payload);
+});
 
 //set warningMessage
-ipcMain.on('SET_WARNING_MODE',(evt,payload)=>{
-  setting.warningMessage.mode=payload;
-  warningMessageWindow.send('SET_WARNING_MODE',payload)
-})
-ipcMain.on('INSERT_MESSAGE',(evt,payload)=>{
-  warningMessageWindow.send('INSERT_MESSAGE',payload)
-})
-ipcMain.on('SET_WARNING_VOLUME',(evt,payload)=>{
-  warningMessageWindow.send('SET_WARNING_VOLUME',payload)
-})
+ipcMain.on("SET_WARNING_MODE", (evt, payload) => {
+  setting.warningMessage.mode = payload;
+  warningMessageWindow.send("SET_WARNING_MODE", payload);
+});
+ipcMain.on("INSERT_MESSAGE", (evt, payload) => {
+  warningMessageWindow.send("INSERT_MESSAGE", payload);
+});
+ipcMain.on("SET_WARNING_VOLUME", (evt, payload) => {
+  warningMessageWindow.send("SET_WARNING_VOLUME", payload);
+});
 
 //얼굴 거리 감지
-ipcMain.on('ESTIMATE_DISTANCE',(evt,payload)=>{
-  faceProcessWindow.send('ESTIMATE_DISTANCE')
-})
-ipcMain.on('SET_FACE_DISTANCE',(evt,payload)=>{
-  setting.faceProcess.faceLength = payload;
-  settingWindow.send('SET_FACE_DISTANCE_SUCCESS',true)
-})
+ipcMain.on("ESTIMATE_DISTANCE", (evt, payload) => {
+  faceProcessWindow.send("ESTIMATE_DISTANCE");
+});
+ipcMain.on("SET_FACE_DISTANCE", (evt, payload) => {
+  setting.faceProcess.faceLength = payload.faceLength;
+  setting.faceProcess.faceHeight = payload.faceHeight;
+  settingWindow.send("SET_FACE_DISTANCE_SUCCESS", true);
+});
 //카메라 감지 성공 여부
-ipcMain.on('LOAD_CAMERA_SUCCESS',(evt,payload)=>{
-  settingWindow.send('LOAD_CAMERA_SUCCESS',true)
-})
-ipcMain.on('LOAD_CAMERA_FAILED',(evt,payload)=>{
-  settingWindow.send('LOAD_CAMERA_FAILED',true)
-})
+ipcMain.on("LOAD_CAMERA_SUCCESS", (evt, payload) => {
+  const sendAfterReady = () => {
+    if (settingWindow.isReady) {
+      settingWindow.send("LOAD_CAMERA_SUCCESS", true);
+    } else {
+      setTimeout(sendAfterReady, 1000);
+    }
+  };
+  sendAfterReady();
+});
+ipcMain.on("LOAD_CAMERA_FAILED", (evt, payload) => {
+  const sendAfterReady = () => {
+    if (settingWindow.isReady) {
+      settingWindow.send("LOAD_CAMERA_FAILED", true);
+    } else {
+      setTimeout(sendAfterReady, 1000);
+    }
+  };
+  sendAfterReady();
+});
 //각 알람 On Off 여부
-ipcMain.on('SET_DISTANCE_WARNING',(evt,payload)=>{
-  setting.faceProcess.isDistanceWarningOn = payload
-  faceProcessWindow.send('SET_DISTANCE_WARNING',payload)
-})
-ipcMain.on('SET_SITTED_WARNING',(evt,payload)=>{
-  setting.faceProcess.isSittedWarningOn = payload
-  faceProcessWindow.send('SET_SITTED_WARNING',payload)
-})
-ipcMain.on('SET_EYEBLINK_WARNING',(evt,payload)=>{
-  setting.faceProcess.isEyeblinkWarningOn = payload
-  faceProcessWindow.send('SET_EYEBLINK_WARNING',payload)
-})
-ipcMain.on('SET_AUTO_DARKNESS_CONTROL',(evt,payload)=>{
-  setting.faceProcess.isAutoDarknessControlOn = payload
-  faceProcessWindow.send('SET_AUTO_DARKNESS_CONTROL',payload)
-})
-ipcMain.on('SET_STRETCH_GUIDE',(evt,payload)=>{
-  setting.stretchGuideScreen.isStretchGuideOn=payload;
-  faceProcessWindow.send('SET_STRETCH_GUIDE')
-})
+ipcMain.on("SET_DISTANCE_WARNING", (evt, payload) => {
+  setting.faceProcess.isDistanceWarningOn = payload;
+  faceProcessWindow.send("SET_DISTANCE_WARNING", payload);
+});
+ipcMain.on("SET_SITTED_WARNING", (evt, payload) => {
+  setting.faceProcess.isSittedWarningOn = payload;
+  faceProcessWindow.send("SET_SITTED_WARNING", payload);
+});
+ipcMain.on("SET_EYEBLINK_WARNING", (evt, payload) => {
+  setting.faceProcess.isEyeblinkWarningOn = payload;
+  faceProcessWindow.send("SET_EYEBLINK_WARNING", payload);
+});
+ipcMain.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
+  setting.faceProcess.isAutoDarknessControlOn = payload;
+  faceProcessWindow.send("SET_AUTO_DARKNESS_CONTROL", payload);
+});
+ipcMain.on("SET_STRETCH_GUIDE", (evt, payload) => {
+  setting.stretchGuideScreen.isStretchGuideOn = payload;
+  faceProcessWindow.send("SET_STRETCH_GUIDE");
+});
 // minimize, maximize, close
-ipcMain.on('MINIMIZE',(evt,payload)=>{
-  switch(payload){
-    case 'settingPage': {
+ipcMain.on("MINIMIZE", (evt, payload) => {
+  switch (payload) {
+    case "settingPage": {
       settingWindow.minimize();
     }
   }
-})
-ipcMain.on('MAXIMIZE',(evt,payload)=>{
-  switch(payload){
-    case 'settingPage': {
-      if(settingWindow.isMaximized()){
+});
+ipcMain.on("MAXIMIZE", (evt, payload) => {
+  switch (payload) {
+    case "settingPage": {
+      if (settingWindow.isMaximized()) {
         settingWindow.unmaximize();
-      }
-      else {
+      } else {
         settingWindow.maximize();
       }
     }
   }
-})
-ipcMain.on('CLOSE',(evt,payload)=>{
-  switch(payload){
-    case 'settingPage': {
+});
+ipcMain.on("CLOSE", (evt, payload) => {
+  switch (payload) {
+    case "settingPage": {
       settingWindow.close();
     }
   }
-})
-
-
+});
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

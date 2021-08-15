@@ -8,7 +8,11 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <img id="mascot" src="../assets/images/mascot.png"/>
+            <img id="mascot" src="../assets/images/mascot.svg"/>
+            <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
+            <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="100" cy="50" rx="50" ry="10" />
+            </svg>
         </div>
         <div id="settings">
             <section class="status">
@@ -24,7 +28,7 @@
             <section class="warning-setting">
                 <div class="setting-option warning-position">
                     <p class="explanation">경고문 위치</p>
-                    <custom-select :options="['regular-top','regular-bottom','mini']" @select="changeMessageMode" :checked="messageMode"/>
+                    <custom-select-radio :options="['regular-top','regular-bottom','mini']" @select="changeMessageMode" :checked="messageMode"/>
                 </div>
                 <div class="setting-option warning-sound">
                     <span class="explanation">경고음 출력</span>
@@ -48,7 +52,7 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <h3>화면 접근 경고</h3><toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
+                        <span>화면 접근 경고</span><toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
                     </div>
                     <small class="explanation">
                         디스플레이를 너무 가까이서 보게되면 눈에 이러이러케 안좋습니다.
@@ -58,7 +62,7 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <h3>눈 깜빡임 경고</h3><toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
+                        <span>눈 깜빡임 경고</span><toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
                     </div>
                     <small class="explanation">
                         화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
@@ -68,11 +72,11 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <h3>장시간 착석 경고</h3><toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle>
+                        <span>장시간 착석 경고</span><toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle>
                     </div>
                     <div class="stretch-guide-option">
                         <small class="option-explanation">스트레칭 가이드</small>
-                        <custom-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
+                        <custom-input-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
                     </div>
                     <!-- <button @click="playStretchGuide">스트레칭 가이드 보여주기</button> -->
                 </CardUI>
@@ -80,7 +84,7 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <h3>밝기 자동 조절</h3><toggle @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"></toggle>
+                        <span>밝기 자동 조절</span><toggle @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"></toggle>
                     </div>
                     <div class="bright-option">
                         <small class="option-explanation">수동조절</small>
@@ -92,7 +96,7 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <h3>편안하게 화면보기</h3><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
+                        <span>편안하게 화면보기</span><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
                     </div>
                     <div class="bluelight-option">
                         <small class="option-explanation">blueLight</small>
@@ -116,9 +120,9 @@ import { ipcRenderer as ipc } from 'electron'
 import CardUI from './widgets/CardUI.vue'
 import TitleBar from './TitleBar.vue'
 import CustomInputRange from './widgets/CustomInputRange.vue'
-import CustomCheckBox from './widgets/CustomCheckBox.vue'
+import CustomInputCheckBox from './widgets/CustomInputCheckBox.vue'
 import CustomInputNumber from './widgets/CustomInputNumber.vue'
-import CustomSelect from './widgets/CustomSelect.vue'
+import CustomSelectRadio from './widgets/CustomSelectRadio.vue'
 import Tooltip from './widgets/Tooltip.vue'
 import Toggle from './widgets/Toggle.vue'
 import StatusDot from './widgets/StatusDot.vue';
@@ -149,15 +153,15 @@ export default {
         CardUI,
         TitleBar,
         CustomInputRange,
-        CustomCheckBox,
+        CustomInputCheckBox,
         CustomInputNumber,
-        CustomSelect, 
+        CustomSelectRadio, 
         Tooltip,
         Toggle,
         StatusDot,
         CustomButton 
     },
-    mounted(){
+    created(){
         ipc.send('REQUEST_INIT_SCREEN_VALUE','settingPage')
         ipc.on('INIT',(evt,payload)=>{
             this.warningVolume = payload.warningMessage.warningVolume;
@@ -289,6 +293,7 @@ main#setting-page {
     background:var(--background-color);
     color:var(--text-regular-color);
     padding:30px 0;
+    overflow:auto;
 }
 main#setting-page * {
     user-select: none;
@@ -305,6 +310,16 @@ main#setting-page * {
     margin-left:-150px;
     top:50%;
     margin-top:-150px;
+    animation:floating 2s infinite ease-in-out;
+}
+#setting-page #main-image #shadow {
+    fill:rgba(0,0,0,0.5);
+    position:absolute;
+    top:450px;
+    left:50%;
+    width:200px;
+    margin-left:-100px;
+    animation:stretch 2s infinite ease-in-out;
 }
 #setting-page #settings {
     width:600px;
@@ -358,10 +373,12 @@ section.warning-setting {
     margin-right:5px;
 }
 .alarm-setting .title {
+    font-weight:200;
+    font-size:1.1rem;
     display:flex;
     flex-direction:row;
     justify-content: space-between;
-    margin-bottom:5px;
+    margin-bottom:8px;
 }
 .alarm-setting .stretch-guide-option .option-explanation,
 .alarm-setting .bright-option .option-explanation,
@@ -393,4 +410,28 @@ section.warning-setting {
 .button {
     width:100px;
 }
+@keyframes floating {
+    0% {
+        transform:translateY(0px)
+    }
+    50% {
+        transform:translateY(-10px)
+    }
+    100% {
+        transform:translateY(0px)
+    }
+}
+@keyframes stretch {
+    0% {
+        transform: scaleX(1.2);
+    }
+    50% {
+        transform: scaleX(1);
+    }
+    100% {
+        transform: scaleX(1.2);
+    }
+}
+::-webkit-scrollbar              { width:5px; }
+::-webkit-scrollbar-thumb        { background:#666 }
 </style>
