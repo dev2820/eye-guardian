@@ -40,6 +40,7 @@ const canvasEl = document.getElementById('inputCanvas');
 ipcRenderer.send('REQUEST_INIT_SCREEN_VALUE','faceProcess')
 ipcRenderer.on('INIT',(evt,payload)=>{
     faceLength = parseFloat(payload.faceProcess.faceLength);
+    sittingHeight = parseFloat(payload.faceProcess.faceHeight);
     isDistanceWarningOn= payload.faceProcess.isDistanceWarningOn;
     isEyeblinkWarningOn= payload.faceProcess.isEyeblinkWarningOn;
     isSittedWarningOn= payload.faceProcess.isSittedWarningOn;
@@ -118,8 +119,9 @@ async function saveDistance() {
     if(pose){
         faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
         sittingHeight = pose.keypoints[0].position.y;
+        console.log(sittingHeight)
         ipcRenderer.send('INSERT_MESSAGE',{content:'capture-face',type:'normal'});
-        ipcRenderer.send('SET_FACE_DISTANCE',faceLength);
+        ipcRenderer.send('SET_FACE_DISTANCE',{"faceLength":faceLength, "faceHeight":sittingHeight});
     }
     else {
         ipcRenderer.send('INSERT_MESSAGE',{content:'no-face',type:'warning'})
@@ -193,10 +195,10 @@ async function sitted() {
             else
                 sitCount++;
                 
-            console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
+            // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
         }
     }
-    if(sitCount == 10)
+    if(sitCount % 10 == 0 && sitCount !== 0)
         generateSitWarning();
     setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
 }
