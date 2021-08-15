@@ -43,7 +43,7 @@ let isEyeblinkWarningOn = false;
 let isSittedWarningOn = false;
 let sittingHeight = 0;
 let sitCount = 0;
-
+let rafID;
 const videoEl = document.getElementById("inputVideo");
 const canvasEl = document.getElementById("inputCanvas");
 ipcRenderer.send("REQUEST_INIT_SCREEN_VALUE", "faceProcess");
@@ -89,7 +89,7 @@ function loadCamera() {
     async (stream) => {
       videoEl.srcObject = stream;
       ipcRenderer.send("LOAD_CAMERA_SUCCESS", true);
-      videoEl.play();
+      setTimeout(videoEl.play, 5000);
     },
     (err) => {
       ipcRenderer.send("LOAD_CAMERA_FAILED", true);
@@ -100,7 +100,7 @@ function loadCamera() {
 
 videoEl.addEventListener(
   "play",
-  async () => {
+  () => {
     bright();
     eyeblink();
     sitted();
@@ -115,6 +115,9 @@ function generateBrightWarning() {
     //밝기 자동 조절 모드가 켜져있는 경우
     // ipcRenderer.send('SET_DARKNESS',0.5);//0~0.5
   }
+}
+function distancePoints(a, b) {
+  return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
 }
 
 function generateSitWarning() {
@@ -160,15 +163,17 @@ function getImgfromWebcam(videoEl, canvasEl) {
   return img;
 }
 async function eyeblink() {
+  console.log(eyeblinkModel);
+  console.log(isEyeblinkWarningOn);
+
   if (eyeblinkModel && isEyeblinkWarningOn) {
     const predictions = await eyeblinkModel.estimateFaces({
       input: videoEl,
-      returnTensors: false,
-      flipHorizontal: false,
-      predictIrises: state.predictIrises,
+      // returnTensors: false,
+      // flipHorizontal: false,
     });
 
-    // console.log(predictions);
+    console.log(predictions);
     if (predictions.length > 0) {
       predictions.forEach((prediction) => {
         const keypoints = prediction.scaledMesh;
@@ -182,49 +187,45 @@ async function eyeblink() {
         }
       });
 
-      if (renderPointcloud && state.renderPointcloud != null) {
-        const pointsData = predictions.map((prediction) => {
-          let scaledMesh = prediction.scaledMesh;
-          return scaledMesh.map((point) => [-point[0], -point[1], -point[2]]);
-        });
+      // if (renderPointcloud && state.renderPointcloud != null) {
+      //   const pointsData = predictions.map((prediction) => {
+      //     let scaledMesh = prediction.scaledMesh;
+      //     return scaledMesh.map((point) => [-point[0], -point[1], -point[2]]);
+      //   });
 
-        let flattenedPointsData = [];
-        for (let i = 0; i < pointsData.length; i++) {
-          flattenedPointsData = flattenedPointsData.concat(pointsData[i]);
-        }
-      }
-
-      rafID = requestAnimationFrame(eyeblink);
-      async function bright() {
-        const context = canvasEl.getContext("2d");
-        context.drawImage(videoEl, 0, 0, 300, 150);
-        const data = context.getImageData(0, 0, canvasEl.width, canvasEl.height)
-          .data;
-        let r = 0,
-          g = 0,
-          b = 0;
-        for (let x = 0, len = data.length; x < len; x += 4) {
-          r += data[x];
-          g += data[x + 1];
-          b += data[x + 2];
-        }
-        const colorSum = Math.sqrt(
-          0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2
-        );
-        const brightness = Math.floor(
-          colorSum / (canvasEl.width * canvasEl.height)
-        );
-
-        // console.log('brightness',brightness)
-        if (brightness <= 0) {
-          //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-        } else if (0 < brightness && brightness < 50) {
-          generateBrightWarning();
-        }
-      }
+      //   let flattenedPointsData = [];
+      //   for (let i = 0; i < pointsData.length; i++) {
+      //     flattenedPointsData = flattenedPointsData.concat(pointsData[i]);
+      //   }
+      // }
+      setTimeout(eyeblink, 100);
+      // rafID = requestAnimationFrame(eyeblink);
     }
   }
 }
+async function bright() {
+  const context = canvasEl.getContext("2d");
+  context.drawImage(videoEl, 0, 0, 300, 150);
+  const data = context.getImageData(0, 0, canvasEl.width, canvasEl.height).data;
+  let r = 0,
+    g = 0,
+    b = 0;
+  for (let x = 0, len = data.length; x < len; x += 4) {
+    r += data[x];
+    g += data[x + 1];
+    b += data[x + 2];
+  }
+  const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
+  const brightness = Math.floor(colorSum / (canvasEl.width * canvasEl.height));
+
+  // console.log('brightness',brightness)
+  if (brightness <= 0) {
+    //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
+  } else if (0 < brightness && brightness < 50) {
+    generateBrightWarning();
+  }
+}
+
 async function draw() {
   const pose = await net.estimateSinglePose(videoEl, {
     flipHorizontal: true,

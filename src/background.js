@@ -184,7 +184,6 @@ app.on("ready", async () => {
     loadingWindow.close();
     settingWindow.show();
   });
-
   warningMessageWindow = createWindow(
     "/#/warningMessage",
     "index.html#warningMessage",
@@ -197,7 +196,7 @@ app.on("ready", async () => {
       // fullscreen: true,
       frame: false,
       transparent: true,
-      // alwaysOnTop :true,
+      alwaysOnTop: true,
       focusable: false,
       resizable: false,
     },
@@ -205,7 +204,6 @@ app.on("ready", async () => {
   );
   warningMessageWindow.setIgnoreMouseEvents(true);
   warningMessageWindow.setAlwaysOnTop(true, "normal");
-
   screenFilterWindow = createWindow(
     "/#/screenFilter",
     "index.html#screenFilter",
