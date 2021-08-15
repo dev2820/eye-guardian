@@ -87,7 +87,7 @@ export default {
                     return '얼굴이 감지되지 않습니다.'
                 }
                 case 'ready-to-capture': {
-                    return '5초뒤 얼굴 거리를 설정합니다. 정자세를 취해주세요'
+                    return '얼굴 거리를 설정합니다. 정자세를 취해주세요. 5~10초의 시간이 소요됩니다.'
                 }
                 case 'success-capture': {
                     return ''

@@ -1,8 +1,5 @@
 const { ipcRenderer } = require("electron");
-const path = require("path");
 let net, eyeblinkModel;
-const posenet = require("@tensorflow-models/posenet");
-const faceLandmarksDetection = require("@tensorflow-models/face-landmarks-detection");
 
 const NOSE = 0;
 const LEFTEYE = 1;
