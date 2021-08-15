@@ -45,7 +45,10 @@
                         정자세 기준 설정하기
                         <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
                     </span>
-                    <custom-button class="button" @click="setStandardPos()">설정</custom-button>
+                    <custom-button class="button" @click="setStandardPos()">
+                        <span v-if="standardPosSetStatus==='complete'">설정</span>
+                        <font-awesome-icon v-else-if="standardPosSetStatus==='ongoing'" icon="spinner" spin/>
+                    </custom-button>
                     <!-- <span v-if="timer>0">{{timer}}</span> -->
                 </div>
             </section>
@@ -141,6 +144,7 @@ export default {
             loadCameraMessage:'카메라 로드중...',
             standardPosStatus: 'ongoing',
             standardPosMessage:'정자세 기준값 불러오는중...',
+            standardPosSetStatus: 'complete',
             messageMode:'regular-top',
             isStretchGuideOn:false,
             isDistanceWarningOn:false,
@@ -197,6 +201,7 @@ export default {
         })
         ipc.on('SET_FACE_DISTANCE_SUCCESS',()=>{
             this.standardPosStatus = 'complete';
+            this.standardPosSetStatus = 'complete'
             this.standardPosMessage = '정자세 기준값이 설정되어있습니다.'
         })
         ipc.on('RUN_TIMER',()=>{
@@ -215,6 +220,7 @@ export default {
         setStandardPos(){
             if(this.loadCameraStatus === 'complete'){
                 ipc.send('ESTIMATE_DISTANCE',1);
+                this.standardPosSetStatus = "ongoing"
             }
             else {
                 ipc.send('INSERT_MESSAGE',{content:'cant-detect-camera',type:'warning'});

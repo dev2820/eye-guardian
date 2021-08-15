@@ -64,7 +64,7 @@ ipcRenderer.on("ESTIMATE_DISTANCE", () => {
         content: "ready-to-capture",
         type: "normal",
     });
-    setTimeout(() => saveDistance(), 5 * 1000);
+    setTimeout(saveDistance, 5 * 1000);
 });
 ipcRenderer.on("SET_DISTANCE_WARNING", (evt, payload) => {
     isDistanceWarningOn = payload;
@@ -79,7 +79,7 @@ ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
     isAutoDarknessControlOn = payload;
 });
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
-    
+    isStretchGuideOn = payload;
 });
 
 function loadCamera() {
