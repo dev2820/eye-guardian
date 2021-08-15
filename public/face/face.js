@@ -1,21 +1,9 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
 let net, eyeblinkModel;
-require("@tensorflow-models/posenet")
-  .load({
-    inputResolution: { width: 300, height: 150 },
-  })
-  .then((value) => {
-    net = value;
-  });
+const posenet = require("@tensorflow-models/posenet");
 const faceLandmarksDetection = require("@tensorflow-models/face-landmarks-detection");
-faceLandmarksDetection
-  .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh, {
-    maxFaces: 1,
-  })
-  .then((value) => {
-    eyeblinkModel = value;
-  });
+
 const NOSE = 0;
 const LEFTEYE = 1;
 const RIGHTEYE = 2;
@@ -44,8 +32,24 @@ let isSittedWarningOn = false;
 let sittingHeight = 0;
 let sitCount = 0;
 let rafID;
+const cameraWidth = 600;
+const cameraHeight = 300;
 const videoEl = document.getElementById("inputVideo");
 const canvasEl = document.getElementById("inputCanvas");
+
+async function loadModel(){
+    net = await posenet.load({
+        inputResolution: { width: cameraWidth, height: cameraHeight },
+    })
+    
+    eyeblinkModel = await faceLandmarksDetection
+                        .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh, {
+                            maxFaces: 1,
+                        })
+}
+
+loadModel();
+
 ipcRenderer.send("REQUEST_INIT_SCREEN_VALUE", "faceProcess");
 ipcRenderer.on("INIT", (evt, payload) => {
     faceLength = parseFloat(payload.faceProcess.faceLength);
@@ -87,27 +91,29 @@ function loadCamera() {
     navigator.getMedia(
         { video: true },
         async (stream) => {
-        videoEl.srcObject = stream;
-        ipcRenderer.send("LOAD_CAMERA_SUCCESS", true);
-        setTimeout(videoEl.play, 5000);
+            videoEl.srcObject = stream;
         },
         (err) => {
-        ipcRenderer.send("LOAD_CAMERA_FAILED", true);
-        console.error(err);
+            ipcRenderer.send("LOAD_CAMERA_FAILED", true);
+            console.error(err);
         }
     );
 }
-
-videoEl.addEventListener(
-    "play",
-    () => {
-        bright();
-        eyeblink();
-        sitted();
-        screenDistance();
-    },
-    false
-);
+videoEl.addEventListener('loadeddata',()=>{
+    const waitForLoadModel = () => {
+        if(net && eyeblinkModel) {
+            ipcRenderer.send("LOAD_CAMERA_SUCCESS", true);
+            bright();
+            eyeblink();
+            sitted();
+            screenDistance();
+        }
+        else {
+            setTimeout(waitForLoadModel,1000);
+        }
+    }
+    waitForLoadModel();
+},false)
 
 function generateBrightWarning() {
   // ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'normal'})
@@ -157,20 +163,18 @@ async function saveDistance() {
 
 function getImgfromWebcam(videoEl, canvasEl) {
     const context = canvasEl.getContext("2d");
-    context.drawImage(videoEl, 0, 0, 300, 150);
+    context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
     const img = new Image();
     img.src = canvasEl.toDataURL("image/jpeg");
     return img;
 }
 async function eyeblink() {
-    console.log(eyeblinkModel);
-    console.log(isEyeblinkWarningOn);
 
     if (eyeblinkModel && isEyeblinkWarningOn) {
         const predictions = await eyeblinkModel.estimateFaces({
-        input: videoEl,
-        // returnTensors: false,
-        // flipHorizontal: false,
+            input: videoEl,
+            // returnTensors: false,
+            // flipHorizontal: false,
         });
 
         console.log(predictions);
@@ -198,15 +202,16 @@ async function eyeblink() {
         //     flattenedPointsData = flattenedPointsData.concat(pointsData[i]);
         //   }
         // }
-        setTimeout(eyeblink, 100);
-        // rafID = requestAnimationFrame(eyeblink);
         }
+        // rafID = requestAnimationFrame(eyeblink);
     }
+
+    setTimeout(eyeblink, 50);
 }
 async function bright() {
     const context = canvasEl.getContext('2d');
-    context.drawImage(videoEl, 0, 0, 300, 150);
-    const data= context.getImageData(0,0,canvasEl.width,canvasEl.height).data;
+    context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
+    const data= context.getImageData(0,0,cameraWidth,cameraHeight).data;
     let r=0,g=0,b=0;
     for(let x= 0, len= data.length; x < len; x+=4) {
         r += data[x];
@@ -216,7 +221,7 @@ async function bright() {
     const colorSum = Math.sqrt(0.299 * (r ** 2)
     + 0.587 * (g ** 2)
     + 0.114 * (b ** 2));
-    const brightness= Math.floor(colorSum /(canvasEl.width*canvasEl.height));
+    const brightness= Math.floor(colorSum /(cameraWidth*cameraHeight));
 
     // console.log('brightness',brightness)
     if(brightness<=0) {

@@ -8,7 +8,7 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <img id="mascot" src="../assets/images/mascot4.svg"/>
+            <img id="mascot" src="../assets/images/mascot3.svg"/>
             <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
             <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="100" cy="50" rx="50" ry="10" />
