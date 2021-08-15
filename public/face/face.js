@@ -1,8 +1,5 @@
 const { ipcRenderer } = require("electron");
-const path = require("path");
 let net, eyeblinkModel;
-const posenet = require("@tensorflow-models/posenet");
-const faceLandmarksDetection = require("@tensorflow-models/face-landmarks-detection");
 
 const NOSE = 0;
 const LEFTEYE = 1;
@@ -144,6 +141,7 @@ async function saveDistance() {
     const pose = await net.estimateSinglePose(videoEl, {
         flipHorizontal: true,
     });
+    
     if (pose) {
         faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
         sittingHeight = pose.keypoints[0].position.y;
@@ -169,7 +167,6 @@ function getImgfromWebcam(videoEl, canvasEl) {
     return img;
 }
 async function eyeblink() {
-
     if (eyeblinkModel && isEyeblinkWarningOn) {
         const predictions = await eyeblinkModel.estimateFaces({
             input: videoEl,
