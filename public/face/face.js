@@ -187,7 +187,7 @@ async function sitted() {
         //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
             flipHorizontal:true
-        })
+        }).catch((err)=>{})
         if(pose){
             if(pose.keypoints[0].position.y < sittingHeight - faceLength*2 )
                 sitCount = 0;
@@ -207,7 +207,7 @@ async function screenDistance() {
         if(faceLength !== 0){
             const pose = await net.estimateSinglePose(videoEl, {
                 flipHorizontal:true
-            })
+            }).catch((err)=>{})
             if(pose && (faceLength*8)/6 < pose.keypoints[2].position.x - pose.keypoints[1].position.x){
                 generateDistanceWarning();
             }
