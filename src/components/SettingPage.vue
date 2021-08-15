@@ -8,7 +8,7 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <img id="mascot" src="../assets/images/mascot3.svg"/>
+            <img id="mascot" src="../assets/images/mascot4.svg"/>
             <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
             <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="100" cy="50" rx="50" ry="10" />
@@ -415,16 +415,16 @@ section.warning-setting {
         transform:translateY(0px)
     }
     25% {
-        transform:translateY(-10px) rotateZ(360deg);
+        transform:translateY(-10px);
     }
     50% {
-        transform:translateY(0px) scale(1);
+        transform:translateY(0px);
     }
     75% {
-        transform:translateY(-10px) scale(1.1);
+        transform:translateY(-10px);
     }
     100% {
-        transform:translateY(0px)  scale(1);
+        transform:translateY(0px) rotateZ(360deg);
     }
 }
 @keyframes stretch {
