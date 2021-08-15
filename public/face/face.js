@@ -111,7 +111,7 @@ function generateDistanceWarning(){
 }
 
 
-async function saveDistance() {
+async function saveDistance() {//10초걸리고 -> 5초
     const pose = await net.estimateSinglePose(videoEl, {
         flipHorizontal:true
     })
@@ -170,6 +170,8 @@ async function bright() {
     }
     else if( 0 < brightness && brightness < 50){
         generateBrightWarning();
+        //isAutoDarknessControlOn <= 이게 on인 경우
+        //ipc.send('SET_DARKNESS',this.darkness); <=이걸로 밝기 조절
     }
     setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
 }
@@ -183,6 +185,7 @@ async function eyeblink() {
 }
 
 async function sitted() {
+    // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
     if(isSittedWarningOn && sittingHeight){//isStretchGuideOn
         //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
@@ -197,7 +200,7 @@ async function sitted() {
             // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
         }
     }
-    if(sitCount % 10 == 0 && sitCount !== 0)
+    if(sitCount % 360 == 0 && sitCount !== 0)
         generateSitWarning();
     setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
 }

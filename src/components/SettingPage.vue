@@ -8,7 +8,7 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <img id="mascot" src="../assets/images/mascot.svg"/>
+            <img id="mascot" src="../assets/images/mascot3.svg"/>
             <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
             <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="100" cy="50" rx="50" ry="10" />
@@ -304,13 +304,13 @@ main#setting-page * {
 }
 #setting-page #main-image img#mascot {
     position:absolute;
-    width:300px;
-    height:300px;
+    width:200px;
+    height:200px;
     left:50%;
-    margin-left:-150px;
+    margin-left:-100px;
     top:50%;
-    margin-top:-150px;
-    animation:floating 2s infinite ease-in-out;
+    margin-top:-100px;
+    animation:floating 4s infinite ease-in-out;
 }
 #setting-page #main-image #shadow {
     fill:rgba(0,0,0,0.5);
@@ -414,11 +414,17 @@ section.warning-setting {
     0% {
         transform:translateY(0px)
     }
+    25% {
+        transform:translateY(-10px) rotateZ(360deg);
+    }
     50% {
-        transform:translateY(-10px)
+        transform:translateY(0px) scale(1);
+    }
+    75% {
+        transform:translateY(-10px) scale(1.1);
     }
     100% {
-        transform:translateY(0px)
+        transform:translateY(0px)  scale(1);
     }
 }
 @keyframes stretch {
@@ -430,6 +436,14 @@ section.warning-setting {
     }
     100% {
         transform: scaleX(1.2);
+    }
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }
 ::-webkit-scrollbar              { width:5px; }
