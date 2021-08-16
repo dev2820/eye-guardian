@@ -292,8 +292,9 @@ async function sitted() {
         // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
     }
     if (sitCount % 3600 == 0 && sitCount !== 0) {
+      if(isStretchGuideOn)
         ipcRenderer.send('SHOW_STRETCH_GUIDE');
-        generateSitWarning();
+      generateSitWarning();
     }
     setTimeout(sitted, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 }
