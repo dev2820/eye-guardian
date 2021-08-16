@@ -394,7 +394,7 @@ ipcMain.on("SET_STRETCH_GUIDE", (evt, payload) => {
   faceProcessWindow.send("SET_STRETCH_GUIDE");
 });
 ipcMain.on("SET_BRIGHT_WARNING", (evt, payload) => {
-  setting.stretchGuideScreen.isBrightWarningOn = payload;
+  setting.faceProcess.isBrightWarningOn = payload;
   faceProcessWindow.send("SET_BRIGHT_WARNING");
 });
 // minimize, maximize, close

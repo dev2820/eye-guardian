@@ -96,6 +96,9 @@ ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
     isStretchGuideOn = payload;
 });
+ipcRenderer.on("SET_BRIGHT_WARNING", (evt, payload) => {
+    isBrightWarningOn = payload;
+});
 function loadCamera() {
     navigator.getMedia =
         navigator.getUserMedia ||
