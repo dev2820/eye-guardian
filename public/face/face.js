@@ -203,12 +203,12 @@ async function eyeblink() {
 
             leftEyelid = distancePoints(keypoints[386], keypoints[374]);
             rightEyelid = distancePoints(keypoints[159], keypoints[144]);
-            if (leftEyelid <= 3 && rightEyelid <= 3) {
+            if (leftEyelid <= 2.5 && rightEyelid <= 2.5) {
                 // console.log(leftEyelid);
                 // console.log(rightEyelid);
                 // console.log("closed");
                 console.log(second)
-                if (second >= 6) generateEyeblinkWarning();
+                if (second >= 7) generateEyeblinkWarning();
                 clearInterval(timer);
                 second = 0;
                 startTimer();
@@ -217,7 +217,7 @@ async function eyeblink() {
         }
     }
 
-    setTimeout(eyeblink, 100);
+    setTimeout(eyeblink, 80);
 }
 
 async function bright() {
@@ -289,7 +289,7 @@ async function stare() {
             stareCount++;
         // console.log(stareCount, sittingHeight, pose.keypoints[0].position.y)
     }
-    if (sitCount % 3600 == 0 && sitCount !== 0) {
+    if (stareCount % 3600 == 0 && stareCount !== 0) {
       if(isStretchGuideOn)
         ipcRenderer.send('SHOW_STRETCH_GUIDE');
       generateSitWarning();
