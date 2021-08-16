@@ -1,8 +1,8 @@
 <template>
     <div id="screen-filter">
-        <div id="blue-light" :class="{'hidden':!isBlueLightFilterOn}" :style="{background:`rgba(255,219,0,${blueLightFigure})`}"></div>
+        <div id="blue-light" :class="{'hidden':!isBlueLightFilterOn}" :style="{background:`rgba(240,127,0,${blueLightFigure})`}"></div>
         <div id="darkness" :style="{background:`rgba(0,0,0,${darkness})`}"></div>
-    </div>
+    </div>EEE3D6
 </template>
 
 <script>
