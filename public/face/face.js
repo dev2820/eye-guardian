@@ -261,7 +261,7 @@ async function bright() {
           ipcRenderer.send('SET_DARKNESS', 0);
     }
         
-    brighttimer = setTimeout(bright, 1 * 1000); //30초마다 밝기 테스트하도록 되어있음
+    brighttimer = setTimeout(bright, 60 * 1000); //30초마다 밝기 테스트하도록 되어있음
 }
 
 // async function draw() {
