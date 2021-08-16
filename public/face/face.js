@@ -204,6 +204,7 @@ async function eyeblink() {
             // console.log(leftEyelid);
             // console.log(rightEyelid);
             // console.log("closed");
+            console.log(second)
             if (second >= 6) generateEyeblinkWarning();
             clearInterval(timer);
             second = 0;
@@ -237,14 +238,14 @@ async function bright() {
 
     if(isAutoDarknessControlOn){
         if(brightness in brightInterval){
-        const now = brightInterval[brightness];
-        if(darkness - 0.1 > now || darkness + 0.1 < now){
-            darkness = now;
-            ipcRenderer.send('SET_DARKNESS', now);
-        }
+          const now = brightInterval[brightness];
+          if(darkness - 0.1 > now || darkness + 0.1 < now){
+              darkness = now;
+              ipcRenderer.send('SET_DARKNESS', now);
+          }
         }
         else
-        ipcRenderer.send('SET_DARKNESS', 0);
+          ipcRenderer.send('SET_DARKNESS', 0);
     }
         
     brighttimer = setTimeout(bright, 30 * 1000); //30초마다 밝기 테스트하도록 되어있음
@@ -271,15 +272,11 @@ async function sitted() {
         //isStretchGuideOn
         //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
-        flipHorizontal: true,
+          flipHorizontal: true,
         });
-        if (pose) {
-        if (pose.keypoints[0].position.y < sittingHeight - faceLength * 2)
-            sitCount = 0;
-        else sitCount++;
-
+        if (pose) 
+          sitCount++;
         // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
-        }
     }
     if (sitCount % 3600 == 0 && sitCount !== 0) {
         ipcRenderer.send('SHOW_STRETCH_GUIDE');
