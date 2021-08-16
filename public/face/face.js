@@ -138,6 +138,9 @@ videoEl.addEventListener(
 );
 
 function generateBrightWarning() {
+  if(isAutoDarknessControlOn)
+    ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning-auto',type:'warning'})
+  else
     ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'warning'})
 }
 
@@ -218,6 +221,7 @@ async function eyeblink() {
 
     setTimeout(eyeblink, 100);
 }
+
 async function bright() {
     const context = canvasEl.getContext("2d");
     context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
@@ -235,11 +239,12 @@ async function bright() {
 
     // console.log('brightness',brightness)
     //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-    if (0 < brightness && brightness < 25){
+    if (isBrightWarningOn && 0 < brightness && brightness < 25){
       if(brightFlag){
         generateBrightWarning();
-        brightFlag = false
       }
+      if(isAutoDarknessControlOn)
+        brightFlag = false;
     }
     else
       brightFlag = true;
@@ -256,7 +261,7 @@ async function bright() {
           ipcRenderer.send('SET_DARKNESS', 0);
     }
         
-    brighttimer = setTimeout(bright, 30 * 1000); //30초마다 밝기 테스트하도록 되어있음
+    brighttimer = setTimeout(bright, 1 * 1000); //30초마다 밝기 테스트하도록 되어있음
 }
 
 // async function draw() {
