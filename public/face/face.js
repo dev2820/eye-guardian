@@ -94,6 +94,8 @@ ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
     darkness=0;
     clearTimeout(brighttimer);
     bright();
+    if(!payload)
+      ipcRenderer.send('SET_DARKNESS', 0);
 });
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
     isStretchGuideOn = payload;
@@ -264,23 +266,8 @@ async function bright() {
     brighttimer = setTimeout(bright, 60 * 1000); //30초마다 밝기 테스트하도록 되어있음
 }
 
-// async function draw() {
-//   const pose = await net.estimateSinglePose(videoEl, {
-//     flipHorizontal: true,
-//   });
-//   if (pose) {
-//     box.style.width =
-//       pose.keypoints[4].position.x - pose.keypoints[3].position.x + "px";
-//     box.style.height = 10 + "px";
-//     box.style.top = pose.keypoints[3].position.y + "px";
-//     box.style.left = pose.keypoints[3].position.x + "px";
-//   }
-//   detectFace = pose ? pose.score : "no face";
-//   setTimeout(draw, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
-// }
 
 async function sitted() {
-    // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
     if (isSittedWarningOn) {
         //isStretchGuideOn
         //앉아있는지 감지하는 로직
