@@ -193,27 +193,28 @@ async function eyeblink() {
         input: videoEl,
         });
 
-        // console.log(predictions);
+        console.log(predictions);
         if (predictions.length > 0) {
         predictions.forEach((prediction) => {
             const keypoints = prediction.scaledMesh;
 
             leftEyelid = distancePoints(keypoints[386], keypoints[374]);
             rightEyelid = distancePoints(keypoints[159], keypoints[144]);
-            if (leftEyelid <= 5 && rightEyelid <= 5) {
-            // console.log(leftEyelid);
-            // console.log(rightEyelid);
-            // console.log("closed");
-            if (second >= 6) generateEyeblinkWarning();
-            clearInterval(timer);
-            second = 0;
-            startTimer();
+            if (leftEyelid <= 2 && rightEyelid <= 2) {
+                // console.log(leftEyelid);
+                // console.log(rightEyelid);
+                // console.log("closed");
+                console.log(second)
+                if (second >= 6) generateEyeblinkWarning();
+                clearInterval(timer);
+                second = 0;
+                startTimer();
             }
         });
         }
     }
 
-    setTimeout(eyeblink, 50);
+    setTimeout(eyeblink, 100);
 }
 async function bright() {
     const context = canvasEl.getContext("2d");
