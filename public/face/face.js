@@ -268,16 +268,12 @@ async function bright() {
 
 
 async function stare() {
-    // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
     if (isStareWarningOn) {
-        //isStretchGuideOn
-        //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
             flipHorizontal: true,
         });
         if (pose) 
             stareCount++;
-        // console.log(stareCount, sittingHeight, pose.keypoints[0].position.y)
     }
     if (stareCount % 3600 == 0 && stareCount !== 0) {
         stareCount = stareCount>=7200 ? (stareCount-3600) : stareCount;

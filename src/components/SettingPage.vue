@@ -10,7 +10,6 @@
         <div id="main-image">
             <font-awesome-icon class="exclamation" icon="exclamation" v-if="loadCameraStatus==='failed' || loadModelStatus==='failed' || standardPosStatus==='failed'"/>
             <img id="mascot" src="../assets/images/mascot3.svg"/>
-            <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
             <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="100" cy="50" rx="50" ry="10" />
             </svg>
@@ -281,10 +280,6 @@ export default {
             this.isAutoDarknessControlOn = boolean;
             ipc.send('SET_AUTO_DARKNESS_CONTROL',boolean);
         },
-        // setDarkness(e){
-        //     this.darkness = parseFloat(e.target.value);
-        //     ipc.send('SET_DARKNESS',this.darkness);
-        // },
         setBlueLightFigure(e){
             this.blueLightFigure = parseFloat(e.target.value);
             ipc.send('SET_BLUELIGHT_FIGURE',this.blueLightFigure);
@@ -299,10 +294,6 @@ export default {
         insertMessage(content,type) {
             ipc.send('INSERT_MESSAGE',{content,type});
         },
-        // playStretchGuide(){
-        //     console.log('??')
-        //     ipc.send('SHOW_STRETCH_GUIDE');
-        // },
         setStretchGuide(boolean) {
             this.isStretchGuideOn = boolean;
             ipc.send('SET_STRETCH_GUIDE',boolean);

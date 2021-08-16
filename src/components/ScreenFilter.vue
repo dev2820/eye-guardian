@@ -6,9 +6,7 @@
 </template>
 
 <script>
-// import setting from '../assets/setting.json'
 import { ipcRenderer as ipc } from 'electron'
-// import fs from 'fs'
 export default {
     name:'ScreenFilter',
     data(){

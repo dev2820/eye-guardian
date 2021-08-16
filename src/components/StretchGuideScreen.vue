@@ -20,7 +20,6 @@ export default {
             this.isplay=true;
         })
         videoEl.addEventListener('ended',()=>{//플레이가 끝나면
-            // console.log('ended')
             this.isended=true;
             this.closeStretchGuide();
         });
