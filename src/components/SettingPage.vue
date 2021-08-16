@@ -8,7 +8,7 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
-            <font-awesome-icon class="exclamation" icon="exclamation" v-if="loadCameraStatus==='failed' || loadModelStatus==='failed' || standardPosStatus==='failed'"/>
+            <font-awesome-icon class="exclamation" icon="exclamation" v-if="loadCameraStatus==='failed' || loadModelStatus==='failed' || standardPosStatus==='failed' || standardEyeStatus==='failed'"/>
             <img id="mascot" src="../assets/images/mascot3.svg"/>
             <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="100" cy="50" rx="50" ry="10" />
@@ -28,6 +28,10 @@
                     <status-dot :status="standardPosStatus"/>
                     <small class="status-message">{{standardPosMessage}}</small>
                 </div>
+                <div class="standard-eye-status">
+                    <status-dot :status="standardEyeStatus"/>
+                    <small class="status-message">{{standardEyeMessage}}</small>
+                </div>
             </section>
             <section class="warning-setting">
                 <div class="setting-option warning-position">
@@ -44,15 +48,27 @@
                         <custom-input-range :value="warningVolume" @change="setWarningVolume($event)" :min="0" :max="1" :step="0.01"/>
                     </div>
                 </div>
-                <div class="setting-option standard-pos-setting">
-                    <span class="explanation">
-                        정자세 기준 설정하기
-                        <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
-                    </span>
-                    <custom-button class="button" @click="setStandardPos()">
-                        <span v-if="standardPosSetStatus==='complete'">설정</span>
-                        <font-awesome-icon v-else-if="standardPosSetStatus==='ongoing'" icon="spinner" spin/>
-                    </custom-button>
+                <div class="setting-option-bundle">
+                    <div class="setting-option standard-pos-setting">
+                        <span class="explanation">
+                            정자세 기준 설정하기
+                            <font-awesome-icon icon="question-circle" class="icon" title="사용자가 정자세를 취하고있는지 판단하는데 도움이되는 기준값을 설정합니다."/>
+                        </span>
+                        <custom-button class="button" @click="setStandardPos()">
+                            <span v-if="standardPosSetStatus==='complete'">설정</span>
+                            <font-awesome-icon v-else-if="standardPosSetStatus==='ongoing'" icon="spinner" spin/>
+                        </custom-button>
+                    </div>
+                    <div class="setting-option standard-eyesize-setting">
+                        <span class="explanation">
+                            눈 크기 측정하기
+                            <font-awesome-icon icon="question-circle" class="icon" title="눈을 감았는지 여부를 판정하는 기준값을 설정합니다."/>
+                        </span>
+                        <custom-button class="button" @click="setStandardEye()">
+                            <span v-if="standardEyeSetStatus==='complete'">설정</span>
+                            <font-awesome-icon v-else-if="standardEyeSetStatus==='ongoing'" icon="spinner" spin/>
+                        </custom-button>
+                    </div>
                 </div>
             </section>
             <section class="alarm-setting">
@@ -166,9 +182,12 @@ export default {
             loadCameraMessage:'카메라 로드중...',
             standardPosStatus: 'ongoing',
             standardPosMessage:'정자세 기준값 불러오는중...',
+            standardEyeStatus: 'ongoing',
+            standardEyeMessage:'감은 눈 기준값 불러오는중...',
             loadModelStatus:'ongoing',
             loadModelMessage:'얼굴감지 모델 불러오는중...',
             standardPosSetStatus: 'complete',
+            standardEyeSetStatus: 'complete',
             messageMode:'regular-top',
             isStretchGuideOn:false,
             isDistanceWarningOn:false,
@@ -209,7 +228,15 @@ export default {
             }
             else {
                 this.standardPosStatus = 'complete';
-                this.standardPosMessage = '정자세 기준값이 설정되어있습니다.'
+                this.standardPosMessage = '정자세 기준값이 설정되어 있습니다.'
+            }
+            if(payload.faceProcess.leftEyeSize<=0&&payload.faceProcess.rightEyeSize<=0) {
+                this.standardEyeStatus = 'failed';
+                this.standardEyeMessage = '감은 눈 기준값이 설정되어있지 않습니다. 설정버튼을 눌러 기준값 설정을 완료해주세요.'
+            }
+            else {
+                this.standardEyeStatus = 'complete';
+                this.standardEyeMessage = '감은 눈 기준값이 설정되어 있습니다.'
             }
         })
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
@@ -236,7 +263,12 @@ export default {
         ipc.on('SET_FACE_DISTANCE_SUCCESS',()=>{
             this.standardPosStatus = 'complete';
             this.standardPosSetStatus = 'complete'
-            this.standardPosMessage = '정자세 기준값이 설정되어있습니다.'
+            this.standardPosMessage = '정자세 기준값이 설정되어 있습니다.'
+        })
+        ipc.on('SET_EYESIZE_DISTANCE_SUCCESS',()=>{
+            this.standardEyeStatus = 'complete';
+            this.standardEyeSetStatus = 'complete'
+            this.standardEyeMessage = '감은 눈 기준값이 설정되어 있습니다.'
         })
         ipc.on('RUN_TIMER',()=>{
             this.timer=5;
@@ -255,6 +287,16 @@ export default {
             if(this.loadCameraStatus === 'complete'){
                 ipc.send('ESTIMATE_DISTANCE',1);
                 this.standardPosSetStatus = "ongoing"
+            }
+            else {
+                ipc.send('INSERT_MESSAGE',{content:'cant-detect-camera',type:'warning'});
+            }
+        },
+        setStandardEye(){
+            if(this.loadCameraStatus === 'complete'){
+                
+                ipc.send('MEASURE_EYESIZE',1);
+                this.standardEyeSetStatus = "ongoing"
             }
             else {
                 ipc.send('INSERT_MESSAGE',{content:'cant-detect-camera',type:'warning'});
@@ -382,6 +424,11 @@ section.status .status-message {
 section.warning-setting {
     width:100%;
 }
+.setting-option-bundle{
+    display:flex;
+    flex-direction:row;
+    justify-content: flex-start ;
+}
 .setting-option {
     display:flex;
     flex-direction:column;
@@ -404,6 +451,10 @@ section.warning-setting {
 }
 .setting-option.standard-pos-setting > .explanation{
     margin-right:5px;
+}
+.setting-option.standard-eyesize-setting {
+    margin-right:5px;
+    margin-left:130.2px;
 }
 .alarm-setting .title {
     font-weight:200;

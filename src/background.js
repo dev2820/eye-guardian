@@ -171,7 +171,7 @@ app.on("ready", async () => {
         nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
-      icon: path.join(__static, "/images/logo.ico")
+      icon: path.join(__static, "/images/logo.ico"),
     },
     true
   );
@@ -217,7 +217,7 @@ app.on("ready", async () => {
       fullscreen: true,
       frame: false,
       transparent: true,
-      alwaysOnTop :true,
+      alwaysOnTop: true,
       focusable: false,
       resizable: false,
     },
@@ -237,7 +237,7 @@ app.on("ready", async () => {
         devTools: false,
       },
       useContentSize: true,
-      alwaysOnTop :true,
+      alwaysOnTop: true,
       frame: false,
       show: false,
     },
@@ -325,10 +325,18 @@ ipcMain.on("SET_WARNING_VOLUME", (evt, payload) => {
 ipcMain.on("ESTIMATE_DISTANCE", (evt, payload) => {
   faceProcessWindow.send("ESTIMATE_DISTANCE");
 });
+ipcMain.on("MEASURE_EYESIZE", (evt, payload) => {
+  faceProcessWindow.send("MEASURE_EYESIZE");
+});
 ipcMain.on("SET_FACE_DISTANCE", (evt, payload) => {
   setting.faceProcess.faceLength = payload.faceLength;
   setting.faceProcess.faceHeight = payload.faceHeight;
   settingWindow.send("SET_FACE_DISTANCE_SUCCESS", true);
+});
+ipcMain.on("SET_EYESIZE_DISTANCE", (evt, payload) => {
+  setting.faceProcess.leftEyeSize = payload.leftEyeSize;
+  setting.faceProcess.rightEyeSize = payload.rightEyeSize;
+  settingWindow.send("SET_EYESIZE_DISTANCE_SUCCESS", true);
 });
 //카메라 감지 성공 여부
 ipcMain.on("LOAD_CAMERA_SUCCESS", (evt, payload) => {
