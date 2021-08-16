@@ -33,6 +33,7 @@ let second = 0;
 let timer;
 let darkness=0;
 let brighttimer;
+let brightFlag = true;
 
 const cameraWidth = 600;
 const cameraHeight = 300;
@@ -234,8 +235,14 @@ async function bright() {
 
     // console.log('brightness',brightness)
     //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-    if (0 < brightness && brightness < 25)
+    if (0 < brightness && brightness < 25){
+      if(brightFlag){
         generateBrightWarning();
+        brightFlag = false
+      }
+    }
+    else
+      brightFlag = true;
 
     if(isAutoDarknessControlOn){
         if(brightness in brightInterval){
