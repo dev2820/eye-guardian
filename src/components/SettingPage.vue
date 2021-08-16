@@ -8,6 +8,7 @@
     </header>
     <main id="setting-page">
         <div id="main-image">
+            <font-awesome-icon class="exclamation" icon="exclamation" v-if="loadCameraStatus==='failed' || loadModelStatus==='failed' || standardPosStatus==='failed'"/>
             <img id="mascot" src="../assets/images/mascot3.svg"/>
             <!-- <img id="shadow" src="../assets/images/shadow.svg"/> -->
             <svg id="shadow" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
@@ -428,7 +429,16 @@ section.warning-setting {
 .alarm-setting .bluelight-option *{
     margin:auto 0;
 }
-
+.exclamation {
+    font-size:5rem;
+    color:var(--danger-color);
+    position:absolute;
+    width:50px;
+    left:50%;
+    margin-left:-25px;
+    top:60px;
+    animation:scaleUp 3s infinite;
+}
 .button {
     width:100px;
 }
@@ -460,12 +470,38 @@ section.warning-setting {
         transform: scaleX(1.2);
     }
 }
-@keyframes spin {
+@keyframes scaleUp {
     0% {
-        transform: rotate(0deg);
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
     }
     100% {
-        transform: rotate(360deg);
+        transform: scale(1);
+    }
+}
+@keyframes swing {
+    0% {
+        transform: rotateZ(0deg);
+    }
+    50% {
+        transform: rotateZ(0deg);
+    }
+    60% {
+        transform: rotateZ(10deg);
+    }
+    70% {
+        transform: rotateZ(-10deg);
+    }
+    80% {
+        transform: rotateZ(10deg);
+    }
+    90% {
+        transform: rotateZ(-10deg);
+    }
+    100% {
+        transform: rotateZ(0deg);
     }
 }
 ::-webkit-scrollbar              { width:5px; }
