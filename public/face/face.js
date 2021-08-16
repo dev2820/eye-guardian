@@ -28,21 +28,36 @@ let isEyeblinkWarningOn = false;
 let isSittedWarningOn = false;
 let sittingHeight = 0;
 let sitCount = 0;
-let rafID;
+let second = 0;
+let timer;
+let darkness=0;
+let brighttimer;
+
 const cameraWidth = 600;
 const cameraHeight = 300;
 const videoEl = document.getElementById("inputVideo");
 const canvasEl = document.getElementById("inputCanvas");
 
-async function loadModel(){
+const brightInterval = new Proxy([],{
+    get:(target, index) => 0.8 - (index / 50),
+    has:(target, brightness) =>{
+        if(brightness > 0 && brightness < 40)
+        return true;
+        else
+        return false;
+    }
+})
+async function loadModel() {
     net = await posenet.load({
         inputResolution: { width: cameraWidth, height: cameraHeight },
-    })
-    
-    eyeblinkModel = await faceLandmarksDetection
-                        .load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh, {
-                            maxFaces: 1,
-                        })
+    });
+
+    eyeblinkModel = await faceLandmarksDetection.load(
+        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+        {
+        maxFaces: 1,
+        }
+    );
 }
 
 loadModel();
@@ -55,8 +70,8 @@ ipcRenderer.on("INIT", (evt, payload) => {
     isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
     isSittedWarningOn = payload.faceProcess.isSittedWarningOn;
     isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
-});
-ipcRenderer.on("ESTIMATE_DISTANCE", () => {
+    });
+    ipcRenderer.on("ESTIMATE_DISTANCE", () => {
     ipcRenderer.send("INSERT_MESSAGE", {
         content: "ready-to-capture",
         type: "normal",
@@ -74,6 +89,9 @@ ipcRenderer.on("SET_EYEBLINK_WARNING", (evt, payload) => {
 });
 ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
     isAutoDarknessControlOn = payload;
+    darkness=0;
+    clearTimeout(brighttimer);
+    bright();
 });
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
     isStretchGuideOn = payload;
@@ -97,36 +115,39 @@ function loadCamera() {
         }
     );
 }
-videoEl.addEventListener('loadeddata',()=>{
-    const waitForLoadModel = () => {
-        if(net && eyeblinkModel) {
+videoEl.addEventListener(
+    "loadeddata",
+    () => {
+        const waitForLoadModel = () => {
+        if (net && eyeblinkModel) {
             ipcRenderer.send("LOAD_MODEL_SUCCESS", true);
             bright();
             eyeblink();
+            startTimer();
             sitted();
             screenDistance();
+        } else {
+            setTimeout(waitForLoadModel, 1000);
         }
-        else {
-            setTimeout(waitForLoadModel,1000);
-        }
-    }
-    waitForLoadModel();
-},false)
+        };
+        waitForLoadModel();
+    },
+    false
+);
 
 function generateBrightWarning() {
-  // ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'normal'})
-    if (isAutoDarknessControlOn) {
-        //밝기 자동 조절 모드가 켜져있는 경우
-        // ipcRenderer.send('SET_DARKNESS',0.5);//0~0.5
-    }
-}
-function distancePoints(a, b) {
-    return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+    ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'warning'})
 }
 
 function generateSitWarning() {
     ipcRenderer.send("INSERT_MESSAGE", {
         content: "sit-up-time",
+        type: "warning",
+    });
+    }
+    function generateEyeblinkWarning() {
+    ipcRenderer.send("INSERT_MESSAGE", {
+        content: "eye-blink",
         type: "warning",
     });
 }
@@ -142,11 +163,9 @@ async function saveDistance() {
     const pose = await net.estimateSinglePose(videoEl, {
         flipHorizontal: true,
     });
-    
     if (pose) {
         faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
         sittingHeight = pose.keypoints[0].position.y;
-        console.log(sittingHeight);
         ipcRenderer.send("INSERT_MESSAGE", {
         content: "capture-face",
         type: "normal",
@@ -160,15 +179,21 @@ async function saveDistance() {
     }
 }
 
+function distancePoints(a, b) {
+    return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+}
+function startTimer() {
+    timer = setInterval(() => {
+        second = second + 0.1;
+    }, 100);
+}
 async function eyeblink() {
     if (eyeblinkModel && isEyeblinkWarningOn) {
         const predictions = await eyeblinkModel.estimateFaces({
-            input: videoEl,
-            // returnTensors: false,
-            // flipHorizontal: false,
+        input: videoEl,
         });
 
-        console.log(predictions);
+        // console.log(predictions);
         if (predictions.length > 0) {
         predictions.forEach((prediction) => {
             const keypoints = prediction.scaledMesh;
@@ -178,88 +203,89 @@ async function eyeblink() {
             if (leftEyelid <= 5 && rightEyelid <= 5) {
             // console.log(leftEyelid);
             // console.log(rightEyelid);
-            console.log("closed");
+            // console.log("closed");
+            if (second >= 6) generateEyeblinkWarning();
+            clearInterval(timer);
+            second = 0;
+            startTimer();
             }
         });
-
-        // if (renderPointcloud && state.renderPointcloud != null) {
-        //   const pointsData = predictions.map((prediction) => {
-        //     let scaledMesh = prediction.scaledMesh;
-        //     return scaledMesh.map((point) => [-point[0], -point[1], -point[2]]);
-        //   });
-
-        //   let flattenedPointsData = [];
-        //   for (let i = 0; i < pointsData.length; i++) {
-        //     flattenedPointsData = flattenedPointsData.concat(pointsData[i]);
-        //   }
-        // }
         }
-        // rafID = requestAnimationFrame(eyeblink);
     }
 
     setTimeout(eyeblink, 50);
 }
 async function bright() {
-    const context = canvasEl.getContext('2d');
+    const context = canvasEl.getContext("2d");
     context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
-    const data= context.getImageData(0,0,cameraWidth,cameraHeight).data;
-    let r=0,g=0,b=0;
-    for(let x= 0, len= data.length; x < len; x+=4) {
+    const data = context.getImageData(0, 0, cameraWidth, cameraHeight).data;
+    let r = 0,
+        g = 0,
+        b = 0;
+    for (let x = 0, len = data.length; x < len; x += 4) {
         r += data[x];
-        g += data[x+1];
-        b += data[x+2];
+        g += data[x + 1];
+        b += data[x + 2];
     }
-    const colorSum = Math.sqrt(0.299 * (r ** 2)
-    + 0.587 * (g ** 2)
-    + 0.114 * (b ** 2));
-    const brightness= Math.floor(colorSum /(cameraWidth*cameraHeight));
+    const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
+    const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
     // console.log('brightness',brightness)
-    if(brightness<=0) {
-        //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-    }
-    else if( 0 < brightness && brightness < 50){
+    //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
+    if (0 < brightness && brightness < 25)
         generateBrightWarning();
-        //isAutoDarknessControlOn <= 이게 on인 경우
-        //ipc.send('SET_DARKNESS',this.darkness); <=이걸로 밝기 조절
+
+    if(isAutoDarknessControlOn){
+        if(brightness in brightInterval){
+        const now = brightInterval[brightness];
+        if(darkness - 0.1 > now || darkness + 0.1 < now){
+            darkness = now;
+            ipcRenderer.send('SET_DARKNESS', now);
+        }
+        }
+        else
+        ipcRenderer.send('SET_DARKNESS', 0);
     }
-    setTimeout( bright, 30*1000 );//30초마다 밝기 테스트하도록 되어있음
+        
+    brighttimer = setTimeout(bright, 30 * 1000); //30초마다 밝기 테스트하도록 되어있음
 }
 
-async function draw() {
-    const pose = await net.estimateSinglePose(videoEl, {
-        flipHorizontal: true,
-    });
-    if (pose) {
-        box.style.width =
-        pose.keypoints[4].position.x - pose.keypoints[3].position.x + "px";
-        box.style.height = 10 + "px";
-        box.style.top = pose.keypoints[3].position.y + "px";
-        box.style.left = pose.keypoints[3].position.x + "px";
-    }
-    detectFace = pose ? pose.score : "no face";
-    setTimeout(draw, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
-}
+// async function draw() {
+//   const pose = await net.estimateSinglePose(videoEl, {
+//     flipHorizontal: true,
+//   });
+//   if (pose) {
+//     box.style.width =
+//       pose.keypoints[4].position.x - pose.keypoints[3].position.x + "px";
+//     box.style.height = 10 + "px";
+//     box.style.top = pose.keypoints[3].position.y + "px";
+//     box.style.left = pose.keypoints[3].position.x + "px";
+//   }
+//   detectFace = pose ? pose.score : "no face";
+//   setTimeout(draw, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
+// }
 
 async function sitted() {
     // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
-    if(isSittedWarningOn && sittingHeight){//isStretchGuideOn
+    if (isSittedWarningOn && sittingHeight) {
+        //isStretchGuideOn
         //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
-            flipHorizontal:true
-        })
-        if(pose){
-            if(pose.keypoints[0].position.y < sittingHeight - faceLength*2 )
-                sitCount = 0;
-            else
-                sitCount++;
-                
-            // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
+        flipHorizontal: true,
+        });
+        if (pose) {
+        if (pose.keypoints[0].position.y < sittingHeight - faceLength * 2)
+            sitCount = 0;
+        else sitCount++;
+
+        // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
         }
     }
-    if(sitCount % 360 == 0 && sitCount !== 0)
+    if (sitCount % 3600 == 0 && sitCount !== 0) {
+        ipcRenderer.send('SHOW_STRETCH_GUIDE');
         generateSitWarning();
-    setTimeout( sitted, 1000 );//10~30프레임 0.06초마다 얼굴을 감지한다.
+    }
+    setTimeout(sitted, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 }
 
 async function screenDistance() {
@@ -268,9 +294,8 @@ async function screenDistance() {
         const pose = await net.estimateSinglePose(videoEl, {
             flipHorizontal: true,
         });
-        if (
-            pose &&
-            (faceLength * 8) / 6 <
+        if (pose &&
+            faceLength * 3 / 2 <
             pose.keypoints[2].position.x - pose.keypoints[1].position.x
         ) {
             generateDistanceWarning();
