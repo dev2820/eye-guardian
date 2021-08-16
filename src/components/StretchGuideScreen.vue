@@ -1,6 +1,5 @@
 <template>
     <div class="background">
-        {{isplay}}{{isended}}
         <video ref="stretchVideo" src="local-video://videos/Stretch.mp4" type="video/mp4"></video>
     </div>
 </template>
@@ -39,9 +38,16 @@ export default {
 
 <style>
 .background {
+    width:100%;
+    height:100%;
     background: #333333;
 }
 video {
+    position:absolute;
+    left:50%;
+    margin-left: -350px;
+    top:50%;
+    margin-top:-250px;
     width:700px;
     height:500px;
 }
