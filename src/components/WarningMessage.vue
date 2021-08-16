@@ -72,34 +72,34 @@ export default {
         messageFilter(content){
             switch(content){
                 case 'eye-blink':{
-                    return '눈 깜빡임 경고'
+                    return '눈이 건조해지고 있습니다. 눈을 더 자주 깜빡여주세요.'
                 }
                 case 'bright-warning':{
-                    return '주변이 너무 어둡습니다.'
+                    return '주변이 너무 어둡습니다. 주변을 밝게 해주세요.'
+                }
+                case 'bright-warning-auto':{
+                    return '주변이 너무 어둡습니다. 자동으로 밝기를 조절할게요.'
                 }
                 case 'distance-warning':{
-                    return '얼굴이 너무 가깝네요. 떨어지세요.'
+                    return '화면과의 거리가 너무 가깝습니다. 적정거리를 유지해주세요.'
                 }
                 case 'capture-face': {
-                    return '얼굴 거리 설정이 완료되었습니다.'
+                    return '정자세 기준이 설정되었어요.'
                 }
                 case 'no-face': {
-                    return '얼굴이 감지되지 않습니다.'
+                    return '흠... 얼굴을 못찾겠네요. 카메라를 정면으로 바라봐주세요'
                 }
                 case 'ready-to-capture': {
-                    return '얼굴 거리를 설정합니다. 정자세를 취해주세요. 5~10초의 시간이 소요됩니다.'
-                }
-                case 'success-capture': {
-                    return ''
+                    return '정자세 기준을 설정합니다. 바른자세로 카메라를 응시해 주세요. 5~10초의 시간이 소요됩니다.'
                 }
                 case 'cant-detect-camera': {
-                    return '카메라가 준비되면 다시 시도해 주십시오'
+                    return '카메라가 준비되면 다시 시도해 주세요.'
                 }
                 case 'message-position': {
-                    return '이제 이 위치에 메세지가 출력됩니다'
+                    return '이제 이 위치에 메세지가 출력됩니다.'
                 }
-                case 'sit-up-time':{
-                    return '일어날 시간입니다. 용사여'
+                case 'stare-time':{
+                    return '너무 오랜시간 화면을 보고 있어요. 5분만 눈에게 휴식시간을 주세요'
                 }
                 default: {
                     return ''

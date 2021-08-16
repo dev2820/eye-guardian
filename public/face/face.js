@@ -19,16 +19,14 @@ const RIGHTKNEE = 14;
 const LEFTANKLE = 15;
 const RIGHTANKLE = 16;
 
-let detectFace = "no face";
 let faceLength = 0;
 let isAutoDarknessControlOn = false;
 let isStretchGuideOn = false;
 let isBrightWarningOn = false;
 let isDistanceWarningOn = false;
 let isEyeblinkWarningOn = false;
-let isSittedWarningOn = false;
-let sittingHeight = 0;
-let sitCount = 1;
+let isStareWarningOn = false;
+let stareCount = 0;
 let second = 0;
 let timer;
 let darkness=0;
@@ -66,14 +64,14 @@ loadModel();
 
 ipcRenderer.send("REQUEST_INIT_SCREEN_VALUE", "faceProcess");
 ipcRenderer.on("INIT", (evt, payload) => {
-    faceLength = parseFloat(payload.faceProcess.faceLength);
-    sittingHeight = parseFloat(payload.faceProcess.faceHeight);
-    isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
-    isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
-    isSittedWarningOn = payload.faceProcess.isSittedWarningOn;
-    isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
+        faceLength = parseFloat(payload.faceProcess.faceLength);
+        isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn;
+        isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
+        isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
+        isStareWarningOn = payload.faceProcess.isStareWarningOn;
+        isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
     });
-    ipcRenderer.on("ESTIMATE_DISTANCE", () => {
+ipcRenderer.on("ESTIMATE_DISTANCE", () => {
     ipcRenderer.send("INSERT_MESSAGE", {
         content: "ready-to-capture",
         type: "normal",
@@ -83,8 +81,8 @@ ipcRenderer.on("INIT", (evt, payload) => {
 ipcRenderer.on("SET_DISTANCE_WARNING", (evt, payload) => {
     isDistanceWarningOn = payload;
 });
-ipcRenderer.on("SET_SITTED_WARNING", (evt, payload) => {
-    isSittedWarningOn = payload;
+ipcRenderer.on("SET_STARE_WARNING", (evt, payload) => {
+    isStareWarningOn = payload;
 });
 ipcRenderer.on("SET_EYEBLINK_WARNING", (evt, payload) => {
     isEyeblinkWarningOn = payload;
@@ -99,6 +97,9 @@ ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
 });
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
     isStretchGuideOn = payload;
+});
+ipcRenderer.on("SET_BRIGHT_WARNING", (evt, payload) => {
+    isBrightWarningOn = payload;
 });
 function loadCamera() {
     navigator.getMedia =
@@ -128,7 +129,7 @@ videoEl.addEventListener(
             bright();
             eyeblink();
             startTimer();
-            sitted();
+            stare();
             screenDistance();
         } else {
             setTimeout(waitForLoadModel, 1000);
@@ -146,9 +147,9 @@ function generateBrightWarning() {
     ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'warning'})
 }
 
-function generateSitWarning() {
+function generateStareWarning() {
     ipcRenderer.send("INSERT_MESSAGE", {
-        content: "sit-up-time",
+        content: "stare-time",
         type: "warning",
     });
     }
@@ -174,12 +175,12 @@ async function saveDistance() {
         faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
         sittingHeight = pose.keypoints[0].position.y;
         ipcRenderer.send("INSERT_MESSAGE", {
-        content: "capture-face",
-        type: "normal",
+            content: "capture-face",
+            type: "normal",
         });
         ipcRenderer.send("SET_FACE_DISTANCE", {
-        faceLength: faceLength,
-        faceHeight: sittingHeight,
+            faceLength: faceLength,
+            faceHeight: sittingHeight,
         });
     } else {
         ipcRenderer.send("INSERT_MESSAGE", { content: "no-face", type: "warning" });
@@ -187,7 +188,8 @@ async function saveDistance() {
 }
 
 function distancePoints(a, b) {
-    return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+    // return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+    return a[1]>b[1]? a[1]-b[1] : b[1]-a[1];
 }
 function startTimer() {
     timer = setInterval(() => {
@@ -199,12 +201,10 @@ async function eyeblink() {
         const predictions = await eyeblinkModel.estimateFaces({
         input: videoEl,
         });
-
-        console.log(predictions);
+        // console.log(predictions)
         if (predictions.length > 0) {
         predictions.forEach((prediction) => {
             const keypoints = prediction.scaledMesh;
-
             leftEyelid = distancePoints(keypoints[386], keypoints[374]);
             rightEyelid = distancePoints(keypoints[159], keypoints[144]);
             if (leftEyelid <= 2 && rightEyelid <= 2) {
@@ -212,7 +212,7 @@ async function eyeblink() {
                 // console.log(rightEyelid);
                 // console.log("closed");
                 console.log(second)
-                if (second >= 6) generateEyeblinkWarning();
+                if (second >= 7) generateEyeblinkWarning();
                 clearInterval(timer);
                 second = 0;
                 startTimer();
@@ -221,7 +221,7 @@ async function eyeblink() {
         }
     }
 
-    setTimeout(eyeblink, 100);
+    setTimeout(eyeblink, 80);
 }
 
 async function bright() {
@@ -267,25 +267,25 @@ async function bright() {
 }
 
 
-async function sitted() {
-    if (isSittedWarningOn) {
+async function stare() {
+    // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
+    if (isStareWarningOn) {
         //isStretchGuideOn
         //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
-          flipHorizontal: true,
+            flipHorizontal: true,
         });
         if (pose) 
-          sitCount++;
-        else
-          sitCount = 0;
-        // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
+            stareCount++;
+        // console.log(stareCount, sittingHeight, pose.keypoints[0].position.y)
     }
-    if (sitCount % 3600 == 0) {
-      if(isStretchGuideOn)
-        ipcRenderer.send('SHOW_STRETCH_GUIDE');
-      generateSitWarning();
+    if (stareCount % 3600 == 0 && stareCount !== 0) {
+        stareCount = stareCount>=7200 ? (stareCount-3600) : stareCount;
+        if(isStretchGuideOn)
+            ipcRenderer.send('SHOW_STRETCH_GUIDE');
+        generateStareWarning();
     }
-    setTimeout(sitted, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
+    setTimeout(stare, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 }
 
 async function screenDistance() {

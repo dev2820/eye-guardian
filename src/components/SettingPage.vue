@@ -54,71 +54,89 @@
                         <span v-if="standardPosSetStatus==='complete'">설정</span>
                         <font-awesome-icon v-else-if="standardPosSetStatus==='ongoing'" icon="spinner" spin/>
                     </custom-button>
-                    <!-- <span v-if="timer>0">{{timer}}</span> -->
                 </div>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>화면 접근 경고</span><toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
+                        <span>
+                            화면 접근 경고
+                            <font-awesome-icon icon="question-circle" class="icon question" title="컴퓨터화면과 눈 사이의 거리는 50~60cm를 유지하면 적당하며, 정면에서 10~15도 아래 화면 중심이 위치하는 것이 눈의 피로를 덜 수 있습니다."/>
+                        </span>
+                        <toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
                     </div>
                     <small class="explanation">
-                        디스플레이를 너무 가까이서 보게되면 눈에 이러이러케 안좋습니다.
+                        화면을 가까이서 보게되는 경우 경고문을 출력합니다.
                     </small>
                 </CardUI>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>눈 깜빡임 경고</span><toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
+                        <span>
+                            눈 깜빡임 경고
+                            <font-awesome-icon icon="question-circle" class="icon question" title="화면에 집중하다보면 눈을 깜빡이는 횟수가 평소의 1/3으로 줄어듧니다. 이는 안구를 마르게해 안구건조증이나 눈 통증을 일으킬 수 있습니다."/>
+                        </span>
+                        <toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
                     </div>
                     <small class="explanation">
-                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                        눈을 깜빡이는 횟수가 일정 이상  줄어들면 경고를 띄워 안구건조증을 예방합니다.
                     </small>
                 </CardUI>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>장시간 착석 경고</span><toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle>
+                        <span>
+                            장시간 화면 사용 경고
+                            <font-awesome-icon icon="question-circle" class="icon question" title="1시간 이상 화면에 집중했다면 10~20분 정도 휴식하며 눈의 피로를 풀어주는 것이 좋습니다. 눈 운동은 눈의 피로를 푸는데 도움이 됩니다."/>
+                        </span>
+                        <toggle @on="setStareWarning(true)" @off="setStareWarning(false)" :checked="isStareWarningOn"></toggle>
                     </div>
                     <div class="stretch-guide-option">
-                        <small class="option-explanation">스트레칭 가이드</small>
+                        <small class="option-explanation">눈 운동 가이드</small>
                         <custom-input-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
                     </div>
-                    <!-- <button @click="playStretchGuide">스트레칭 가이드 보여주기</button> -->
+                    <small class="explanation">
+                        컴퓨터를 1시간 이상 연속으로 사용한 경우 경고문을 띄웁니다. 눈 운동 가이드를 켜면 경고문과 함께 눈 운동 가이드영상을 보여줍니다.
+                    </small>
                 </CardUI>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>밝기 자동 조절</span><toggle @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"></toggle>
+                        <span>
+                            밝기 경고
+                            <font-awesome-icon icon="question-circle" class="icon question" title="어두운 곳에서 밝은 화면을 보면 눈이 금세 피곤해집니다. 화면 밝기는 주변과 비슷한 정도가 좋습니다."/>
+                        </span>
+                        <toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle>
                     </div>
-                    <div class="bright-option">
-                        <small class="option-explanation">수동조절</small>
-                        <!-- <font-awesome-icon icon="sun"/> -->
-                        <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="isAutoDarknessControlOn"/>
+                    <div class="darkness-auto-control-option">
+                        <small class="option-explanation">밝기 자동 조절</small>
+                        <custom-input-check-box @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"/>
                     </div>
+                    <small class="explanation">
+                        어두운 환경에서 화면을 보게되는 경우 경고문을 출력합니다. 밝기 자동 조절을 켜게되면 주변환경에 맞춰 화면 밝기를 조절합니다.
+                    </small>
                 </CardUI>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>편안하게 화면보기</span><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
+                        <span>
+                            블루라이트 필터
+                            <font-awesome-icon icon="question-circle" class="icon question" title="블루라이트는 가시광선 중 짧은 파장과 강한 에너지를 가진 파란색 계열의 빛으로, 눈에 높은 피로감을 주고 수면 장애를 일으킵니다."/>
+                        </span>
+                        <toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
                     </div>
                     <div class="bluelight-option">
-                        <small class="option-explanation">blueLight</small>
+                        <small class="option-explanation">세기</small>
                         <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
                     </div>
+                    <small class="explanation">
+                        수면 유도 호르몬의 분비를 저하시키는 블루라이트를 감소시키는 필터를 씌웁니다.
+                    </small>
                 </CardUI>
-            </section>
-            <section>
-                디버깅용 섹션, 추후 지울 것
-                <div>
-                    <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
-                    <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
-                    <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
-                </div>
             </section>
         </div>
     </main>
@@ -144,7 +162,7 @@ export default {
             isBlueLightFilterOn: false,
             blueLightFigure: 0,
             isAutoDarknessControlOn:false,
-            darkness: 0,
+            // darkness: 0,
             loadCameraStatus: 'ongoing',
             loadCameraMessage:'카메라 로드중...',
             standardPosStatus: 'ongoing',
@@ -155,7 +173,7 @@ export default {
             messageMode:'regular-top',
             isStretchGuideOn:false,
             isDistanceWarningOn:false,
-            isSittedWarningOn:false,
+            isStareWarningOn:false,
             isBrightWarningOn:false,
             isEyeblinkWarningOn:false,
         }
@@ -177,12 +195,12 @@ export default {
         ipc.on('INIT',(evt,payload)=>{
             this.warningVolume = payload.warningMessage.warningVolume;
             this.isBlueLightFilterOn = payload.screenFilter.isBlueLightFilterOn;
-            this.darkness = parseFloat(payload.screenFilter.darkness);
+            // this.darkness = parseFloat(payload.screenFilter.darkness);
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
             this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
             this.isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn
             this.isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn
-            this.isSittedWarningOn = payload.faceProcess.isSittedWarningOn
+            this.isStareWarningOn = payload.faceProcess.isStareWarningOn
             this.isBrightWarningOn = payload.faceProcess.isBrightWarningOn
             this.isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn
         
@@ -247,9 +265,9 @@ export default {
             this.isDistanceWarningOn = boolean
             ipc.send('SET_DISTANCE_WARNING',boolean);
         },
-        setSittedWarning(boolean){
-            this.isSittedWarningOn = boolean
-            ipc.send('SET_SITTED_WARNING',boolean);
+        setStareWarning(boolean){
+            this.isStareWarningOn = boolean
+            ipc.send('SET_STARE_WARNING',boolean);
         },
         setBrightWarning(boolean){
             this.isBrightWarningOn = boolean
@@ -263,10 +281,10 @@ export default {
             this.isAutoDarknessControlOn = boolean;
             ipc.send('SET_AUTO_DARKNESS_CONTROL',boolean);
         },
-        setDarkness(e){
-            this.darkness = parseFloat(e.target.value);
-            ipc.send('SET_DARKNESS',this.darkness);
-        },
+        // setDarkness(e){
+        //     this.darkness = parseFloat(e.target.value);
+        //     ipc.send('SET_DARKNESS',this.darkness);
+        // },
         setBlueLightFigure(e){
             this.blueLightFigure = parseFloat(e.target.value);
             ipc.send('SET_BLUELIGHT_FIGURE',this.blueLightFigure);
@@ -281,9 +299,10 @@ export default {
         insertMessage(content,type) {
             ipc.send('INSERT_MESSAGE',{content,type});
         },
-        playStretchGuide(){
-            ipc.send('SHOW_STRETCH_GUIDE');
-        },
+        // playStretchGuide(){
+        //     console.log('??')
+        //     ipc.send('SHOW_STRETCH_GUIDE');
+        // },
         setStretchGuide(boolean) {
             this.isStretchGuideOn = boolean;
             ipc.send('SET_STRETCH_GUIDE',boolean);
@@ -403,23 +422,25 @@ section.warning-setting {
     justify-content: space-between;
     margin-bottom:8px;
 }
+.alarm-setting .darkness-auto-control-option .option-explanation,
 .alarm-setting .stretch-guide-option .option-explanation,
 .alarm-setting .bright-option .option-explanation,
 .alarm-setting .bluelight-option .option-explanation{
     margin-right:5px;
 }
-
-.alarm-setting .stretch-guide-option {
+.alarm-setting .darkness-auto-control-option {
     display:flex;
+    margin-bottom:5px;
 }
-.alarm-setting .stretch-guide-option *{
+.alarm-setting .darkness-auto-control-option *{
     margin:auto 0;
 }
 
-.alarm-setting .bright-option {
+.alarm-setting .stretch-guide-option {
     display:flex;
+    margin-bottom:5px;
 }
-.alarm-setting .bright-option *{
+.alarm-setting .stretch-guide-option *{
     margin:auto 0;
 }
 
@@ -429,6 +450,15 @@ section.warning-setting {
 .alarm-setting .bluelight-option *{
     margin:auto 0;
 }
+
+.alarm-setting .bluelight-option {
+    display:flex;
+    margin-bottom:5px;
+}
+.alarm-setting .bluelight-option *{
+    margin:auto 0;
+}
+
 .exclamation {
     font-size:5rem;
     color:var(--danger-color);
@@ -441,6 +471,10 @@ section.warning-setting {
 }
 .button {
     width:100px;
+}
+.question {
+    width:16px;
+    height:16px;
 }
 @keyframes floating {
     0% {

@@ -163,7 +163,7 @@ app.on("ready", async () => {
     "index.html",
     {
       width: 1000,
-      height: 720,
+      height: 740,
       frame: false,
       show: false,
       backgroundColor: "#32353B",
@@ -252,7 +252,7 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
       useContentSize: true,
-      show:false
+      // show:false
     },
     false
   );
@@ -350,6 +350,7 @@ ipcMain.on("LOAD_CAMERA_FAILED", (evt, payload) => {
   };
   sendAfterReady();
 });
+//얼굴감지 모델 불러오기 성공여부
 ipcMain.on("LOAD_MODEL_SUCCESS", (evt, payload) => {
   const sendAfterReady = () => {
     if (settingWindow.isReady) {
@@ -376,9 +377,9 @@ ipcMain.on("SET_DISTANCE_WARNING", (evt, payload) => {
   setting.faceProcess.isDistanceWarningOn = payload;
   faceProcessWindow.send("SET_DISTANCE_WARNING", payload);
 });
-ipcMain.on("SET_SITTED_WARNING", (evt, payload) => {
-  setting.faceProcess.isSittedWarningOn = payload;
-  faceProcessWindow.send("SET_SITTED_WARNING", payload);
+ipcMain.on("SET_STARE_WARNING", (evt, payload) => {
+  setting.faceProcess.isStareWarningOn = payload;
+  faceProcessWindow.send("SET_STARE_WARNING", payload);
 });
 ipcMain.on("SET_EYEBLINK_WARNING", (evt, payload) => {
   setting.faceProcess.isEyeblinkWarningOn = payload;
@@ -391,6 +392,10 @@ ipcMain.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
 ipcMain.on("SET_STRETCH_GUIDE", (evt, payload) => {
   setting.stretchGuideScreen.isStretchGuideOn = payload;
   faceProcessWindow.send("SET_STRETCH_GUIDE");
+});
+ipcMain.on("SET_BRIGHT_WARNING", (evt, payload) => {
+  setting.faceProcess.isBrightWarningOn = payload;
+  faceProcessWindow.send("SET_BRIGHT_WARNING");
 });
 // minimize, maximize, close
 ipcMain.on("MINIMIZE", (evt, payload) => {

@@ -1,8 +1,7 @@
 {
   "screenFilter": {
     "isBlueLightFilterOn": false,
-    "blueLightFigure": 0.08,
-    "darkness": 0.06
+    "blueLightFigure": 0.08
   },
   "warningMessage": {
     "mode": "regular-top",
@@ -15,7 +14,8 @@
     "isAutoDarknessControlOn": false,
     "isDistanceWarningOn": true,
     "isEyeblinkWarningOn": true,
-    "isSittedWarningOn": false
+    "isStareWarningOn": false,
+    "isBrightWarningOn":false
   },
   "stretchGuideScreen": { "isStretchGuideOn": true }
 }
