@@ -64,14 +64,14 @@ loadModel();
 
 ipcRenderer.send("REQUEST_INIT_SCREEN_VALUE", "faceProcess");
 ipcRenderer.on("INIT", (evt, payload) => {
-    faceLength = parseFloat(payload.faceProcess.faceLength);
-    sittingHeight = parseFloat(payload.faceProcess.faceHeight);
-    isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
-    isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
-    isStareWarningOn = payload.faceProcess.isStareWarningOn;
-    isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
+        faceLength = parseFloat(payload.faceProcess.faceLength);
+        isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn;
+        isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
+        isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
+        isStareWarningOn = payload.faceProcess.isStareWarningOn;
+        isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
     });
-    ipcRenderer.on("ESTIMATE_DISTANCE", () => {
+ipcRenderer.on("ESTIMATE_DISTANCE", () => {
     ipcRenderer.send("INSERT_MESSAGE", {
         content: "ready-to-capture",
         type: "normal",
@@ -81,7 +81,7 @@ ipcRenderer.on("INIT", (evt, payload) => {
 ipcRenderer.on("SET_DISTANCE_WARNING", (evt, payload) => {
     isDistanceWarningOn = payload;
 });
-ipcRenderer.on("SET_SITTED_WARNING", (evt, payload) => {
+ipcRenderer.on("SET_STARE_WARNING", (evt, payload) => {
     isStareWarningOn = payload;
 });
 ipcRenderer.on("SET_EYEBLINK_WARNING", (evt, payload) => {
@@ -183,7 +183,8 @@ async function saveDistance() {
 }
 
 function distancePoints(a, b) {
-    return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+    // return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+    return a[1]>b[1]? a[1]-b[1] : b[1]-a[1];
 }
 function startTimer() {
     timer = setInterval(() => {
@@ -195,15 +196,13 @@ async function eyeblink() {
         const predictions = await eyeblinkModel.estimateFaces({
         input: videoEl,
         });
-
-        console.log(predictions);
+        console.log(predictions)
         if (predictions.length > 0) {
         predictions.forEach((prediction) => {
             const keypoints = prediction.scaledMesh;
-
             leftEyelid = distancePoints(keypoints[386], keypoints[374]);
             rightEyelid = distancePoints(keypoints[159], keypoints[144]);
-            if (leftEyelid <= 2.5 && rightEyelid <= 2.5) {
+            if (leftEyelid <= 2 && rightEyelid <= 2) {
                 // console.log(leftEyelid);
                 // console.log(rightEyelid);
                 // console.log("closed");
@@ -290,9 +289,10 @@ async function stare() {
         // console.log(stareCount, sittingHeight, pose.keypoints[0].position.y)
     }
     if (stareCount % 3600 == 0 && stareCount !== 0) {
-      if(isStretchGuideOn)
-        ipcRenderer.send('SHOW_STRETCH_GUIDE');
-      generateSitWarning();
+        stareCount = stareCount>=7200 ? (stareCount-3600) : stareCount;
+        if(isStretchGuideOn)
+            ipcRenderer.send('SHOW_STRETCH_GUIDE');
+        generateStareWarning();
     }
     setTimeout(stare, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 }
