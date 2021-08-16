@@ -39,7 +39,7 @@ const videoEl = document.getElementById("inputVideo");
 const canvasEl = document.getElementById("inputCanvas");
 
 const brightInterval = new Proxy([],{
-  get:(target, index) => 0.7 - (index / 50),
+  get:(target, index) => 0.8 - (index / 50),
   has:(target, brightness) =>{
     if(brightness > 0 && brightness < 40)
       return true;
@@ -135,11 +135,7 @@ videoEl.addEventListener(
 );
 
 function generateBrightWarning() {
-  // ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'normal'})
-  if (isAutoDarknessControlOn) {
-    //밝기 자동 조절 모드가 켜져있는 경우
-    // ipcRenderer.send('SET_DARKNESS',0.5);//0~0.5
-  }
+  ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'warning'})
 }
 
 function generateSitWarning() {
@@ -169,7 +165,6 @@ async function saveDistance() {
   if (pose) {
     faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
     sittingHeight = pose.keypoints[0].position.y;
-    console.log(sittingHeight);
     ipcRenderer.send("INSERT_MESSAGE", {
       content: "capture-face",
       type: "normal",
@@ -241,7 +236,7 @@ async function bright() {
   const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
   const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
-  console.log('brightness',brightness)
+  // console.log('brightness',brightness)
   //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
   if (0 < brightness && brightness < 25)
     generateBrightWarning();
@@ -305,9 +300,8 @@ async function screenDistance() {
       const pose = await net.estimateSinglePose(videoEl, {
         flipHorizontal: true,
       });
-      if (
-        pose &&
-        (faceLength * 8) / 6 <
+      if (pose &&
+        faceLength * 3 / 2 <
           pose.keypoints[2].position.x - pose.keypoints[1].position.x
       ) {
         generateDistanceWarning();
