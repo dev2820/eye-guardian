@@ -39,7 +39,13 @@ const videoEl = document.getElementById("inputVideo");
 const canvasEl = document.getElementById("inputCanvas");
 
 const brightInterval = new Proxy([],{
-  get:(target, index) => 0.7 - (index / 200)
+  get:(target, index) => 0.7 - (index / 50),
+  has:(target, brightness) =>{
+    if(brightness > 0 && brightness < 40)
+      return true;
+    else
+      return false;
+  }
 })
 async function loadModel() {
   net = await posenet.load({
@@ -235,17 +241,21 @@ async function bright() {
   const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
   const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
-  // console.log('brightness',brightness)
+  console.log('brightness',brightness)
   //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
-  if (0 < brightness && brightness < 50)
+  if (0 < brightness && brightness < 25)
     generateBrightWarning();
-    
-  if(isAutoDarknessControlOn && brightness !== 0){
-    const now = brightInterval[brightness];
-    if(darkness - 0.1 > now || darkness + 0.1 < now){
-      darkness = now;
-      ipcRenderer.send('SET_DARKNESS', now);
+
+  if(isAutoDarknessControlOn){
+    if(brightness in brightInterval){
+      const now = brightInterval[brightness];
+      if(darkness - 0.1 > now || darkness + 0.1 < now){
+        darkness = now;
+        ipcRenderer.send('SET_DARKNESS', now);
+      }
     }
+    else
+      ipcRenderer.send('SET_DARKNESS', 0);
   }
      
   brighttimer = setTimeout(bright, 30 * 1000); //30초마다 밝기 테스트하도록 되어있음
