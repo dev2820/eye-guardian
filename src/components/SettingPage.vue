@@ -54,13 +54,16 @@
                         <span v-if="standardPosSetStatus==='complete'">설정</span>
                         <font-awesome-icon v-else-if="standardPosSetStatus==='ongoing'" icon="spinner" spin/>
                     </custom-button>
-                    <!-- <span v-if="timer>0">{{timer}}</span> -->
                 </div>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>화면 접근 경고</span><toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
+                        <span>
+                            화면 접근 경고
+                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                        </span>
+                        <toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
                     </div>
                     <small class="explanation">
                         디스플레이를 너무 가까이서 보게되면 눈에 이러이러케 안좋습니다.
@@ -72,7 +75,7 @@
                     <div class="title">
                         <span>
                             눈 깜빡임 경고
-                            <font-awesome-icon icon="question-circle" class="icon" title="눈깜빡임에 대한 건강 설명"/>
+                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
                         </span>
                         <toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
                     </div>
@@ -84,50 +87,56 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>장시간 디스플레이 사용 경고</span><toggle @on="setStareWarning(true)" @off="setStareWarning(false)" :checked="isStareWarningOn"></toggle>
+                        <span>
+                            장시간 화면 사용 경고
+                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                        </span>
+                        <toggle @on="setStareWarning(true)" @off="setStareWarning(false)" :checked="isStareWarningOn"></toggle>
                     </div>
                     <div class="stretch-guide-option">
                         <small class="option-explanation">눈 운동 가이드</small>
                         <custom-input-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
                     </div>
-                    <!-- <button @click="playStretchGuide">스트레칭 가이드 보여주기</button> -->
+                    <small class="explanation">
+                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                    </small>
                 </CardUI>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>밝기 경고</span><toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle>
+                        <span>
+                            밝기 경고
+                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                        </span>
+                        <toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle>
                     </div>
                     <div class="darkness-auto-control-option">
                         <small class="option-explanation">밝기 자동 조절</small>
                         <custom-input-check-box @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"/>
                     </div>
-                    <!-- <font-awesome-icon icon="sun"/> -->
-                    <!-- <div class="bright-option">
-                        <small class="option-explanation">수동조절</small>
-                        
-                        <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="isAutoDarknessControlOn"/>
-                    </div> -->
+                    <small class="explanation">
+                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                    </small>
                 </CardUI>
             </section>
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>블루라이트 필터</span><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
+                        <span>
+                            블루라이트 필터
+                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                        </span>
+                        <toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
                     </div>
                     <div class="bluelight-option">
-                        <small class="option-explanation">figure</small>
+                        <small class="option-explanation">세기</small>
                         <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
                     </div>
+                    <small class="explanation">
+                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                    </small>
                 </CardUI>
-            </section>
-            <section>
-                디버깅용 섹션, 추후 지울 것
-                <div>
-                    <button @click="insertMessage('eye-blink','warning')">insert eye-blink warning</button>
-                    <button @click="insertMessage('distance-warning','warning')">insert too-close warning</button>
-                    <button @click="insertMessage('bright-warning','warning')">insert bright warning</button>
-                </div>
             </section>
         </div>
     </main>
@@ -421,6 +430,7 @@ section.warning-setting {
 }
 .alarm-setting .darkness-auto-control-option {
     display:flex;
+    margin-bottom:5px;
 }
 .alarm-setting .darkness-auto-control-option *{
     margin:auto 0;
@@ -428,15 +438,9 @@ section.warning-setting {
 
 .alarm-setting .stretch-guide-option {
     display:flex;
+    margin-bottom:5px;
 }
 .alarm-setting .stretch-guide-option *{
-    margin:auto 0;
-}
-
-.alarm-setting .bright-option {
-    display:flex;
-}
-.alarm-setting .bright-option *{
     margin:auto 0;
 }
 
@@ -446,6 +450,15 @@ section.warning-setting {
 .alarm-setting .bluelight-option *{
     margin:auto 0;
 }
+
+.alarm-setting .bluelight-option {
+    display:flex;
+    margin-bottom:5px;
+}
+.alarm-setting .bluelight-option *{
+    margin:auto 0;
+}
+
 .exclamation {
     font-size:5rem;
     color:var(--danger-color);
@@ -458,6 +471,10 @@ section.warning-setting {
 }
 .button {
     width:100px;
+}
+.question {
+    width:16px;
+    height:16px;
 }
 @keyframes floating {
     0% {
