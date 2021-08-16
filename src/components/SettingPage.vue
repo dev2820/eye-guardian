@@ -113,10 +113,10 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>편안하게 화면보기</span><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
+                        <span>블루라이트 필터</span><toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
                     </div>
                     <div class="bluelight-option">
-                        <small class="option-explanation">blueLight</small>
+                        <small class="option-explanation">figure</small>
                         <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
                     </div>
                 </CardUI>
@@ -153,7 +153,7 @@ export default {
             isBlueLightFilterOn: false,
             blueLightFigure: 0,
             isAutoDarknessControlOn:false,
-            darkness: 0,
+            // darkness: 0,
             loadCameraStatus: 'ongoing',
             loadCameraMessage:'카메라 로드중...',
             standardPosStatus: 'ongoing',
@@ -186,7 +186,7 @@ export default {
         ipc.on('INIT',(evt,payload)=>{
             this.warningVolume = payload.warningMessage.warningVolume;
             this.isBlueLightFilterOn = payload.screenFilter.isBlueLightFilterOn;
-            this.darkness = parseFloat(payload.screenFilter.darkness);
+            // this.darkness = parseFloat(payload.screenFilter.darkness);
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
             this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
             this.isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn
@@ -272,10 +272,10 @@ export default {
             this.isAutoDarknessControlOn = boolean;
             ipc.send('SET_AUTO_DARKNESS_CONTROL',boolean);
         },
-        setDarkness(e){
-            this.darkness = parseFloat(e.target.value);
-            ipc.send('SET_DARKNESS',this.darkness);
-        },
+        // setDarkness(e){
+        //     this.darkness = parseFloat(e.target.value);
+        //     ipc.send('SET_DARKNESS',this.darkness);
+        // },
         setBlueLightFigure(e){
             this.blueLightFigure = parseFloat(e.target.value);
             ipc.send('SET_BLUELIGHT_FIGURE',this.blueLightFigure);
@@ -290,9 +290,10 @@ export default {
         insertMessage(content,type) {
             ipc.send('INSERT_MESSAGE',{content,type});
         },
-        playStretchGuide(){
-            ipc.send('SHOW_STRETCH_GUIDE');
-        },
+        // playStretchGuide(){
+        //     console.log('??')
+        //     ipc.send('SHOW_STRETCH_GUIDE');
+        // },
         setStretchGuide(boolean) {
             this.isStretchGuideOn = boolean;
             ipc.send('SET_STRETCH_GUIDE',boolean);
