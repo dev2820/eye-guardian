@@ -92,6 +92,7 @@ function loadCamera() {
         },
         (err) => {
             ipcRenderer.send("LOAD_CAMERA_FAILED", true);
+            ipcRenderer.send("LOAD_MODEL_FAILED", true);
             console.error(err);
         }
     );
