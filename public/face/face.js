@@ -268,7 +268,7 @@ async function bright() {
 
 async function sitted() {
     // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
-    if (isSittedWarningOn && sittingHeight) {
+    if (isSittedWarningOn) {
         //isStretchGuideOn
         //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
