@@ -237,6 +237,7 @@ app.on("ready", async () => {
         devTools: false,
       },
       useContentSize: true,
+      alwaysOnTop :true,
       frame: false,
       show: false,
     },
