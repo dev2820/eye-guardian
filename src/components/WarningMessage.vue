@@ -24,7 +24,6 @@
     </transition-group>
 </template>
 <script>
-// import setting from '@/assets/setting.json'
 import { ipcRenderer as ipc } from 'electron'
 export default {
     name:'warning-message',
