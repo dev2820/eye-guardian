@@ -61,12 +61,12 @@
                     <div class="title">
                         <span>
                             화면 접근 경고
-                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                            <font-awesome-icon icon="question-circle" class="icon question" title="컴퓨터화면과 눈 사이의 거리는 50~60cm를 유지하면 적당하며, 정면에서 10~15도 아래 화면 중심이 위치하는 것이 눈의 피로를 덜 수 있습니다."/>
                         </span>
                         <toggle @on="setDistanceWarning(true)" @off="setDistanceWarning(false)" :checked="isDistanceWarningOn"></toggle>
                     </div>
                     <small class="explanation">
-                        디스플레이를 너무 가까이서 보게되면 눈에 이러이러케 안좋습니다.
+                        화면을 가까이서 보게되는 경우 경고문을 출력합니다.
                     </small>
                 </CardUI>
             </section>
@@ -75,12 +75,12 @@
                     <div class="title">
                         <span>
                             눈 깜빡임 경고
-                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                            <font-awesome-icon icon="question-circle" class="icon question" title="화면에 집중하다보면 눈을 깜빡이는 횟수가 평소의 1/3으로 줄어듧니다. 이는 안구를 마르게해 안구건조증이나 눈 통증을 일으킬 수 있습니다."/>
                         </span>
                         <toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
                     </div>
                     <small class="explanation">
-                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                        눈을 깜빡이는 횟수가 일정 이상  줄어들면 경고를 띄워 안구건조증을 예방합니다.
                     </small>
                 </CardUI>
             </section>
@@ -89,7 +89,7 @@
                     <div class="title">
                         <span>
                             장시간 화면 사용 경고
-                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                            <font-awesome-icon icon="question-circle" class="icon question" title="1시간 이상 화면에 집중했다면 10~20분 정도 휴식하며 눈의 피로를 풀어주는 것이 좋습니다."/>
                         </span>
                         <toggle @on="setStareWarning(true)" @off="setStareWarning(false)" :checked="isStareWarningOn"></toggle>
                     </div>
@@ -98,7 +98,7 @@
                         <custom-input-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
                     </div>
                     <small class="explanation">
-                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                        컴퓨터를 1시간 이상 연속으로 사용한 경우 경고문을 띄웁니다. 눈 운동 가이드를 켜면 경고문과 함께 눈 운동 가이드영상을 보여줍니다.
                     </small>
                 </CardUI>
             </section>
@@ -107,7 +107,7 @@
                     <div class="title">
                         <span>
                             밝기 경고
-                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                            <font-awesome-icon icon="question-circle" class="icon question" title="어두운 곳에서 밝은 화면을 보면 눈이 금세 피곤해집니다. 화면 밝기는 주변과 비슷한 정도가 좋습니다."/>
                         </span>
                         <toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle>
                     </div>
@@ -116,7 +116,7 @@
                         <custom-input-check-box @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"/>
                     </div>
                     <small class="explanation">
-                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                        어두운 환경에서 화면을 보게되는 경우 경고문을 출력합니다. 밝기 자동 조절을 켜게되면 주변환경에 맞춰 화면 밝기를 조절합니다.
                     </small>
                 </CardUI>
             </section>
@@ -125,7 +125,7 @@
                     <div class="title">
                         <span>
                             블루라이트 필터
-                            <font-awesome-icon icon="question-circle" class="icon question" title="눈깜빡임에 대한 건강 설명"/>
+                            <font-awesome-icon icon="question-circle" class="icon question" title="블루라이트는 가시광선 중 짧은 파장과 강한 에너지를 가진 파란색 계열의 빛으로, 눈에 높은 피로감을 주고 수면 장애를 일으킵니다."/>
                         </span>
                         <toggle @on="showBlueLightFilter(true)" @off="showBlueLightFilter(false)" :checked="isBlueLightFilterOn"></toggle>
                     </div>
@@ -134,7 +134,7 @@
                         <custom-input-range :value="blueLightFigure" @change="setBlueLightFigure($event)" :min="0" :max="0.5" :step="0.01"/>
                     </div>
                     <small class="explanation">
-                        화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
+                        수면 유도 호르몬의 분비를 저하시키는 블루라이트를 감소시키는 필터를 씌웁니다.
                     </small>
                 </CardUI>
             </section>

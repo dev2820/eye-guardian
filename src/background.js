@@ -163,7 +163,7 @@ app.on("ready", async () => {
     "index.html",
     {
       width: 1000,
-      height: 730,
+      height: 740,
       frame: false,
       show: false,
       backgroundColor: "#32353B",
