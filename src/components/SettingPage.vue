@@ -437,7 +437,7 @@ section.warning-setting {
     left:50%;
     margin-left:-25px;
     top:60px;
-    animation:scaleUp 3s infinite;
+    animation:twinkle 1s infinite;
 }
 .button {
     width:100px;
@@ -479,6 +479,17 @@ section.warning-setting {
     }
     100% {
         transform: scale(1);
+    }
+}
+@keyframes twinkle {
+    0% {
+        opacity:1;
+    }
+    50% {
+        opacity:0;
+    }
+    100% {
+        opacity:1;
     }
 }
 @keyframes swing {
