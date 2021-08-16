@@ -23,6 +23,7 @@ let detectFace = "no face";
 let faceLength = 0;
 let isAutoDarknessControlOn = false;
 let isStretchGuideOn = false;
+let isBrightWarningOn = false;
 let isDistanceWarningOn = false;
 let isEyeblinkWarningOn = false;
 let isSittedWarningOn = false;
