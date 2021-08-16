@@ -70,7 +70,11 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>눈 깜빡임 경고</span><toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
+                        <span>
+                            눈 깜빡임 경고
+                            <font-awesome-icon icon="question-circle" class="icon" title="눈깜빡임에 대한 건강 설명"/>
+                        </span>
+                        <toggle @on="setEyeblinkWarning(true)" @off="setEyeblinkWarning(false)" :checked="isEyeblinkWarningOn"></toggle>
                     </div>
                     <small class="explanation">
                         화면에 집중하다보면 눈 깜빡이는 횟수가 평균보다 절반가량 줄어들게됩니다. 이는 안구건조증을 유발하고 등등
@@ -80,10 +84,10 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>장시간 착석 경고</span><toggle @on="setSittedWarning(true)" @off="setSittedWarning(false)" :checked="isSittedWarningOn"></toggle>
+                        <span>장시간 디스플레이 사용 경고</span><toggle @on="setStareWarning(true)" @off="setStareWarning(false)" :checked="isStareWarningOn"></toggle>
                     </div>
                     <div class="stretch-guide-option">
-                        <small class="option-explanation">스트레칭 가이드</small>
+                        <small class="option-explanation">눈 운동 가이드</small>
                         <custom-input-check-box @on="setStretchGuide(true)" @off="setStretchGuide(false)" :checked="isStretchGuideOn"/>
                     </div>
                     <!-- <button @click="playStretchGuide">스트레칭 가이드 보여주기</button> -->
@@ -92,13 +96,18 @@
             <section class="alarm-setting">
                 <CardUI>
                     <div class="title">
-                        <span>밝기 자동 조절</span><toggle @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"></toggle>
+                        <span>밝기 경고</span><toggle @on="setBrightWarning(true)" @off="setBrightWarning(false)" :checked="isBrightWarningOn"></toggle>
                     </div>
-                    <div class="bright-option">
+                    <div class="darkness-auto-control-option">
+                        <small class="option-explanation">밝기 자동 조절</small>
+                        <custom-input-check-box @on="setIsAutoDarknessControlOn(true)" @off="setIsAutoDarknessControlOn(false)" :checked="isAutoDarknessControlOn"/>
+                    </div>
+                    <!-- <font-awesome-icon icon="sun"/> -->
+                    <!-- <div class="bright-option">
                         <small class="option-explanation">수동조절</small>
-                        <!-- <font-awesome-icon icon="sun"/> -->
+                        
                         <custom-input-range :value="darkness" @change="setDarkness($event)" :min="0" :max="0.5" :step="0.01" :disabled="isAutoDarknessControlOn"/>
-                    </div>
+                    </div> -->
                 </CardUI>
             </section>
             <section class="alarm-setting">
@@ -155,7 +164,7 @@ export default {
             messageMode:'regular-top',
             isStretchGuideOn:false,
             isDistanceWarningOn:false,
-            isSittedWarningOn:false,
+            isStareWarningOn:false,
             isBrightWarningOn:false,
             isEyeblinkWarningOn:false,
         }
@@ -182,7 +191,7 @@ export default {
             this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
             this.isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn
             this.isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn
-            this.isSittedWarningOn = payload.faceProcess.isSittedWarningOn
+            this.isStareWarningOn = payload.faceProcess.isStareWarningOn
             this.isBrightWarningOn = payload.faceProcess.isBrightWarningOn
             this.isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn
         
@@ -247,9 +256,9 @@ export default {
             this.isDistanceWarningOn = boolean
             ipc.send('SET_DISTANCE_WARNING',boolean);
         },
-        setSittedWarning(boolean){
-            this.isSittedWarningOn = boolean
-            ipc.send('SET_SITTED_WARNING',boolean);
+        setStareWarning(boolean){
+            this.isStareWarningOn = boolean
+            ipc.send('SET_STARE_WARNING',boolean);
         },
         setBrightWarning(boolean){
             this.isBrightWarningOn = boolean
@@ -403,10 +412,17 @@ section.warning-setting {
     justify-content: space-between;
     margin-bottom:8px;
 }
+.alarm-setting .darkness-auto-control-option .option-explanation,
 .alarm-setting .stretch-guide-option .option-explanation,
 .alarm-setting .bright-option .option-explanation,
 .alarm-setting .bluelight-option .option-explanation{
     margin-right:5px;
+}
+.alarm-setting .darkness-auto-control-option {
+    display:flex;
+}
+.alarm-setting .darkness-auto-control-option *{
+    margin:auto 0;
 }
 
 .alarm-setting .stretch-guide-option {

@@ -19,16 +19,14 @@ const RIGHTKNEE = 14;
 const LEFTANKLE = 15;
 const RIGHTANKLE = 16;
 
-let detectFace = "no face";
 let faceLength = 0;
 let isAutoDarknessControlOn = false;
 let isStretchGuideOn = false;
 let isBrightWarningOn = false;
 let isDistanceWarningOn = false;
 let isEyeblinkWarningOn = false;
-let isSittedWarningOn = false;
-let sittingHeight = 0;
-let sitCount = 0;
+let isStareWarningOn = false;
+let stareCount = 0;
 let second = 0;
 let timer;
 let darkness=0;
@@ -70,7 +68,7 @@ ipcRenderer.on("INIT", (evt, payload) => {
     sittingHeight = parseFloat(payload.faceProcess.faceHeight);
     isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
     isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
-    isSittedWarningOn = payload.faceProcess.isSittedWarningOn;
+    isStareWarningOn = payload.faceProcess.isStareWarningOn;
     isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
     });
     ipcRenderer.on("ESTIMATE_DISTANCE", () => {
@@ -84,7 +82,7 @@ ipcRenderer.on("SET_DISTANCE_WARNING", (evt, payload) => {
     isDistanceWarningOn = payload;
 });
 ipcRenderer.on("SET_SITTED_WARNING", (evt, payload) => {
-    isSittedWarningOn = payload;
+    isStareWarningOn = payload;
 });
 ipcRenderer.on("SET_EYEBLINK_WARNING", (evt, payload) => {
     isEyeblinkWarningOn = payload;
@@ -126,7 +124,7 @@ videoEl.addEventListener(
             bright();
             eyeblink();
             startTimer();
-            sitted();
+            stare();
             screenDistance();
         } else {
             setTimeout(waitForLoadModel, 1000);
@@ -141,9 +139,9 @@ function generateBrightWarning() {
     ipcRenderer.send('INSERT_MESSAGE',{content:'bright-warning',type:'warning'})
 }
 
-function generateSitWarning() {
+function generateStareWarning() {
     ipcRenderer.send("INSERT_MESSAGE", {
-        content: "sit-up-time",
+        content: "stare-time",
         type: "warning",
     });
     }
@@ -169,12 +167,12 @@ async function saveDistance() {
         faceLength = pose.keypoints[2].position.x - pose.keypoints[1].position.x;
         sittingHeight = pose.keypoints[0].position.y;
         ipcRenderer.send("INSERT_MESSAGE", {
-        content: "capture-face",
-        type: "normal",
+            content: "capture-face",
+            type: "normal",
         });
         ipcRenderer.send("SET_FACE_DISTANCE", {
-        faceLength: faceLength,
-        faceHeight: sittingHeight,
+            faceLength: faceLength,
+            faceHeight: sittingHeight,
         });
     } else {
         ipcRenderer.send("INSERT_MESSAGE", { content: "no-face", type: "warning" });
@@ -202,7 +200,7 @@ async function eyeblink() {
 
             leftEyelid = distancePoints(keypoints[386], keypoints[374]);
             rightEyelid = distancePoints(keypoints[159], keypoints[144]);
-            if (leftEyelid <= 2 && rightEyelid <= 2) {
+            if (leftEyelid <= 3 && rightEyelid <= 3) {
                 // console.log(leftEyelid);
                 // console.log(rightEyelid);
                 // console.log("closed");
@@ -274,23 +272,23 @@ async function bright() {
 //   setTimeout(draw, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 // }
 
-async function sitted() {
+async function stare() {
     // ipc.send('SHOW_STRETCH_GUIDE');<= 이거 써서 장시간 앉아있는 경우 스트레칭 출력하도록
-    if (isSittedWarningOn) {
+    if (isStareWarningOn) {
         //isStretchGuideOn
         //앉아있는지 감지하는 로직
         const pose = await net.estimateSinglePose(videoEl, {
-          flipHorizontal: true,
+            flipHorizontal: true,
         });
         if (pose) 
-          sitCount++;
-        // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
+            stareCount++;
+        // console.log(stareCount, sittingHeight, pose.keypoints[0].position.y)
     }
-    if (sitCount % 3600 == 0 && sitCount !== 0) {
+    if (stareCount % 3600 == 0 && stareCount !== 0) {
         ipcRenderer.send('SHOW_STRETCH_GUIDE');
-        generateSitWarning();
+        generateStareWarning();
     }
-    setTimeout(sitted, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
+    setTimeout(stare, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
 }
 
 async function screenDistance() {

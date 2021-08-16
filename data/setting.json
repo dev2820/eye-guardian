@@ -15,7 +15,8 @@
     "isAutoDarknessControlOn": false,
     "isDistanceWarningOn": true,
     "isEyeblinkWarningOn": true,
-    "isSittedWarningOn": false
+    "isStareWarningOn": false,
+    "isBrightWarningOn":false
   },
   "stretchGuideScreen": { "isStretchGuideOn": true }
 }
