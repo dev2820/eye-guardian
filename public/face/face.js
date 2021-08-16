@@ -28,7 +28,7 @@ let isDistanceWarningOn = false;
 let isEyeblinkWarningOn = false;
 let isSittedWarningOn = false;
 let sittingHeight = 0;
-let sitCount = 0;
+let sitCount = 1;
 let second = 0;
 let timer;
 let darkness=0;
@@ -289,9 +289,11 @@ async function sitted() {
         });
         if (pose) 
           sitCount++;
+        else
+          sitCount = 0;
         // console.log(sitCount, sittingHeight, pose.keypoints[0].position.y)
     }
-    if (sitCount % 3600 == 0 && sitCount !== 0) {
+    if (sitCount % 3600 == 0) {
       if(isStretchGuideOn)
         ipcRenderer.send('SHOW_STRETCH_GUIDE');
       generateSitWarning();
