@@ -160,13 +160,6 @@ async function saveDistance() {
     }
 }
 
-function getImgfromWebcam(videoEl, canvasEl) {
-    const context = canvasEl.getContext("2d");
-    context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
-    const img = new Image();
-    img.src = canvasEl.toDataURL("image/jpeg");
-    return img;
-}
 async function eyeblink() {
     if (eyeblinkModel && isEyeblinkWarningOn) {
         const predictions = await eyeblinkModel.estimateFaces({
