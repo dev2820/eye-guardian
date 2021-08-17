@@ -253,7 +253,7 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
       useContentSize: true,
-      // show:false
+      show:false
     },
     false
   );
