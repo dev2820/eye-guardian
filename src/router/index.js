@@ -8,21 +8,21 @@ export const router = createRouter({
             name: 'setting-page',
             component: ()=> import('../components/SettingPage')
         },
-        {
-            path: '/screenFilter',
-            name: 'screen-filter',
-            component: require('@/components/ScreenFilter').default
-        },
+        // {
+        //     path: '/screenFilter',
+        //     name: 'screen-filter',
+        //     component: require('@/components/ScreenFilter').default
+        // },
         {
             path: '/warningMessage',
             name: 'warning-message',
             component: require('@/components/WarningMessage').default
         },
-        {
-            path: '/stretchGuideScreen',
-            name: 'stretch-guide-screen',
-            component: require('@/components/StretchGuideScreen').default
-        },
+        // {
+        //     path: '/stretchGuideScreen',
+        //     name: 'stretch-guide-screen',
+        //     component: require('@/components/StretchGuideScreen').default
+        // },
         {
             path: "/:catchAll(.*)",
             redirect: '/'
