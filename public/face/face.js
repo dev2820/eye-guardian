@@ -26,7 +26,7 @@ let isBrightWarningOn = false;
 let isDistanceWarningOn = false;
 let isEyeblinkWarningOn = false;
 let isStareWarningOn = false;
-let stareCount = 0;
+let stareCount = 1;
 let second = 0;
 let timer;
 let darkness=0;
@@ -42,9 +42,9 @@ const brightInterval = new Proxy([],{
     get:(target, index) => 0.8 - (index / 50),
     has:(target, brightness) =>{
         if(brightness > 0 && brightness < 40)
-        return true;
+          return true;
         else
-        return false;
+          return false;
     }
 })
 async function loadModel() {
@@ -53,10 +53,7 @@ async function loadModel() {
     });
 
     eyeblinkModel = await faceLandmarksDetection.load(
-        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
-        {
-        maxFaces: 1,
-        }
+        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh, { maxFaces: 1}
     );
 }
 
@@ -89,11 +86,7 @@ ipcRenderer.on("SET_EYEBLINK_WARNING", (evt, payload) => {
 });
 ipcRenderer.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
     isAutoDarknessControlOn = payload;
-    darkness=0;
-    clearTimeout(brighttimer);
-    bright();
-    if(!payload)
-      ipcRenderer.send('SET_DARKNESS', 0);
+    resetBright(payload)
 });
 ipcRenderer.on("SET_STRETCH_GUIDE", (evt, payload) => {
     isStretchGuideOn = payload;
@@ -224,6 +217,13 @@ async function eyeblink() {
     setTimeout(eyeblink, 80);
 }
 
+function resetBright(payload){
+  darkness=0;
+  clearTimeout(brighttimer);
+  bright();
+  if(!payload)
+    ipcRenderer.send('SET_DARKNESS', 0);
+}
 async function bright() {
     const context = canvasEl.getContext("2d");
     context.drawImage(videoEl, 0, 0, cameraWidth, cameraHeight);
@@ -239,12 +239,10 @@ async function bright() {
     const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
     const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
-    // console.log('brightness',brightness)
-    //brightness가 0 인경우 에러값으로 치부하고 패스하겠음(처음 값으로 0값이 들어와 무조건 알람이 발생함)
     if (isBrightWarningOn && 0 < brightness && brightness < 25){
-      if(brightFlag){
+      if(brightFlag)
         generateBrightWarning();
-      }
+      
       if(isAutoDarknessControlOn)
         brightFlag = false;
     }
@@ -263,7 +261,7 @@ async function bright() {
           ipcRenderer.send('SET_DARKNESS', 0);
     }
         
-    brighttimer = setTimeout(bright, 60 * 1000); //30초마다 밝기 테스트하도록 되어있음
+    brighttimer = setTimeout(bright, 60 * 1000); //60초마다 밝기 테스트하도록 되어있음
 }
 
 
@@ -274,14 +272,15 @@ async function stare() {
         });
         if (pose) 
             stareCount++;
+        else
+            stareCount = 0;
     }
-    if (stareCount % 3600 == 0 && stareCount !== 0) {
-        stareCount = stareCount>=7200 ? (stareCount-3600) : stareCount;
+    if (stareCount % 3600 == 0) {
         if(isStretchGuideOn)
             ipcRenderer.send('SHOW_STRETCH_GUIDE');
         generateStareWarning();
     }
-    setTimeout(stare, 1000); //10~30프레임 0.06초마다 얼굴을 감지한다.
+    setTimeout(stare, 1000); // 1초에 한번 감지
 }
 
 async function screenDistance() {

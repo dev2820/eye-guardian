@@ -242,7 +242,6 @@ app.on("ready", async () => {
     },
     false
   );
-  // faceProcessWindow = createWindow('/#/faceProcess','index.html#faceProcess',{
   faceProcessWindow = createWindow(
     "face/index.html",
     "face/index.html",
