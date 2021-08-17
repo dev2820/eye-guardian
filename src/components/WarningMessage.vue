@@ -77,13 +77,13 @@ export default {
                     return '잠시만 기다려주세요.'
                 }
                 case 'eye-size-check-start':{
-                    return '지금부터 카메라를 보고 3초간 눈을 크게 떠주세요.'
+                    return '지금부터 카메라를 보고 정자세로 3초간 편하게 눈을 떠주세요.'
                 }
                 case 'eye-size-check-complete':{
                     return '측정이 완료되었습니다.'
                 }
                 case 'eye-size-check-fail':{
-                    return '너 눈감았음. 좀 참아봐'
+                    return '눈을 감으셨습니다. 3초 뒤 다시 측정합니다.'
                 }
                 case 'bright-warning':{
                     return '주변이 너무 어둡습니다. 주변을 밝게 해주세요.'

@@ -12,8 +12,7 @@
     "isEyeblinkWarningOn": true,
     "isStareWarningOn": false,
     "isBrightWarningOn": false,
-    "leftEyeSize": 0,
-    "rightEyeSize": 0
+    "eyeSize": 0
   },
   "stretchGuideScreen": { "isStretchGuideOn": true }
 }

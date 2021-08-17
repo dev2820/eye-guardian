@@ -194,7 +194,7 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
         devTools: false,
       },
-      fullscreen: true,
+      // fullscreen: true,
       frame: false,
       transparent: true,
       alwaysOnTop: true,
@@ -214,7 +214,7 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
         devTools: false,
       },
-      fullscreen: true,
+      // fullscreen: true,
       frame: false,
       transparent: true,
       alwaysOnTop: true,
@@ -333,8 +333,7 @@ ipcMain.on("SET_FACE_DISTANCE", (evt, payload) => {
   settingWindow.send("SET_FACE_DISTANCE_SUCCESS", true);
 });
 ipcMain.on("SET_EYESIZE_DISTANCE", (evt, payload) => {
-  setting.faceProcess.leftEyeSize = payload.leftEyeSize;
-  setting.faceProcess.rightEyeSize = payload.rightEyeSize;
+  setting.faceProcess.eyeSize = payload.eyeSize;
   settingWindow.send("SET_EYESIZE_DISTANCE_SUCCESS", true);
 });
 //카메라 감지 성공 여부
