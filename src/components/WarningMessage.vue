@@ -74,10 +74,16 @@ export default {
                     return '눈이 건조해지고 있습니다. 눈을 더 자주 깜빡여주세요.'
                 }
                 case 'eye-size-check':{
-                    return '눈 크기를 측정합니다.'
+                    return '잠시만 기다려주세요.'
+                }
+                case 'eye-size-check-start':{
+                    return '지금부터 카메라를 보고 3초간 눈을 크게 떠주세요.'
                 }
                 case 'eye-size-check-complete':{
                     return '측정이 완료되었습니다.'
+                }
+                case 'eye-size-check-fail':{
+                    return '너 눈감았음. 좀 참아봐'
                 }
                 case 'bright-warning':{
                     return '주변이 너무 어둡습니다. 주변을 밝게 해주세요.'

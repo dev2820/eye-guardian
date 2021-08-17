@@ -9,13 +9,19 @@ let isDistanceWarningOn = false;
 let isEyeblinkWarningOn = false;
 let isStareWarningOn = false;
 let stareCount = 0;
-let second = 0;
-let timer;
+// let second = 0;
+// let timer;
+let eyeblinkWarning;
 let darkness = 0;
 let brighttimer;
 let brightFlag = true;
 let leftEyeSize = 0;
 let rightEyeSize = 0;
+// let isEyeblinkFuncOn = 0;
+
+let predictions;
+let eyeSizeStandard;
+let eyeSizeStandardAgain;
 
 const cameraWidth = 600;
 const cameraHeight = 300;
@@ -118,7 +124,7 @@ videoEl.addEventListener(
         ipcRenderer.send("LOAD_MODEL_SUCCESS", true);
         bright();
         eyeblink();
-        startTimer();
+        // startTimer();
         stare();
         screenDistance();
       } else {
@@ -193,68 +199,102 @@ function distancePoints(a, b) {
   // return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
   return a[1] > b[1] ? a[1] - b[1] : b[1] - a[1];
 }
+
 function startTimer() {
-  timer = setInterval(() => {
-    second = second + 0.1;
-  }, 100);
+  // timer = setInterval(() => {
+  //   second = second + 0.1;
+  // }, 100);
+  eyeblinkWarning = setInterval(generateEyeblinkWarning, 7 * 1000);
+  // if (second >= 7) eyeblinkWarning = setInterval(generateEyeblinkWarning, 2000);
+}
+function sleep(delay) {
+  let start = new Date().getTime();
+  while (new Date().getTime() < start + delay);
 }
 
 async function measureEyeSize() {
-  //찰칵하는 순간에 눈 감았으면 다시 측정하도록 해야함
-  const eyeSizeStandard = await eyeblinkModel.estimateFaces({
+  let startMeasure = await eyeblinkModel.estimateFaces({
     input: videoEl,
   });
-  // console.log("3초 뒤 찰칵"); //알람으로 카운트다운하면 좋을듯
-  // setTimeout(async () => {
-  //   const eyeSizeStandard = await eyeblinkModel.estimateFaces({
-  //     input: videoEl,
-  //   });
-  //   console.log(eyeSizeStandard);
-  // }, 3000);
-
-  if (eyeSizeStandard) {
-    if (eyeSizeStandard.length > 0) {
-      eyeSizeStandard.forEach((prediction) => {
-        const keypoints = prediction.scaledMesh;
-        leftEyeSize = distancePoints(keypoints[386], keypoints[374]);
-        rightEyeSize = distancePoints(keypoints[159], keypoints[144]);
-        console.log(leftEyeSize, rightEyeSize);
-      });
-    }
-    ipcRenderer.send("INSERT_MESSAGE", {
-      content: "eye-size-check-complete",
-      type: "normal",
-    });
-    ipcRenderer.send("SET_EYESIZE_DISTANCE", {
-      leftEyeSize: leftEyeSize,
-      rightEyeSize: rightEyeSize,
-    });
-  } else {
-    ipcRenderer.send("INSERT_MESSAGE", { content: "no-face", type: "warning" });
-  }
-}
-
-async function eyeblink() {
-  if (eyeblinkModel && isEyeblinkWarningOn && leftEyeSize && rightEyeSize) {
-    const predictions = await eyeblinkModel.estimateFaces({
+  ipcRenderer.send("INSERT_MESSAGE", {
+    content: "eye-size-check-start",
+    type: "normal",
+  });
+  // console.log("5초 뒤 찰칵"); //알람으로 카운트다운하면 좋을듯
+  setTimeout(async () => {
+    eyeSizeStandard = await eyeblinkModel.estimateFaces({
       input: videoEl,
     });
+    // console.log(eyeSizeStandard);
+    if (eyeSizeStandard) {
+      if (eyeSizeStandard.length > 0) {
+        eyeSizeStandard.forEach((prediction) => {
+          const keypoints = prediction.scaledMesh;
+          leftEyeSize = distancePoints(keypoints[386], keypoints[374]);
+          rightEyeSize = distancePoints(keypoints[159], keypoints[144]);
+          // console.log(leftEyeSize, rightEyeSize);
+        });
+      }
+      while (1) {
+        // console.log(leftEyeSize, rightEyeSize);
+        if (leftEyeSize <= 4 || rightEyeSize <= 4) {
+          ipcRenderer.send("INSERT_MESSAGE", {
+            content: "eye-size-check-fail",
+            type: "warning",
+          });
+          console.log("다시");
+          sleep(3000);
+          eyeSizeStandardAgain = await eyeblinkModel.estimateFaces({
+            input: videoEl,
+          });
+          // console.log(eyeSizeStandardAgain);
+          if (eyeSizeStandardAgain.length > 0) {
+            eyeSizeStandardAgain.forEach((prediction) => {
+              const keypoints = prediction.scaledMesh;
+              leftEyeSize = distancePoints(keypoints[386], keypoints[374]);
+              rightEyeSize = distancePoints(keypoints[159], keypoints[144]);
+              console.log(leftEyeSize, rightEyeSize);
+            });
+          }
+        } else {
+          ipcRenderer.send("INSERT_MESSAGE", {
+            content: "eye-size-check-complete",
+            type: "normal",
+          });
+          ipcRenderer.send("SET_EYESIZE_DISTANCE", {
+            leftEyeSize: leftEyeSize,
+            rightEyeSize: rightEyeSize,
+          });
+          break;
+        }
+      }
+    } else {
+      ipcRenderer.send("INSERT_MESSAGE", {
+        content: "no-face",
+        type: "warning",
+      });
+    }
+  }, 5000);
+}
+async function eyeblink() {
+  if (eyeblinkModel && isEyeblinkWarningOn && leftEyeSize && rightEyeSize) {
+    predictions = await eyeblinkModel.estimateFaces({
+      input: videoEl,
+    });
+    // console.log(second);
     // console.log(predictions);
     if (predictions.length > 0) {
       predictions.forEach((prediction) => {
         const keypoints = prediction.scaledMesh;
         leftEyelid = distancePoints(keypoints[386], keypoints[374]);
         rightEyelid = distancePoints(keypoints[159], keypoints[144]);
-
         // console.log(leftEyelid, rightEyelid);
-        if (leftEyelid <= leftEyeSize / 3 && rightEyelid <= rightEyeSize / 3) {
-          // console.log(leftEyelid, rightEyelid);
-          // console.log(leftEyeSize);
+        if (leftEyelid <= leftEyeSize / 2 && rightEyelid <= rightEyeSize / 2) {
+          // clearInterval(timer);
+          clearInterval(eyeblinkWarning);
+          // console.log(second);
+          // second = 0;
           // console.log("closed");
-          console.log(second);
-          if (second >= 7) generateEyeblinkWarning();
-          clearInterval(timer);
-          second = 0;
           startTimer();
         }
       });
