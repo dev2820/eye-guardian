@@ -194,7 +194,7 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
         devTools: false,
       },
-      // fullscreen: true,
+      fullscreen: true,
       frame: false,
       transparent: true,
       alwaysOnTop: true,
@@ -252,8 +252,7 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
       useContentSize: true,
-      // show:false
-      show:true
+      show:false
     },
     false
   );
