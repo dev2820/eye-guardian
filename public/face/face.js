@@ -266,7 +266,7 @@ async function measureEyeSize() {
 }
 async function eyeblink() {
   //고개 돌렸을 때 로직 추가해야함
-  predictions = await eyeblinkModel.estimateFaces({input: videoEl});
+  predictions = await eyeblinkModel.estimateFaces({ input: videoEl });
   if (eyeblinkModel && isEyeblinkWarningOn && eyeSize) {
     // console.log(predictions);
     // if (predictions) {
@@ -280,7 +280,7 @@ async function eyeblink() {
         if (rightEyeLength < (rightEyeXSize / 3) * 2) {
           //얼굴 오른쪽으로 돌릴 때
           // console.log("얼굴 오른쪽으로 돌림");
-          if (rightEyelid < (rightEyeYSize / 3) * 2) {
+          if (rightEyelid < (rightEyeYSize / 5) * 3) {
             clearInterval(eyeblinkWarning);
             console.log("closed");
             startEyeblinkWarning();
@@ -288,7 +288,7 @@ async function eyeblink() {
         } else if (leftEyeLength < (leftEyeXSize / 3) * 2) {
           //얼굴 왼쪽으로 돌릴 때
           // console.log("얼굴 왼쪽으로 돌림");
-          if (leftEyelid < (leftEyeYSize / 3) * 2) {
+          if (leftEyelid < (leftEyeYSize / 5) * 3) {
             clearInterval(eyeblinkWarning);
             console.log("closed");
             startEyeblinkWarning();
@@ -298,7 +298,7 @@ async function eyeblink() {
           if (
             // leftEyelid < (leftEyeYSize / 3) * 2 &&
             rightEyelid <
-            (rightEyeYSize / 3) * 2
+            (rightEyeYSize / 5) * 3
           ) {
             clearInterval(eyeblinkWarning);
             console.log("closed");
@@ -309,6 +309,8 @@ async function eyeblink() {
     } else if (predictions.length == 0) {
       clearInterval(eyeblinkWarning);
     }
+  } else if (isEyeblinkWarningOn == false) {
+    clearInterval(eyeblinkWarning);
   }
   setTimeout(eyeblink, 80);
 }
@@ -336,11 +338,10 @@ async function bright() {
 
   if (isBrightWarningOn && 0 < brightness && brightness < 25) {
     if (brightFlag) {
-        generateBrightWarning();
-        brightFlag = false;
+      generateBrightWarning();
+      brightFlag = false;
     }
-  } else 
-        brightFlag = true;
+  } else brightFlag = true;
 
   if (isAutoDarknessControlOn) {
     if (brightness in brightInterval) {
@@ -380,11 +381,12 @@ async function stare() {
   setTimeout(stare, 1000); // 1초에 한번 감지
 }
 
+const calcdistance = (a,b) => Math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2)
 async function screenDistance() {
   if (isDistanceWarningOn) {
     if (faceLength !== 0 && predictions && predictions.length > 0) {
       const keypoints = predictions[0].scaledMesh;
-      if ((faceLength * 3) / 2 < keypoints[174][0] - keypoints[145][0])
+      if ((faceLength * 3) / 2 < calcdistance(keypoints[174], keypoints[145]))
         generateDistanceWarning();
     }
   }
