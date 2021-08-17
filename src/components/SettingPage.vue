@@ -230,7 +230,7 @@ export default {
                 this.standardPosStatus = 'complete';
                 this.standardPosMessage = '정자세 기준값이 설정되어 있습니다.'
             }
-            if(payload.faceProcess.leftEyeSize<=0&&payload.faceProcess.rightEyeSize<=0) {
+            if(payload.faceProcess.eyeSize<=0) {
                 this.standardEyeStatus = 'failed';
                 this.standardEyeMessage = '감은 눈 기준값이 설정되어있지 않습니다. 설정버튼을 눌러 기준값 설정을 완료해주세요.'
             }
