@@ -390,7 +390,7 @@ main#setting-page * {
 #setting-page #main-image #shadow {
     fill:rgba(0,0,0,0.5);
     position:absolute;
-    top:450px;
+    top:70%;
     left:50%;
     width:200px;
     margin-left:-100px;
