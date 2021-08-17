@@ -266,7 +266,7 @@ async function measureEyeSize() {
 }
 async function eyeblink() {
   //고개 돌렸을 때 로직 추가해야함
-  predictions = await eyeblinkModel.estimateFaces({input: videoEl});
+  predictions = await eyeblinkModel.estimateFaces({ input: videoEl });
   if (eyeblinkModel && isEyeblinkWarningOn && eyeSize) {
     // console.log(predictions);
     // if (predictions) {
@@ -277,7 +277,7 @@ async function eyeblink() {
         leftEyelid = distanceYPoints(keypoints[159], keypoints[144]);
         rightEyeLength = distanceXPoints(keypoints[226], keypoints[244]);
         leftEyeLength = distanceXPoints(keypoints[446], keypoints[464]);
-        if (rightEyeLength < (rightEyeXSize / 5) * 3) {
+        if (rightEyeLength < (rightEyeXSize / 3) * 2) {
           //얼굴 오른쪽으로 돌릴 때
           // console.log("얼굴 오른쪽으로 돌림");
           if (rightEyelid < (rightEyeYSize / 5) * 3) {
@@ -285,10 +285,10 @@ async function eyeblink() {
             console.log("closed");
             startEyeblinkWarning();
           }
-        } else if (leftEyeLength < (leftEyeXSize / 5) * 3) {
+        } else if (leftEyeLength < (leftEyeXSize / 3) * 2) {
           //얼굴 왼쪽으로 돌릴 때
           // console.log("얼굴 왼쪽으로 돌림");
-          if (leftEyelid < (leftEyeYSize / 3) * 2) {
+          if (leftEyelid < (leftEyeYSize / 5) * 3) {
             clearInterval(eyeblinkWarning);
             console.log("closed");
             startEyeblinkWarning();
@@ -338,11 +338,10 @@ async function bright() {
 
   if (isBrightWarningOn && 0 < brightness && brightness < 25) {
     if (brightFlag) {
-        generateBrightWarning();
-        brightFlag = false;
+      generateBrightWarning();
+      brightFlag = false;
     }
-  } else 
-        brightFlag = true;
+  } else brightFlag = true;
 
   if (isAutoDarknessControlOn) {
     if (brightness in brightInterval) {
