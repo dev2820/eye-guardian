@@ -19,11 +19,6 @@ export const router = createRouter({
             component: require('@/components/WarningMessage').default
         },
         {
-            path: '/faceProcess',
-            name: 'face-process',
-            component: require('@/components/FaceProcess').default
-        },
-        {
             path: '/stretchGuideScreen',
             name: 'stretch-guide-screen',
             component: require('@/components/StretchGuideScreen').default

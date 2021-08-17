@@ -206,8 +206,8 @@ app.on("ready", async () => {
   warningMessageWindow.setIgnoreMouseEvents(true);
   warningMessageWindow.setAlwaysOnTop(true, "normal");
   screenFilterWindow = createWindow(
-    "/#/screenFilter",
-    "index.html#screenFilter",
+    "filter/index.html",
+    "filter/index.html",
     {
       webPreferences: {
         nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
@@ -227,8 +227,8 @@ app.on("ready", async () => {
   screenFilterWindow.setAlwaysOnTop(true, "normal");
 
   stretchGuideWindow = createWindow(
-    "/#/stretchGuideScreen",
-    "index.html#stretchGuideScreen",
+    "stretch/index.html",
+    "stretch/index.html",
     {
       webPreferences: {
         nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,

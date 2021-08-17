@@ -275,7 +275,7 @@ async function stare() {
         if (pose) 
             stareCount++;
     }
-    if (stareCount % 3600 == 0 && stareCount !== 0) {
+    if (stareCount % 60 == 0 && stareCount !== 0) {
         stareCount = stareCount>=7200 ? (stareCount-3600) : stareCount;
         if(isStretchGuideOn)
             ipcRenderer.send('SHOW_STRETCH_GUIDE');
