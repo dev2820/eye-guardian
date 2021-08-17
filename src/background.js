@@ -253,7 +253,6 @@ app.on("ready", async () => {
       },
       useContentSize: true,
       // show:false
-      show:true
     },
     false
   );

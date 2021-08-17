@@ -277,15 +277,15 @@ async function eyeblink() {
         leftEyelid = distanceYPoints(keypoints[159], keypoints[144]);
         rightEyeLength = distanceXPoints(keypoints[226], keypoints[244]);
         leftEyeLength = distanceXPoints(keypoints[446], keypoints[464]);
-        if (rightEyeLength < (rightEyeXSize / 3) * 2) {
+        if (rightEyeLength < (rightEyeXSize / 5) * 3) {
           //얼굴 오른쪽으로 돌릴 때
           // console.log("얼굴 오른쪽으로 돌림");
-          if (rightEyelid < (rightEyeYSize / 3) * 2) {
+          if (rightEyelid < (rightEyeYSize / 5) * 3) {
             clearInterval(eyeblinkWarning);
             console.log("closed");
             startEyeblinkWarning();
           }
-        } else if (leftEyeLength < (leftEyeXSize / 3) * 2) {
+        } else if (leftEyeLength < (leftEyeXSize / 5) * 3) {
           //얼굴 왼쪽으로 돌릴 때
           // console.log("얼굴 왼쪽으로 돌림");
           if (leftEyelid < (leftEyeYSize / 3) * 2) {
@@ -298,7 +298,7 @@ async function eyeblink() {
           if (
             // leftEyelid < (leftEyeYSize / 3) * 2 &&
             rightEyelid <
-            (rightEyeYSize / 3) * 2
+            (rightEyeYSize / 5) * 3
           ) {
             clearInterval(eyeblinkWarning);
             console.log("closed");
@@ -309,6 +309,8 @@ async function eyeblink() {
     } else if (predictions.length == 0) {
       clearInterval(eyeblinkWarning);
     }
+  } else if (isEyeblinkWarningOn == false) {
+    clearInterval(eyeblinkWarning);
   }
   setTimeout(eyeblink, 80);
 }
