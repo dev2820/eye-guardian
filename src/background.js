@@ -252,7 +252,8 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
       useContentSize: true,
-      show:false
+      // show:false
+      show:true
     },
     false
   );
@@ -402,7 +403,7 @@ ipcMain.on("SET_STRETCH_GUIDE", (evt, payload) => {
 });
 ipcMain.on("SET_BRIGHT_WARNING", (evt, payload) => {
   setting.faceProcess.isBrightWarningOn = payload;
-  faceProcessWindow.send("SET_BRIGHT_WARNING");
+  faceProcessWindow.send("SET_BRIGHT_WARNING", payload);
 });
 // minimize, maximize, close
 ipcMain.on("MINIMIZE", (evt, payload) => {

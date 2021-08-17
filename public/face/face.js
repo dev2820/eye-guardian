@@ -249,10 +249,13 @@ async function measureEyeSize() {
   }, 5000);
 }
 async function eyeblink() {
-  if (eyeblinkModel && isEyeblinkWarningOn && leftEyeSize && rightEyeSize) {
     predictions = await eyeblinkModel.estimateFaces({
-      input: videoEl,
+        input: videoEl,
     });
+  if (eyeblinkModel && isEyeblinkWarningOn && leftEyeSize && rightEyeSize) {
+    // predictions = await eyeblinkModel.estimateFaces({
+    //   input: videoEl,
+    // });
     if (predictions.length > 0) {
       predictions.forEach((prediction) => {
         const keypoints = prediction.scaledMesh;
@@ -292,21 +295,12 @@ async function bright() {
   const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
   if (isBrightWarningOn && 0 < brightness && brightness < 25) {
-    if (brightFlag) {
-      generateBrightWarning();
-    }
-    if (isAutoDarknessControlOn) brightFlag = false;
-  } else brightFlag = true;
-
-    if (isBrightWarningOn && 0 < brightness && brightness < 25){
-      if(brightFlag)
+    if (brightFlag) 
         generateBrightWarning();
-      
-      if(isAutoDarknessControlOn)
+    if (isAutoDarknessControlOn) 
         brightFlag = false;
-    }
-    else
-      brightFlag = true;
+  } else 
+        brightFlag = true;
 
     if(isAutoDarknessControlOn){
         if(brightness in brightInterval){
