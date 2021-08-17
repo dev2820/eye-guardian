@@ -1,8 +1,5 @@
 {
-  "screenFilter": {
-    "isBlueLightFilterOn": false,
-    "blueLightFigure": 0.08
-  },
+  "screenFilter": { "isBlueLightFilterOn": false, "blueLightFigure": 0.08 },
   "warningMessage": {
     "mode": "regular-top",
     "isPlaySound": true,
@@ -10,12 +7,13 @@
   },
   "faceProcess": {
     "faceLength": 0,
-    "faceHeight": 0,
     "isAutoDarknessControlOn": false,
     "isDistanceWarningOn": true,
     "isEyeblinkWarningOn": true,
     "isStareWarningOn": false,
-    "isBrightWarningOn":false
+    "isBrightWarningOn": false,
+    "leftEyeSize": 0,
+    "rightEyeSize": 0
   },
   "stretchGuideScreen": { "isStretchGuideOn": true }
 }
