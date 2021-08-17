@@ -104,7 +104,7 @@
                     <div class="title">
                         <span>
                             장시간 화면 사용 경고
-                            <font-awesome-icon icon="question-circle" class="icon question" title="1시간 이상 화면에 집중했다면 10~20분 정도 휴식하며 눈의 피로를 풀어주는 것이 좋습니다. 눈 운동은 눈의 피로를 푸는데 도움이 됩니다."/>
+                            <font-awesome-icon icon="question-circle" class="icon question" title="1시간 이상 화면에 집중했다면 5~10분 정도 휴식하며 눈의 피로를 풀어주는 것이 좋습니다. 눈 운동은 눈의 피로를 푸는데 도움이 됩니다."/>
                         </span>
                         <toggle @on="setStareWarning(true)" @off="setStareWarning(false)" :checked="isStareWarningOn"></toggle>
                     </div>
@@ -390,7 +390,7 @@ main#setting-page * {
 #setting-page #main-image #shadow {
     fill:rgba(0,0,0,0.5);
     position:absolute;
-    top:450px;
+    top:70%;
     left:50%;
     width:200px;
     margin-left:-100px;
