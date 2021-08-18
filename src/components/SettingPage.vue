@@ -61,7 +61,7 @@
                     </div>
                     <div class="setting-option standard-eyesize-setting">
                         <span class="explanation">
-                            눈 크기 측정하기
+                            눈 모양 기준값 측정하기
                             <font-awesome-icon icon="question-circle" class="icon" title="눈을 감았는지 여부를 판정하는 기준값을 설정합니다."/>
                         </span>
                         <custom-button class="button" @click="setStandardEye()">
@@ -232,11 +232,11 @@ export default {
             }
             if(payload.faceProcess.rightEyeYSize<=0) {
                 this.standardEyeStatus = 'failed';
-                this.standardEyeMessage = '안구위상값이 설정되어있지 않습니다. 설정버튼을 눌러 기준값 설정을 완료해주세요.'
+                this.standardEyeMessage = '눈 모양 기준값이 설정되어있지 않습니다. 설정버튼을 눌러 기준값 설정을 완료해주세요.'
             }
             else {
                 this.standardEyeStatus = 'complete';
-                this.standardEyeMessage = '안구위상값이 설정되어 있습니다.'
+                this.standardEyeMessage = '눈 모양 기준값이 설정되어 있습니다.'
             }
         })
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
