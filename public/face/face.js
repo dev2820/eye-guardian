@@ -352,7 +352,7 @@ async function bright() {
   const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
   const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
-  if (isBrightWarningOn && 0 < brightness && brightness < 40) {
+  if (isBrightWarningOn && 0 < brightness && brightness < 30) {
     if (brightFlag) {
       generateBrightWarning();
       brightFlag = false;
