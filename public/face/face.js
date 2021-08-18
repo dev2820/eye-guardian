@@ -174,7 +174,7 @@ function generateDistanceWarning() {
 async function saveDistance() {
   if (predictions && predictions.length > 0) {
     const keypoints = predictions[0].scaledMesh;
-    faceLength = calciDstance(keypoints[174], keypoints[145]);
+    faceLength = calciDistance(keypoints[174], keypoints[145]);
     ipcRenderer.send("INSERT_MESSAGE", {
       content: "capture-face",
       type: "normal",
