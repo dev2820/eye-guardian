@@ -14,7 +14,7 @@ let eyeblinkWarning;
 let darkness = 0;
 let brighttimer;
 let brightFlag = true;
-let distanceCount=0;
+let distanceCount = 0;
 
 let eyeSize = 0;
 let leftEyeYSize = 0;
@@ -181,7 +181,7 @@ async function saveDistance() {
     });
     ipcRenderer.send("SET_FACE_DISTANCE", faceLength);
   } else {
-    ipcRenderer.send("NO_FACE",'face-distance');
+    ipcRenderer.send("NO_FACE", "face-distance");
     ipcRenderer.send("INSERT_MESSAGE", { content: "no-face", type: "warning" });
   }
 }
@@ -253,13 +253,16 @@ async function measureEyeSize() {
             type: "normal",
           });
           ipcRenderer.send("SET_EYESIZE_DISTANCE", {
-            eyeSize: eyeSize,
+            leftEyeXSize: leftEyeXSize,
+            leftEyeYSize: leftEyeYSize,
+            rightEyeXSize: rightEyeXSize,
+            rightEyeYSize: rightEyeYSize,
           });
           break;
         }
       }
     } else {
-      ipcRenderer.send("NO_FACE",'measure_eye');
+      ipcRenderer.send("NO_FACE", "measure_eye");
       ipcRenderer.send("INSERT_MESSAGE", {
         content: "no-face",
         type: "warning",
@@ -384,18 +387,16 @@ async function stare() {
   setTimeout(stare, 1000); // 1초에 한번 감지
 }
 
-const calcdistance = (a,b) => Math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2)
+const calcdistance = (a, b) =>
+  Math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2);
 async function screenDistance() {
   if (isDistanceWarningOn) {
     if (faceLength !== 0 && predictions && predictions.length > 0) {
       const keypoints = predictions[0].scaledMesh;
       if ((faceLength * 3) / 2 < calcdistance(keypoints[174], keypoints[145]))
         distanceCount++;
-    }
-    else
-        distanceCount=0;
-    if(distanceCount > 2)
-        generateDistanceWarning();
+    } else distanceCount = 0;
+    if (distanceCount > 2) generateDistanceWarning();
   }
   setTimeout(screenDistance, 5 * 1000); //5초에 한번 얼굴 감지
 }

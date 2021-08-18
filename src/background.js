@@ -252,7 +252,7 @@ app.on("ready", async () => {
         contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
       },
       useContentSize: true,
-      show:false
+      show: false,
     },
     false
   );
@@ -331,11 +331,14 @@ ipcMain.on("SET_FACE_DISTANCE", (evt, payload) => {
   setting.faceProcess.faceLength = payload;
   settingWindow.send("SET_FACE_DISTANCE_SUCCESS", true);
 });
-ipcMain.on("NO_FACE",(evt,payload)=>{
+ipcMain.on("NO_FACE", (evt, payload) => {
   settingWindow.send("NO_FACE", payload);
-})
+});
 ipcMain.on("SET_EYESIZE_DISTANCE", (evt, payload) => {
-  setting.faceProcess.eyeSize = payload.eyeSize;
+  setting.faceProcess.leftEyeXSize = payload.leftEyeXSize;
+  setting.faceProcess.leftEyeYSize = payload.leftEyeYSize;
+  setting.faceProcess.rightEyeXSize = payload.rightEyeXSize;
+  setting.faceProcess.rightEyeYSize = payload.rightEyeYSize;
   settingWindow.send("SET_EYESIZE_DISTANCE_SUCCESS", true);
 });
 //카메라 감지 성공 여부
