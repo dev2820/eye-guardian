@@ -42,10 +42,10 @@
                     <span class="explanation">경고음 출력</span>
                     <div class="control-volume">
                         <span class="icon">
-                            <font-awesome-icon v-if="warningVolume>0" icon="volume-up"/>
-                            <font-awesome-icon v-else icon="volume-mute"/>
+                            <font-awesome-icon v-if="warningVolume>0" icon="volume-up" @click="setWarningVolume(0)"/>
+                            <font-awesome-icon v-else icon="volume-mute" @click="setWarningVolume(1)"/>
                         </span>
-                        <custom-input-range :value="warningVolume" @change="setWarningVolume($event)" :min="0" :max="1" :step="0.01"/>
+                        <!-- <custom-input-range :value="warningVolume" @change="setWarningVolume($event)" :min="0" :max="1" :step="0.01"/> -->
                     </div>
                 </div>
                 <div class="setting-option-bundle">
@@ -341,8 +341,8 @@ export default {
             this.isStretchGuideOn = boolean;
             ipc.send('SET_STRETCH_GUIDE',boolean);
         },
-        setWarningVolume(e) {
-            this.warningVolume = parseFloat(e.target.value);
+        setWarningVolume(value) {
+            this.warningVolume = parseFloat(value);
             ipc.send('SET_WARNING_VOLUME',this.warningVolume);
         },
         minimizeWindow() {
