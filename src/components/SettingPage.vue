@@ -278,13 +278,6 @@ export default {
                 this.standardPosSetStatus = 'complete';
             }
         })
-        ipc.on('RUN_TIMER',()=>{
-            this.timer=5;
-            setTimeout(()=>this.timer--,1*1000);
-            setTimeout(()=>this.timer--,2*1000);
-            setTimeout(()=>this.timer--,3*1000);
-            setTimeout(()=>this.timer--,4*1000);
-        })
     },
     methods: {
         showBlueLightFilter(boolean){
