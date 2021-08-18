@@ -1,18 +1,1 @@
-{
-  "screenFilter": { "isBlueLightFilterOn": false, "blueLightFigure": 0.08 },
-  "warningMessage": {
-    "mode": "regular-top",
-    "isPlaySound": true,
-    "warningVolume": 0.5
-  },
-  "faceProcess": {
-    "faceLength": 0,
-    "isAutoDarknessControlOn": false,
-    "isDistanceWarningOn": true,
-    "isEyeblinkWarningOn": true,
-    "isStareWarningOn": false,
-    "isBrightWarningOn": false,
-    "eyeSize": 0
-  },
-  "stretchGuideScreen": { "isStretchGuideOn": true }
-}
+{"screenFilter":{"isBlueLightFilterOn":false,"blueLightFigure":0.08,"darkness":0},"warningMessage":{"mode":"mini","isPlaySound":true,"warningVolume":0.5},"faceProcess":{"faceLength":25.24824366249727,"isAutoDarknessControlOn":false,"isDistanceWarningOn":true,"isEyeblinkWarningOn":false,"isStareWarningOn":true,"isBrightWarningOn":true,"eyeSize":1},"stretchGuideScreen":{"isStretchGuideOn":false}}
