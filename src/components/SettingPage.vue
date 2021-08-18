@@ -268,7 +268,7 @@ export default {
         ipc.on('SET_EYESIZE_DISTANCE_SUCCESS',()=>{
             this.standardEyeStatus = 'complete';
             this.standardEyeSetStatus = 'complete'
-            this.standardEyeMessage = '감은 눈 기준값이 설정되어 있습니다.'
+            this.standardEyeMessage = '안구위상값이 설정되어 있습니다.'
         })
         ipc.on('NO_FACE',(evt,payload)=>{
             if(payload==='measure_eye') {
