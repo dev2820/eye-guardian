@@ -11,7 +11,7 @@ export const router = createRouter({
         {
             path: '/warningMessage',
             name: 'warning-message',
-            component: require('@/components/WarningMessage').default
+            component: ()=> import('../components/WarningMessage')
         },
         {
             path: "/:catchAll(.*)",
