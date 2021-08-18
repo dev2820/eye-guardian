@@ -172,6 +172,15 @@ function generateDistanceWarning() {
 }
 
 async function saveDistance() {
+  let predictions;
+  if(eyeblinkModel){
+    predictions = await eyeblinkModel.estimateFaces({
+      input: videoEl,
+    });
+  }
+  else {
+    return;
+  }
   if (predictions && predictions.length > 0) {
     const keypoints = predictions[0].scaledMesh;
     faceLength = calcDistance(keypoints[174], keypoints[145]);
