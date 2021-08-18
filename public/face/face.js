@@ -232,7 +232,7 @@ async function measureEyeSize() {
             content: "eye-size-check-fail",
             type: "warning",
           });
-          console.log("다시");
+          // console.log("다시");
           sleep(3000);
           eyeSizeStandardAgain = await eyeblinkModel.estimateFaces({
             input: videoEl,
@@ -296,7 +296,7 @@ async function eyeblink() {
           // console.log("얼굴 왼쪽으로 돌림");
           if (leftEyelid < (leftEyeYSize / 5) * 3) {
             clearInterval(eyeblinkWarning);
-            console.log("closed");
+            // console.log("closed");
             startEyeblinkWarning();
           }
         } else {
@@ -307,7 +307,7 @@ async function eyeblink() {
             (rightEyeYSize / 5) * 3
           ) {
             clearInterval(eyeblinkWarning);
-            console.log("closed");
+            // console.log("closed");
             startEyeblinkWarning();
           }
         }
@@ -366,7 +366,7 @@ async function stare() {
   if (isStareWarningOn) {
     if (predictions && predictions.length > 0) {
       const keypoints = predictions[0].scaledMesh;
-      console.log(keypoints[19][0], keypoints[280][0], keypoints[123][0]);
+      // console.log(keypoints[19][0], keypoints[280][0], keypoints[123][0]);
       if (
         keypoints[19][0] > keypoints[280][0] - 10 ||
         keypoints[19][0] < keypoints[123][0] + 10
@@ -377,7 +377,7 @@ async function stare() {
         notStareCount = 0;
       }
     } else ++notStareCount;
-    console.log("starecount", stareCount, notStareCount);
+    // console.log("starecount", stareCount, notStareCount);
   }
   if (stareCount % 3600 == 0) {
     if (isStretchGuideOn) ipcRenderer.send("SHOW_STRETCH_GUIDE");
