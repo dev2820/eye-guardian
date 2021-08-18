@@ -1,0 +1,75 @@
+{
+  "name": "eye-guardian",
+  "version": "0.1.0",
+  "private": true,
+  "author": "dev2820 (second28200@gmail.com)",
+  "description": "detect face using your webcam and check your behavior which harm to your eye health",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
+  },
+  "main": "background.js",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-regular-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^3.0.0-3",
+    "@tensorflow-models/face-landmarks-detection": "0.0.1",
+    "@tensorflow-models/posenet": "^2.2.2",
+    "@tensorflow/tfjs": "2.6.0",
+    "@tensorflow/tfjs-backend-cpu": "^3.8.0",
+    "@tensorflow/tfjs-backend-wasm": "2.4.0",
+    "@tensorflow/tfjs-backend-webgl": "2.4.0",
+    "@tensorflow/tfjs-converter": "2.4.0",
+    "@tensorflow/tfjs-core": "^3.8.0",
+    "axios": "^0.21.1",
+    "core-js": "^3.6.5",
+    "face-api.js": "^0.22.2",
+    "stats.js": "^0.17.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "babel-eslint": "^10.1.0",
+    "electron": "^13.0.0",
+    "electron-devtools-installer": "^3.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0",
+    "vue-cli-plugin-electron-builder": "~2.1.1"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "build":{
+    "nsis": {
+      "installerIcon": "dist_electron/icons/icon.ico",
+      "oneClick": true,
+      "createDesktopShortcut": true
+    }
+  }
+}

@@ -39,6 +39,13 @@ module.exports = {
                 linux: {
                     icon: "dist_electron/icons"
                 },
+                build:{
+                    "nsis": {
+                        "installerIcon": "dist_electron/icons/icon.ico",
+                        "oneClick": true,
+                        "createDesktopShortcut": true
+                    }
+                }
             }
         }
     }

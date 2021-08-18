@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #loading-page {
+            position:absolute;
+            display:flex;
+            flex-direction:column;
+            width:250px;
+            height:300px;
+            left:50%;
+            top:50%;
+            margin-left:-125px;
+            margin-top:-150px;
+            border-radius:4px;
+            background-color: #333333;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        }
+        .loading-message {
+            width:70px;
+            margin:20px auto;
+        }
+        .loading-image {
+            margin:50px auto;
+            width:100px;
+            height:100px;
+        }
+    </style>
+</head>
+<body>  
+    <div id="loading-page">
+        <img class="loading-image" src="/images/logo.png"/>
+        <span class="loading-message">loading<small id="dot"></small></span>
+        
+    </div>      
+    <script>
+        let dotEl = document.getElementById('dot');
+        let message='loading',dot='.';
+        const plusDot = ()=>{
+            if(dot.length>2){ dot='.'; }
+            else { dot += '.' }
+            dotEl.innerText = dot;
+            setTimeout(plusDot,200)
+        }
+        setTimeout(plusDot,200)
+    </script>
+</body>
+</html>
