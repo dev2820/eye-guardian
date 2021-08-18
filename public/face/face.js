@@ -59,6 +59,7 @@ ipcRenderer.on("INIT", (evt, payload) => {
   isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
   isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
   isStareWarningOn = payload.faceProcess.isStareWarningOn;
+  isBrightWarningOn = payload.faceProcess.isBrightWarningOn;
   isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
 });
 ipcRenderer.on("ESTIMATE_DISTANCE", () => {
@@ -351,7 +352,7 @@ async function bright() {
   const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
   const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
-  if (isBrightWarningOn && 0 < brightness && brightness < 25) {
+  if (isBrightWarningOn && 0 < brightness && brightness < 40) {
     if (brightFlag) {
       generateBrightWarning();
       brightFlag = false;
