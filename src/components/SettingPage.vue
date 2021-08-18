@@ -211,9 +211,9 @@ export default {
     created(){
         ipc.send('REQUEST_INIT_SCREEN_VALUE','settingPage')
         ipc.on('INIT',(evt,payload)=>{
+            this.messageMode = payload.warningMessage.mode;
             this.warningVolume = payload.warningMessage.warningVolume;
             this.isBlueLightFilterOn = payload.screenFilter.isBlueLightFilterOn;
-            // this.darkness = parseFloat(payload.screenFilter.darkness);
             this.blueLightFigure = parseFloat(payload.screenFilter.blueLightFigure);
             this.isStretchGuideOn = payload.stretchGuideScreen.isStretchGuideOn
             this.isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn
