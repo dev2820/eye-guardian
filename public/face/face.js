@@ -16,7 +16,6 @@ let brighttimer;
 let brightFlag = true;
 let distanceCount = 0;
 
-let eyeSize = 0;
 let leftEyeYSize = 0;
 let rightEyeYSize = 0;
 let leftEyeXSize = 0;
@@ -257,7 +256,6 @@ async function measureEyeSize() {
             });
           }
         } else {
-          eyeSize = 1;
           ipcRenderer.send("INSERT_MESSAGE", {
             content: "eye-size-check-complete",
             type: "normal",
@@ -283,7 +281,7 @@ async function measureEyeSize() {
 async function eyeblink() {
   //고개 돌렸을 때 로직 추가해야함
   predictions = await eyeblinkModel.estimateFaces({ input: videoEl });
-  if (eyeblinkModel && isEyeblinkWarningOn && eyeSize) {
+  if (eyeblinkModel && isEyeblinkWarningOn && leftEyeYSize>0) {
     // console.log(predictions);
     // if (predictions) {
     if (predictions.length > 0) {
@@ -389,7 +387,7 @@ async function stare() {
     } else ++notStareCount;
     // console.log("starecount", stareCount, notStareCount);
   }
-  if (stareCount % 3600 == 0) {
+  if (stareCount % 300 == 0) {
     if (isStretchGuideOn) ipcRenderer.send("SHOW_STRETCH_GUIDE");
     generateStareWarning();
   } else if (notStareCount !== 0 && (notStareCount % 5) * 60 == 0)
