@@ -163,7 +163,7 @@ app.on("ready", async () => {
     "index.html",
     {
       width: 1000,
-      height: 740,
+      height: 750,
       frame: false,
       show: false,
       backgroundColor: "#32353B",
@@ -331,6 +331,9 @@ ipcMain.on("SET_FACE_DISTANCE", (evt, payload) => {
   setting.faceProcess.faceLength = payload;
   settingWindow.send("SET_FACE_DISTANCE_SUCCESS", true);
 });
+ipcMain.on("NO_FACE",(evt,payload)=>{
+  settingWindow.send("NO_FACE", payload);
+})
 ipcMain.on("SET_EYESIZE_DISTANCE", (evt, payload) => {
   setting.faceProcess.eyeSize = payload.eyeSize;
   settingWindow.send("SET_EYESIZE_DISTANCE_SUCCESS", true);

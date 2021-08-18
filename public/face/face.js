@@ -71,7 +71,7 @@ ipcRenderer.on("ESTIMATE_DISTANCE", () => {
 ipcRenderer.on("MEASURE_EYESIZE", () => {
   ipcRenderer.send("INSERT_MESSAGE", {
     content: "eye-size-check",
-    type: "warning",
+    type: "normal",
   });
   setTimeout(measureEyeSize, 5 * 1000);
 });
@@ -181,6 +181,7 @@ async function saveDistance() {
     });
     ipcRenderer.send("SET_FACE_DISTANCE", faceLength);
   } else {
+    ipcRenderer.send("NO_FACE",'face-distance');
     ipcRenderer.send("INSERT_MESSAGE", { content: "no-face", type: "warning" });
   }
 }
@@ -258,6 +259,7 @@ async function measureEyeSize() {
         }
       }
     } else {
+      ipcRenderer.send("NO_FACE",'measure_eye');
       ipcRenderer.send("INSERT_MESSAGE", {
         content: "no-face",
         type: "warning",

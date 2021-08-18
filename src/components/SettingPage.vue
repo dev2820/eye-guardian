@@ -270,6 +270,14 @@ export default {
             this.standardEyeSetStatus = 'complete'
             this.standardEyeMessage = '감은 눈 기준값이 설정되어 있습니다.'
         })
+        ipc.on('NO_FACE',(evt,payload)=>{
+            if(payload==='measure_eye') {
+                this.standardEyeSetStatus = 'complete';
+            }
+            else if(payload==='face-distance'){
+                this.standardPosSetStatus = 'complete';
+            }
+        })
         ipc.on('RUN_TIMER',()=>{
             this.timer=5;
             setTimeout(()=>this.timer--,1*1000);
