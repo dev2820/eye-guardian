@@ -7,6 +7,9 @@ exitButton.addEventListener('click',()=>{
     exitStretch();
     closeStretchGuide();
 },false);
+videoEl.addEventListener('paused',()=>{//플레이가 끝나면
+    closeStretchGuide();
+});
 videoEl.addEventListener('ended',()=>{//플레이가 끝나면
     closeStretchGuide();
 });

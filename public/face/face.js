@@ -146,6 +146,10 @@ function generateBrightWarning() {
 }
 
 function generateStareWarning() {
+  console.log(isStretchGuideOn)
+  if (isStretchGuideOn) {
+    ipcRenderer.send("SHOW_STRETCH_GUIDE");
+  }
   ipcRenderer.send("INSERT_MESSAGE", {
     content: "stare-time",
     type: "warning",
@@ -388,7 +392,6 @@ async function stare() {
     // console.log("starecount", stareCount, notStareCount);
   }
   if (stareCount % 300 == 0) {
-    if (isStretchGuideOn) ipcRenderer.send("SHOW_STRETCH_GUIDE");
     generateStareWarning();
   } else if (notStareCount !== 0 && (notStareCount % 5) * 60 == 0)
     stareCount = 1;
