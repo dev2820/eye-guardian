@@ -14,6 +14,7 @@ let eyeblinkWarning;
 let darkness = 0;
 let brighttimer;
 let brightFlag = true;
+let distanceCount=0;
 
 let eyeSize = 0;
 let leftEyeYSize = 0;
@@ -387,8 +388,12 @@ async function screenDistance() {
     if (faceLength !== 0 && predictions && predictions.length > 0) {
       const keypoints = predictions[0].scaledMesh;
       if ((faceLength * 3) / 2 < calcdistance(keypoints[174], keypoints[145]))
-        generateDistanceWarning();
+        distanceCount++;
     }
+    else
+        distanceCount=0;
+    if(distanceCount > 2)
+        generateDistanceWarning();
   }
   setTimeout(screenDistance, 5 * 1000); //5초에 한번 얼굴 감지
 }
