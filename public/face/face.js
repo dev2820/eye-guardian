@@ -402,7 +402,7 @@ async function screenDistance() {
   if (isDistanceWarningOn) {
     if (faceLength !== 0 && predictions && predictions.length > 0) {
       const keypoints = predictions[0].scaledMesh;
-      if ((faceLength * 3) / 2 < calcDistance(keypoints[174], keypoints[145]))
+      if ((faceLength * 4) / 3 < calcDistance(keypoints[174], keypoints[145]))
         distanceCount++;
       else 
         distanceCount = 0;

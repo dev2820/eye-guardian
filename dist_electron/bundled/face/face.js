@@ -172,9 +172,18 @@ function generateDistanceWarning() {
 }
 
 async function saveDistance() {
+  let predictions;
+  if(eyeblinkModel){
+    predictions = await eyeblinkModel.estimateFaces({
+      input: videoEl,
+    });
+  }
+  else {
+    return;
+  }
   if (predictions && predictions.length > 0) {
     const keypoints = predictions[0].scaledMesh;
-    faceLength = calciDistance(keypoints[174], keypoints[145]);
+    faceLength = calcDistance(keypoints[174], keypoints[145]);
     ipcRenderer.send("INSERT_MESSAGE", {
       content: "capture-face",
       type: "normal",
@@ -393,7 +402,7 @@ async function screenDistance() {
   if (isDistanceWarningOn) {
     if (faceLength !== 0 && predictions && predictions.length > 0) {
       const keypoints = predictions[0].scaledMesh;
-      if ((faceLength * 3) / 2 < calcDistance(keypoints[174], keypoints[145]))
+      if ((faceLength * 4) / 3 < calcDistance(keypoints[174], keypoints[145]))
         distanceCount++;
       else 
         distanceCount = 0;
