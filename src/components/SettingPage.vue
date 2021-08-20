@@ -42,10 +42,10 @@
                     <span class="explanation">경고음 출력</span>
                     <div class="control-volume">
                         <span class="icon">
-                            <font-awesome-icon v-if="warningVolume>0" icon="volume-up"/>
-                            <font-awesome-icon v-else icon="volume-mute"/>
+                            <font-awesome-icon v-if="warningVolume>0" icon="volume-up" @click="setWarningVolume(0)"/>
+                            <font-awesome-icon v-else icon="volume-mute" @click="setWarningVolume(1)"/>
                         </span>
-                        <custom-input-range :value="warningVolume" @change="setWarningVolume($event)" :min="0" :max="1" :step="0.01"/>
+                        <!-- <custom-input-range :value="warningVolume" @change="setWarningVolume($event)" :min="0" :max="1" :step="0.01"/> -->
                     </div>
                 </div>
                 <div class="setting-option-bundle">
@@ -61,7 +61,7 @@
                     </div>
                     <div class="setting-option standard-eyesize-setting">
                         <span class="explanation">
-                            눈 크기 측정하기
+                            눈 모양 기준값 측정하기
                             <font-awesome-icon icon="question-circle" class="icon" title="눈을 감았는지 여부를 판정하는 기준값을 설정합니다."/>
                         </span>
                         <custom-button class="button" @click="setStandardEye()">
@@ -232,11 +232,11 @@ export default {
             }
             if(payload.faceProcess.rightEyeYSize<=0) {
                 this.standardEyeStatus = 'failed';
-                this.standardEyeMessage = '안구위상값이 설정되어있지 않습니다. 설정버튼을 눌러 기준값 설정을 완료해주세요.'
+                this.standardEyeMessage = '눈 모양 기준값이 설정되어있지 않습니다. 설정버튼을 눌러 기준값 설정을 완료해주세요.'
             }
             else {
                 this.standardEyeStatus = 'complete';
-                this.standardEyeMessage = '안구위상값이 설정되어 있습니다.'
+                this.standardEyeMessage = '눈 모양 기준값이 설정되어 있습니다.'
             }
         })
         ipc.on('INSERT_BRIGHT_WARNING',(evt,payload)=>{
@@ -268,7 +268,7 @@ export default {
         ipc.on('SET_EYESIZE_DISTANCE_SUCCESS',()=>{
             this.standardEyeStatus = 'complete';
             this.standardEyeSetStatus = 'complete'
-            this.standardEyeMessage = '감은 눈 기준값이 설정되어 있습니다.'
+            this.standardEyeMessage = '안구위상값이 설정되어 있습니다.'
         })
         ipc.on('NO_FACE',(evt,payload)=>{
             if(payload==='measure_eye') {
@@ -341,8 +341,8 @@ export default {
             this.isStretchGuideOn = boolean;
             ipc.send('SET_STRETCH_GUIDE',boolean);
         },
-        setWarningVolume(e) {
-            this.warningVolume = parseFloat(e.target.value);
+        setWarningVolume(value) {
+            this.warningVolume = parseFloat(value);
             ipc.send('SET_WARNING_VOLUME',this.warningVolume);
         },
         minimizeWindow() {

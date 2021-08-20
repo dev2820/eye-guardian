@@ -403,7 +403,7 @@ ipcMain.on("SET_AUTO_DARKNESS_CONTROL", (evt, payload) => {
 });
 ipcMain.on("SET_STRETCH_GUIDE", (evt, payload) => {
   setting.stretchGuideScreen.isStretchGuideOn = payload;
-  faceProcessWindow.send("SET_STRETCH_GUIDE");
+  faceProcessWindow.send("SET_STRETCH_GUIDE",payload);
 });
 ipcMain.on("SET_BRIGHT_WARNING", (evt, payload) => {
   setting.faceProcess.isBrightWarningOn = payload;
