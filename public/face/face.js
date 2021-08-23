@@ -13,7 +13,7 @@ let notStareCount = 0;
 let eyeblinkWarning;
 let darkness = 0;
 let brighttimer;
-let brightFlag = true;
+let brightCount = 0;
 let distanceCount = 0;
 
 let leftEyeYSize = 0;
@@ -133,14 +133,14 @@ videoEl.addEventListener(
 );
 
 function generateBrightWarning() {
-  if (isAutoDarknessControlOn)
-    ipcRenderer.send("INSERT_MESSAGE", {
-      content: "bright-warning-auto",
-      type: "warning",
-    });
-  else
+  if (!isAutoDarknessControlOn)
     ipcRenderer.send("INSERT_MESSAGE", {
       content: "bright-warning",
+      type: "warning",
+    });
+  else if(brightCount == 0)
+    ipcRenderer.send("INSERT_MESSAGE", {
+      content: "bright-warning-auto",
       type: "warning",
     });
 }
@@ -353,13 +353,11 @@ async function bright() {
   }
   const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
   const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
-
   if (isBrightWarningOn && 0 < brightness && brightness < 30) {
-    if (brightFlag) {
+    if (brightCount % 300 == 0) 
       generateBrightWarning();
-      brightFlag = false;
-    }
-  } else brightFlag = true;
+    brightCount += 5;
+  } else brightFlag = 0;
 
   if (isAutoDarknessControlOn) {
     if (brightness in brightInterval) {
@@ -391,9 +389,9 @@ async function stare() {
     } else ++notStareCount;
     // console.log("starecount", stareCount, notStareCount);
   }
-  if (stareCount % 300 == 0) {
+  if (stareCount % 3600 == 0) {
     generateStareWarning();
-  } else if (notStareCount !== 0 && (notStareCount % 5) * 60 == 0)
+  } else if (notStareCount !== 0 && notStareCount % (5 * 60) == 0)
     stareCount = 1;
   setTimeout(stare, 1000); // 1초에 한번 감지
 }
