@@ -369,7 +369,7 @@ async function bright() {
     } else ipcRenderer.send("SET_DARKNESS", 0);
   }
 
-  brighttimer = setTimeout(bright, 10 * 1000); //60초마다 밝기 테스트하도록 되어있음
+  brighttimer = setTimeout(bright, 5 * 1000); //60초마다 밝기 테스트하도록 되어있음
 }
 
 async function stare() {
