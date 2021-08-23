@@ -357,7 +357,7 @@ async function bright() {
     if (brightCount % 300 == 0) 
       generateBrightWarning();
     brightCount += 5;
-  } else brightFlag = 0;
+  } else brightCount = 0;
 
   if (isAutoDarknessControlOn) {
     if (brightness in brightInterval) {
