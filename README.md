@@ -1,5 +1,6 @@
 # electron-test
 
+나중에 쓸것
 ## Project setup
 ```
 npm install
