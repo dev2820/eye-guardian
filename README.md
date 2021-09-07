@@ -121,11 +121,11 @@ Framework
  https://nklayman.github.io/vue-cli-plugin-electron-builder/
 
 ## 개발자
-@spaff13
+김현호 @spaff13
 
-@Tuna-is-DW
+유동원 @Tuna-is-DW
 
-@dev2820 (second28200@gmail.com)
+양기조 @dev2820 (second28200@gmail.com)
 
 본 프로젝트는 숭실대학교 컴퓨터학부 소프트웨어공모전 출품작이며 더 이상의 업데이트는 없음을 알려드립니다.
 
