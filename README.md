@@ -98,6 +98,10 @@ tensorflow.js/face-landmarks-detection 모델을 이용해 사용자의 얼굴�
 
 위 항목들은 userInterfaceWindow에서 옵션을 통해 끄거나 켤 수 있으며, 꺼져 있을 경우 작동하지 않습니다.
 
+## 사용 환경
+- window10 이상
+- 웹캠이 연결되어 있어야함
+
 ## 개발 환경
 
 Hardware
