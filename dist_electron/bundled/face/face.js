@@ -16,7 +16,6 @@ let brighttimer;
 let brightFlag = true;
 let distanceCount = 0;
 
-let eyeSize = 0;
 let leftEyeYSize = 0;
 let rightEyeYSize = 0;
 let leftEyeXSize = 0;
@@ -59,6 +58,7 @@ ipcRenderer.on("INIT", (evt, payload) => {
   isDistanceWarningOn = payload.faceProcess.isDistanceWarningOn;
   isEyeblinkWarningOn = payload.faceProcess.isEyeblinkWarningOn;
   isStareWarningOn = payload.faceProcess.isStareWarningOn;
+  isBrightWarningOn = payload.faceProcess.isBrightWarningOn;
   isAutoDarknessControlOn = payload.faceProcess.isAutoDarknessControlOn;
 });
 ipcRenderer.on("ESTIMATE_DISTANCE", () => {
@@ -146,6 +146,10 @@ function generateBrightWarning() {
 }
 
 function generateStareWarning() {
+  console.log(isStretchGuideOn)
+  if (isStretchGuideOn) {
+    ipcRenderer.send("SHOW_STRETCH_GUIDE");
+  }
   ipcRenderer.send("INSERT_MESSAGE", {
     content: "stare-time",
     type: "warning",
@@ -172,9 +176,18 @@ function generateDistanceWarning() {
 }
 
 async function saveDistance() {
+  let predictions;
+  if(eyeblinkModel){
+    predictions = await eyeblinkModel.estimateFaces({
+      input: videoEl,
+    });
+  }
+  else {
+    return;
+  }
   if (predictions && predictions.length > 0) {
     const keypoints = predictions[0].scaledMesh;
-    faceLength = calciDistance(keypoints[174], keypoints[145]);
+    faceLength = calcDistance(keypoints[174], keypoints[145]);
     ipcRenderer.send("INSERT_MESSAGE", {
       content: "capture-face",
       type: "normal",
@@ -247,7 +260,6 @@ async function measureEyeSize() {
             });
           }
         } else {
-          eyeSize = 1;
           ipcRenderer.send("INSERT_MESSAGE", {
             content: "eye-size-check-complete",
             type: "normal",
@@ -273,7 +285,7 @@ async function measureEyeSize() {
 async function eyeblink() {
   //고개 돌렸을 때 로직 추가해야함
   predictions = await eyeblinkModel.estimateFaces({ input: videoEl });
-  if (eyeblinkModel && isEyeblinkWarningOn && eyeSize) {
+  if (eyeblinkModel && isEyeblinkWarningOn && leftEyeYSize>0) {
     // console.log(predictions);
     // if (predictions) {
     if (predictions.length > 0) {
@@ -342,7 +354,7 @@ async function bright() {
   const colorSum = Math.sqrt(0.299 * r ** 2 + 0.587 * g ** 2 + 0.114 * b ** 2);
   const brightness = Math.floor(colorSum / (cameraWidth * cameraHeight));
 
-  if (isBrightWarningOn && 0 < brightness && brightness < 25) {
+  if (isBrightWarningOn && 0 < brightness && brightness < 30) {
     if (brightFlag) {
       generateBrightWarning();
       brightFlag = false;
@@ -379,8 +391,7 @@ async function stare() {
     } else ++notStareCount;
     // console.log("starecount", stareCount, notStareCount);
   }
-  if (stareCount % 3600 == 0) {
-    if (isStretchGuideOn) ipcRenderer.send("SHOW_STRETCH_GUIDE");
+  if (stareCount % 300 == 0) {
     generateStareWarning();
   } else if (notStareCount !== 0 && (notStareCount % 5) * 60 == 0)
     stareCount = 1;
@@ -393,7 +404,7 @@ async function screenDistance() {
   if (isDistanceWarningOn) {
     if (faceLength !== 0 && predictions && predictions.length > 0) {
       const keypoints = predictions[0].scaledMesh;
-      if ((faceLength * 3) / 2 < calcDistance(keypoints[174], keypoints[145]))
+      if ((faceLength * 4) / 3 < calcDistance(keypoints[174], keypoints[145]))
         distanceCount++;
       else 
         distanceCount = 0;

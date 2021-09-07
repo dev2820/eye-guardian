@@ -1,8 +1,8 @@
 version: 0.1.0
 files:
   - url: eye-guardian-Setup-0.1.0.exe
-    sha512: 1GQAa/jWfjKWfxIZhfqvHCdyrKUCuvh8NhHT3mHLRF38ToJ+b8ccfP+xUn5aSfPjs20449qKwEZ5GyVKvG2EQA==
-    size: 71287478
+    sha512: 71NhelLVMMtfBBMrCP38Ov/vZ6UAj9/+WsRPTm32QZS6djEXdILqg9PNFgVbdL3/mMWYu3q0sG5MC0fiDoKQPA==
+    size: 71289892
 path: eye-guardian-Setup-0.1.0.exe
-sha512: 1GQAa/jWfjKWfxIZhfqvHCdyrKUCuvh8NhHT3mHLRF38ToJ+b8ccfP+xUn5aSfPjs20449qKwEZ5GyVKvG2EQA==
-releaseDate: '2021-08-18T07:11:43.819Z'
+sha512: 71NhelLVMMtfBBMrCP38Ov/vZ6UAj9/+WsRPTm32QZS6djEXdILqg9PNFgVbdL3/mMWYu3q0sG5MC0fiDoKQPA==
+releaseDate: '2021-08-20T11:33:01.962Z'
