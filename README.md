@@ -1,5 +1,6 @@
 # eye-guardian
-
+![main-icon](./readme-images/main-icon.png)
+![main](./readme-images/main1.png)
 ## 빌드하기
 ```bash
 npm run build
@@ -31,16 +32,18 @@ https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection
 ● 주변 밝기가 어두워진 경우 자동으로 화면밝기를 조절하는 옵션을 제공합니다.
 
 ## 시스템 구성도
-
+![시스템 구성도](./readme-images/시스템%20구성도.png)
 ## 구현 기능
 ‘eye-guardian’은 electron desktop framework로 제작된 프로그램으로, main 프로세스 하나와 renderer 프로세스 5개로 구성되어 있습니다. 
 main 프로세스는 각 renderer 프로세스의 생성 및 종료를 담당하고 renderer 프로세스 간의 IPC 통신 허브로 이용됩니다. 즉, renderer 프로세스 간 직접적인 통신이 아닌 main 프로세스를 통한 간접적인 통신을 지원합니다. 
+
+![workflow](./readme-images/workflow.png)
 
 renderer 프로세스는 html파일을 기반으로 생성된 서브 프로세스인데, 각 renderer 프로세스는 하나의 윈도우창을 가지며 필요에 따라 숨기는 것이 가능합니다.  
 프로그램을 실행하면 main 프로세스는 userInterfaceWindow, warning  Window, screenfilterWindow, stretchguideWindow, faceprocessWindow라는 5개의 renderer 프로세스들을 생성합니다. 다음은 각 renderer 프로세스들에 대한 설명입니다.   
 
 ### 1. userInterfaceWindow
-
+![interface](./readme-images/main1.png)
  사용자와 상호작용할 수 있는 GUI창입니다. 
 (1) :  사용자가 프로그램을 정상적으로 이용할 수 있는 환경인지 알려줍니다.
 카메라 연결, 얼굴감지 모델 불러오기, 정자세 측정, 눈 모양 측정이 완료된 경우 모든 서비스를 정상적으로 이용할 수 있습니다. 
@@ -50,15 +53,17 @@ renderer 프로세스는 html파일을 기반으로 생성된 서브 프로세�
 (5) : 각 기능에 대한 경고를 끄거나 켤 수 있습니다. 장시간 화면 사용 경고에 대해서는 경고 발생 시 눈 운동 가이드 영상을 띄우는 옵션을 제공하고, 밝기 경고에 대해서는 경고 발생 시 주변 밝기에 맞추어 자동으로 디스플레이의 밝기를 조절하는 옵션을 제공합니다. 또한 블루라이트 필터를 켰을 때 필터의 세기도 조절할 수 있습니다. 
 
 ### 2. warningWindow
+![warning-position](./readme-images/warning-position.png)
 화면상에 보여지는 경고를 생성합니다. 경고는 메시지 발생 신호를 수신한 경우 메시지를 사용자에게 보여줍니다. 경고는 3초 간 표시된 후 소멸됩니다. 또한 사용자가 경고음 알람 소리를 켠 경우 경고문과 함께 경고음이 발생합니다. userInterfaceWindow를 통해 경고문의 위치를 설정할 수 있으며  regular-top, regular-bottom, mini 3가지 옵션이 있고, 각각 다음의 위치에 경고문을 표시합니다. 
 
 
 ### 3. screenfilterWindow 
-
+![bluelight](./readme-images/bluelight.png)
+![dark-filter](./readme-images/dark-filter.png)
 화면에 블루라이트 필터와 밝기 조절에 사용되는 필터를 생성합니다. 블루라이트 필터는 userInterfaceWindow에서 블루라이트 필터 옵션을 켠 경우 사용할 수 있으며, 필터세기를 조절할 수 있습니다. 밝기 조절 필터는 밝기 경고 옵션과 밝기 자동조절 옵션을 켰을 때 사용됩니다. 밝기 조절 신호를 수신한 경우 필터를 어둡게 만들어 밝기를 조절합니다.   
 
 ### 4. stretchguideWindow
-
+![dark-filter](./readme-images/stretch-guide.png)
 눈 운동 가이드 옵션을 켠 상태로 장시간 화면 사용 경고 신호 수신 시 눈 운동 가이드 영상을 화면에 띄웁니다. 사용자가 가이드 시청을 원하지 않는 경우 종료버튼을 눌러 가이드 영상을 종료할 수 있습니다.
 
 ### 5. faceprocessWindow
@@ -84,11 +89,6 @@ renderer 프로세스는 html파일을 기반으로 생성된 서브 프로세�
 
 tensorflow.js/face-landmarks-detection 모델을 이용해 사용자의 얼굴이 인식되는 시간을 측정합니다. 불필요한 중복 연산을 피하기 위해 눈 깜빡임 감지에서 분석한 값을 재활용합니다.  
 1초 간격으로 사용자의 얼굴을 확인하여 1시간 이상 인식되는 경우 즉, 사용자가 1시간 이상 디스플레이를 사용한 경우 경고 신호를 발생시킵니다. 이 때 눈 운동 가이드 옵션이 켜져 있다면 눈 운동 가이드 실행 신호도 같이 발생시킵니다. 사용자가 자리를 비우거나 고개를 돌려 다른 곳을 바라보는 등 5분 이상 디스플레이를 사용하지 않는 경우 누적 시간이 초기화 됩니다. 화장실을 가거나 휴대폰을 사용하는 등 잠시 디스플레이를 사용하지 않는 경우가 있을 수 있는데, 이때는 사용자가 휴식을 취하고 있다고 판단하기 어렵기 때문에  5분의 유예시간을 두었습니다. 
-
-
-
-
-
 
 #### 4) 디스플레이와 사용자 간의 거리 감지
 
