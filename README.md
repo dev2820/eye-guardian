@@ -1,7 +1,7 @@
 # eye-guardian
 ![main-icon](./readme-images/main-icon.png)
 [마스코트 캐릭터]
-![main](./readme-images/main1.png)
+![main](./readme-images/main.png)
 ## 빌드하기
 ```bash
 npm run build
@@ -44,7 +44,7 @@ renderer 프로세스는 html파일을 기반으로 생성된 서브 프로세�
 프로그램을 실행하면 main 프로세스는 userInterfaceWindow, warning  Window, screenfilterWindow, stretchguideWindow, faceprocessWindow라는 5개의 renderer 프로세스들을 생성합니다. 다음은 각 renderer 프로세스들에 대한 설명입니다.   
 
 ### 1. userInterfaceWindow
-![interface](./readme-images/main1.png)
+![interface](./readme-images/main.png)
  사용자와 상호작용할 수 있는 GUI창입니다. 
 (1) :  사용자가 프로그램을 정상적으로 이용할 수 있는 환경인지 알려줍니다.
 카메라 연결, 얼굴감지 모델 불러오기, 정자세 측정, 눈 모양 측정이 완료된 경우 모든 서비스를 정상적으로 이용할 수 있습니다. 
