@@ -1,5 +1,6 @@
 # eye-guardian
 ![main-icon](./readme-images/main-icon.png)
+[마스코트 캐릭터]
 ![main](./readme-images/main1.png)
 ## 빌드하기
 ```bash
