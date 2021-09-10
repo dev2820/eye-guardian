@@ -17,7 +17,7 @@ npm run build
 -> 7초 이상 눈 깜빡임이 감지되지 않으면 사용자에게 경고합니다.   
 2. 디스플레이와의 거리가 가까울 때   
 -> 사용자의 정자세를 측정하여 정자세 기준 디스플레이와의 거리가 75% 이하가 되면 사용자에게 경고합니다. 
-3. 어두운 환경에서 디스플레이를 사용할 때
+3. 어두운 환경에서 디스플레이를 사용할 때   
 -> 사용자 주변 환경이 특정 기준값보다 어두워지면 사용자에게 경고합니다.
 4. 디스플레이 장시간 사용   
 -> 1시간 이상 컴퓨터 사용 시 사용자에게 경고합니다.
@@ -36,7 +36,7 @@ https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection
 ![시스템 구성도](./readme-images/시스템%20구성도.png)
 ## 구현 기능
 ‘eye-guardian’은 electron desktop framework로 제작된 프로그램으로, main 프로세스 하나와 renderer 프로세스 5개로 구성되어 있습니다. 
-main 프로세스는 각 renderer 프로세스의 생성 및 종료를 담당하고 renderer 프로세스 간의 IPC 통신 허브로 이용됩니다. 즉, renderer 프로세스 간 직접적인 통신이 아닌 main 프로세스를 통한 간접적인 통신을 지원합니다. 
+main 프로세스는 각 renderer 프로세스의 생성 및 종료를 담당하고 renderer 프로세스 간의 IPC 통신 허브로 이용됩니다. 즉, renderer 프로세스 간 직접적인 통신이 아닌 main 프로세스를 통한 **간접적인 통신**을 지원합니다. 
 
 ![workflow](./readme-images/workflow.png)
 
@@ -122,11 +122,11 @@ Framework
  https://nklayman.github.io/vue-cli-plugin-electron-builder/
 
 ## 개발자
-김현호 @spaff13
+김현호 [@spaff13](https://github.com/spaff13)
 
-유동원 @Tuna-is-DW
+유동원 [@Tuna-is-DW](https://github.com/Tuna-is-DW)
 
-양기조 @dev2820 (second28200@gmail.com)
+양기조 [@dev2820](https://github.com/dev2820) (second28200@gmail.com)
 
 본 프로젝트는 숭실대학교 컴퓨터학부 소프트웨어공모전 출품작이며 더 이상의 업데이트는 없음을 알려드립니다.
 
